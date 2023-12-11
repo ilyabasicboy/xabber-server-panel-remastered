@@ -92,3 +92,13 @@ class LDAPServer(models.Model):
 
     def __str__(self):
         return 'LDAP Settings {}'.format(self.server)
+
+
+class RootPage(models.Model):
+    module = models.CharField(
+        max_length=100,
+        default="home"
+    )
+
+    def __str__(self):
+        return self.module

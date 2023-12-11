@@ -1,11 +1,8 @@
 from django.shortcuts import reverse, render
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.core import management
-from django.apps import apps
-from collections import OrderedDict
 from ldap3 import Server, Connection, ALL
 from django.template.utils import get_app_template_dirs
 
@@ -13,7 +10,7 @@ from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.users.models import User
 from xabber_server_panel.utils import host_is_valid, update_ejabberd_config
 
-from .models import LDAPSettings, LDAPServer
+from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
 
 import tarfile
@@ -162,13 +159,17 @@ class ManageAdmins(TemplateView):
 
 class Modules(TemplateView):
 
+    def get(self, request, *args, **kwargs):
+        return HttpResponseNotFound
+
     def post(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
 
         if uploaded_file:
+            temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
+
             try:
                 # Создание временной папки для распаковки
-                temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
                 os.makedirs(temp_extract_dir, exist_ok=True)
 
                 # Распаковка архива во временную папку
@@ -184,23 +185,37 @@ class Modules(TemplateView):
                         module_path = os.path.join(panel_path, module_dir)
                         shutil.copytree(module_path, target_path)
 
-                        # Добавление 'panel' в INSTALLED_APPS
-                        with open(os.path.join(target_path, 'apps.py'), 'a') as apps_file:
-                            apps_file.write("\n\nfrom django.apps import AppConfig\n\n"
-                                            "class PanelConfig(AppConfig):\n"
-                                            f"    name = '{target_path}'\n")
-
                         # Внесение изменений в settings.py
                         settings.INSTALLED_APPS.append(f'{target_path}')
-
+                        print(settings.INSTALLED_APPS)
                     # Удаление временной папки
                     shutil.rmtree(temp_extract_dir)
 
-                    print(HttpResponse("Модуль успешно добавлен и настроен."))
+                    print("Модуль успешно добавлен и настроен.")
             except Exception as e:
                 # Удаление временной папки в случае ошибки
                 shutil.rmtree(temp_extract_dir, ignore_errors=True)
-                print(HttpResponse(f"Ошибка при обработке архива: {str(e)}"))
+                print(f"Ошибка при обработке архива: {str(e)}")
+
+        return HttpResponseRedirect(
+            reverse('config:tabs')
+        )
+
+
+class RootPageView(TemplateView):
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseNotFound
+
+    def post(self, request, *args, **kwargs):
+
+        module = request.POST.get('module', 'home')
+        root_page = RootPage.objects.first()
+        if root_page:
+            root_page.module = module
+            root_page.save()
+        else:
+            RootPage.objects.create(module=module)
 
         return HttpResponseRedirect(
             reverse('config:tabs')

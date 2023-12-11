@@ -1,3 +1,5 @@
+{% load config_tags %}
+
 <div id="modules">
     <table>
         <thead>
@@ -7,7 +9,14 @@
             </tr>
         </thead>
         <tbody>
-
+            {% for module in modules %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {{ module }}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 

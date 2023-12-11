@@ -1,0 +1,27 @@
+<div id="root_page">
+    <div>
+        Root page
+    </div>
+
+    <form action="{% url 'config:root_page' %}" method="post">
+        {% csrf_token %}
+
+        <label>
+            Module
+            <select name="module">
+                <option value="home">
+                    Home page
+                </option>
+                {% for module in modules %}
+                    <option value="{{ module }}">
+                        {{ module }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <button>
+            Save
+        </button>
+    </form>
+</div>

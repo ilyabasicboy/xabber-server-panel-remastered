@@ -1,6 +1,7 @@
 from django import template
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.html import strip_spaces_between_tags
+from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 
 
@@ -50,3 +51,18 @@ def smart_spaceless(parser, token):
     nodelist = parser.parse(('end_smart_spaceless',))
     parser.delete_first_token()
     return SmartSpacelessNode(nodelist)
+
+
+@register.simple_tag
+def get_items_by_model_name(model_name, ordering=None, num=None, **kwargs):
+    """
+    return queryset of every items by model name with filtering
+    example:
+        {% get_items_by_model_name 'door' ordering='-id' num=20 show=True price__gt=6000 as doors %}
+    """
+    items = ContentType.objects.filter(model=model_name).first().get_all_objects_for_this_type().filter(**kwargs)
+    if ordering:
+        items = items.order_by(ordering)
+    if num:
+        items = items[:num]
+    return items

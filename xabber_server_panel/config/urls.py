@@ -8,5 +8,5 @@ urlpatterns = [
     path('host/create/', CreateHost.as_view(), name='host_create'),
     path('admins/manage/', ManageAdmins.as_view(), name='manage_admins'),
     path('modules/', Modules.as_view(), name='modules'),
-    # path('ldap/', LDAPView.as_view(), name='ldap'),
+    path('root_page/', Modules.as_view(), name='root_page'),
 ]
