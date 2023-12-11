@@ -1,0 +1,72 @@
+{% load base_tags %}
+
+<div>
+    Registration:
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="host" value="{{ settings.host.name }}">
+        <select name="status">
+          <option value="disabled">disabled</option>
+          <option value="link" {% if settings.status == 'link' %}selected{% endif %}>link</option>
+          <option value="public" {% if settings.status == 'public' %}selected{% endif %}>public</option>
+        </select>
+
+        <button>
+            Save
+        </button>
+    </form>
+</div>
+
+{% if settings.status == 'link' %}
+    <div>
+        Web client url:
+        <span class="current-url-js">
+            {{ settings.url|default:'' }}
+        </span>
+
+        <a href="{% url 'registration:url' id=settings.id %}">
+            Edit
+        </a>
+    </div>
+
+    {% if keys %}
+        {% paginate keys 1 as paginated_keys %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Key</th>
+                    <th>Expires</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obj in paginated_keys %}
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {{ obj.key }}
+                        </td>
+                        <td>
+                            {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
+                        </td>
+                        <td>
+                            {{ obj.description }}
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'parts/pagination.html' with objects=paginated_keys %}
+    {% endif %}
+
+    <a href="{% url 'registration:create' vhost_id=settings.host.id %}">
+        Add
+    </a>
+{% endif %}

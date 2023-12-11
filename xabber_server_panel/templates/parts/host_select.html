@@ -1,0 +1,7 @@
+<select id="host" name="host" data-url="{{ url }}">
+    {% for host in hosts %}
+        <option value="{{ host.name }}" {% if host.name == curr_host %}selected{% endif %}>
+            {{ host.name }}
+        </option>
+    {% endfor %}
+</select>

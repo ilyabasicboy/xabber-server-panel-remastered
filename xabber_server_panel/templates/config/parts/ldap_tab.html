@@ -1,0 +1,23 @@
+<div id="ldap">
+    <div>
+        LDAP authentication
+    </div>
+    {% url 'config:tabs' as url %}
+    <form method="post">
+        {% csrf_token %}
+        <label>
+            Host
+            <select id="host" name="host" data-url="{{ url }}">
+                {% for host in hosts %}
+                    <option value="{{ host.id }}">
+                        {{ host.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="list-js" data-url="{{ url }}">
+            {% include 'config/parts/ldap_fields.html' %}
+        </div>
+    </form>
+</div>

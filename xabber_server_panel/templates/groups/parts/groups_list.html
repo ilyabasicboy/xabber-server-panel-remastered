@@ -1,0 +1,38 @@
+{% load base_tags users_tags %}
+
+{% if groups %}
+    {% paginate groups 1 as paginated_groups %}
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Chat identifier</th>
+                <th>Owner</th>
+                <th>Members</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in paginated_groups %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {% get_user_by_jid group.owner as user %}
+                        <a {% if user %}href="{% url 'users:detail' id=user.id %}"{% endif %}>
+                            {{ group.owner }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ group.name }}
+                    </td>
+                    <td>
+                        {{ group.size }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'parts/pagination.html' with objects=paginated_groups %}
+{% endif %}

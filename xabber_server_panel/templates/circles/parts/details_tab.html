@@ -1,0 +1,16 @@
+<div id="details">
+    <form action="{% url 'circles:detail' id=circle.id %}" method="POST">
+        {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Name" value="{{ circle.name }}">
+
+        <textarea name="description" cols="30" rows="10">{% if circle.description %}{{ circle.description }}{% endif %}</textarea>
+
+        <button name="save">
+            Save
+        </button>
+        <button name="delete" value="delete">
+            Delete Circle
+        </button>
+    </form>
+</div>

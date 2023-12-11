@@ -1,0 +1,17 @@
+<div id="shared_contacts">
+    <form action="{% url 'circles:detail' id=circle.id %}" method="post">
+        {% csrf_token %}
+
+        {% for contact in circles %}
+            <label>
+                <input type="checkbox" {% if contact.circle in circle.get_subscribes %}checked{% endif %} value="{{ contact.circle }}" name="contacts">
+                {{ contact.circle }}
+                {{ contact.members.count }} members
+            </label>
+        {% endfor %}
+
+        <button>
+            Save
+        </button>
+    </form>
+</div>

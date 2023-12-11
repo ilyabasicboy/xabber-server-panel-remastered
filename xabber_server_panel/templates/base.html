@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static base_tags %}
+{% smart_spaceless %}
+<html lang="en">
+    <head>
+
+        <meta name="theme-color" class="theme-color" content="#fff">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="format-detection" content="telephone=no">
+        <meta charset="utf-8">
+
+        <title>Xabber Server</title>
+
+    </head>
+    {% block body %}
+        <body>
+            <div class="container">
+                <header>
+                    <div>
+                        Create
+                        <a href="{% url 'users:create' %}">
+                            <b>User</b>
+                            <div>
+                                Add new user account. Users can send and
+                                receive messages, create and join group chats,
+                                make audio and video calls.
+                            </div>
+                        </a>
+                        <a href="{% url 'circles:create' %}">
+                            <b>Circle</b>
+                            <div>
+                                Circles are used to manage shared contact
+                                lists, user permissions and resource quotas.
+                            </div>
+                        </a>
+                    </div>
+                    {% if request.user.is_authenticated %}
+                        <div>
+                            {{ request.user.django_user.username|slice:'2' }}
+                            <a href="{# url 'users:detail' id=request.user.django_user.id #}">
+                                {{ request.user.django_user.full_jid }}
+                            </a>
+                            <a href="{% url 'custom_auth:logout' %}">
+                                Logout
+                            </a>
+                        </div>
+                    {% endif %}
+
+                </header>
+                <main>
+                    {% include 'parts/left_menu.html' %}
+                    <div>
+                        {% block title %}{% endblock %}
+                        {% block content %}{% endblock %}
+                    </div>
+                </main>
+
+            </div>
+
+        </body>
+    {% endblock %}
+
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+</html>
+{% end_smart_spaceless %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div>
+            XMPP Server
+            Status:
+            {% if started %}
+                started
+            {% else %}
+                stopped
+            {% endif %}
+        </div>
+
+        <div>
+            <form method="post" action="{% url 'dashboard' %}">
+                {% csrf_token %}
+
+                <button {% if started %}disabled{% endif %} name="start" value="start">
+                    Start server
+                </button>
+                <button {% if not started %}disabled{% endif %} name="restart" value="restart">
+                    Restart server
+                </button>
+                <button {% if not started %}disabled{% endif %} name="stop" value="stop">
+                    Stop server
+                </button>
+            </form>
+        </div>
+
+        <div>
+            Virtual hosts and users
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            Virtual host
+                        </th>
+                        <th>
+                            All users
+                        </th>
+                        <th>
+                            Online users
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for host,users in data.hosts.items %}
+                        <tr>
+                            <td>
+                                {{ forloop.counter }}
+                            </td>
+                            <td>
+                                {{ host }}
+                            </td>
+                            <td>
+                                {{ users }}
+                            </td>
+                            <td>
+                                --
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            {{ data.users }}
+                        </td>
+                        <td>
+                            --
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+
+{% endblock %}

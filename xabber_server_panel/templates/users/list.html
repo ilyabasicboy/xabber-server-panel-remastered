@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% url 'users:list' as url %}
+    <div class="container">
+        <div>
+            <h1>Users</h1>
+            <div>
+                <div>
+                    {{ users.count }} users
+                </div>
+                {% if hosts %}
+                    <div>
+                        {% include 'parts/host_select.html' %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="list-js" data-url="{{ url }}">
+            {% include 'users/parts/user_list.html' %}
+        </div>
+    </div>
+{% endblock %}

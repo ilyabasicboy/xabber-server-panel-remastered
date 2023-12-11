@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% url 'registration:list' as url %}
+    <div class="container">
+        <div>
+            <h1>Registration</h1>
+            {% if hosts %}
+                <div>
+                    {% include 'parts/host_select.html' with curr_host=settings.host.name %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="list-js" data-url="{{ url }}">
+            {% include 'registration/parts/registration_list.html' %}
+        </div>
+    </div>
+{% endblock %}

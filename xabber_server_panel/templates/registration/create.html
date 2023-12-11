@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+        <div>
+            Add registration key for {{ host.name }}
+        </div>
+        <form action="{% url 'registration:create' vhost_id=host.id %}" method="POST">
+            {% csrf_token %}
+            <div>
+              <label>
+                  Expires *
+                  <input type="date" name="expire" placeholder="2022-04-15" required>
+              </label>
+
+              <label>
+                  Description
+                  <input type="text" placeholder="reg key number 1" name="description">
+              </label>
+            </div>
+
+            <button>Save</button>
+        </form>
+  </div>
+{% endblock %}

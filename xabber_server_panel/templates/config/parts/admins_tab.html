@@ -1,0 +1,26 @@
+<div id="admins">
+    {% if admins %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>JID</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admins %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ admin.full_jid }}</td>
+                        <td>{{ admin.nickname|default:admin.username }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <a href="{% url 'config:manage_admins' %}">
+        Manage
+    </a>
+</div>

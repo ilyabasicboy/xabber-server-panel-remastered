@@ -1,0 +1,41 @@
+{% load base_tags %}
+
+{% if circles %}
+    {% paginate circles 5 as paginated_circles %}
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Circle identifier</th>
+                <th>Circle name</th>
+                <th>Members count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for circle in paginated_circles %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        <a href="{% url 'circles:detail' id=circle.id %}">
+                            {{ circle.circle }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ circle.name }}
+                    </td>
+                    <td>
+                        {{ circle.members.count }}
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'parts/pagination.html' with objects=paginated_circles %}
+{% endif %}

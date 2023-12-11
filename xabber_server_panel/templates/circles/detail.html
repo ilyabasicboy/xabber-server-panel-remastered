@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div>
+            <a href="#details">
+                Details
+            </a>
+            <a href="#members">
+                Members
+            </a>
+            <a href="#shared_contacts">
+                Shared contacts
+            </a>
+        </div>
+
+        {% include 'circles/parts/details_tab.html' %}
+        {% include 'circles/parts/members_tab.html' %}
+        {% include 'circles/parts/shared_tab.html' %}
+    </div>
+{% endblock %}

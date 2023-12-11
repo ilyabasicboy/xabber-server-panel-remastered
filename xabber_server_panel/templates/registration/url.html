@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+        <div>
+            Current URL:
+            <span class="current-url-js">
+                {{ settings.url|default:'' }}
+            </span>
+        </div>
+
+        <form action="{% url 'registration:url' id=settings.id %}" method="POST">
+            {% csrf_token %}
+            <div>
+              <label>
+                  Change to
+                  <input type="text" placeholder="https://example.com" name="url" required>
+              </label>
+
+              <label>
+                  <input type="checkbox" name="all">
+                  Set for all domains
+              </label>
+            </div>
+
+            <button>Save</button>
+        </form>
+  </div>
+{% endblock %}

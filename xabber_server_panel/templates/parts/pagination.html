@@ -1,0 +1,27 @@
+{% if objects %}
+  <div class="pagination">
+      <span class="step-links">
+        {% if objects.has_previous %}
+          {% if objects.number > 2 %}
+            <a href="?page=1">1</a>
+            {% if objects.number > 3 %}
+              <span>...</span>
+            {% endif %}
+          {% endif %}
+          <a href="?page={{ objects.previous_page_number }}">{{ objects.previous_page_number }}</a>
+        {% endif %}
+
+        <span class="current">{{ objects.number }}</span>
+
+        {% if objects.has_next %}
+          <a href="?page={{ objects.next_page_number }}">{{ objects.next_page_number }}</a>
+          {% if objects.paginator.num_pages >= objects.next_page_number|add:1 %}
+            {% if objects.next_page_number|add:1 != objects.paginator.num_pages %}
+              <span>...</span>
+            {% endif %}
+            <a href="?page={{ objects.paginator.num_pages }}">{{ objects.paginator.num_pages }}</a>
+          {% endif %}
+        {% endif %}
+      </span>
+  </div>
+{% endif %}
