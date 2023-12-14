@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static base_tags %}
+{% load static base_tags config_tags %}
 {% smart_spaceless %}
 <html lang="en">
     <head>
@@ -13,6 +13,7 @@
 
     </head>
     {% block body %}
+        {% get_external_modules as modules %}
         <body>
             <div class="container">
                 <header>
@@ -36,9 +37,9 @@
                     </div>
                     {% if request.user.is_authenticated %}
                         <div>
-                            {{ request.user.django_user.username|slice:'2' }}
-                            <a href="{# url 'users:detail' id=request.user.django_user.id #}">
-                                {{ request.user.django_user.full_jid }}
+                            {{ request.user.username|slice:'2' }}
+                            <a href="{% url 'users:detail' id=request.user.id %}">
+                                {{ request.user.full_jid }}
                             </a>
                             <a href="{% url 'custom_auth:logout' %}">
                                 Logout

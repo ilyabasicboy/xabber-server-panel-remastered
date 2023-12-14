@@ -50,19 +50,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for host,users in data.hosts.items %}
+                    {% for obj in data.hosts %}
                         <tr>
                             <td>
                                 {{ forloop.counter }}
                             </td>
                             <td>
-                                {{ host }}
+                                {{ obj.host }}
                             </td>
                             <td>
-                                {{ users }}
+                                {{ obj.total|default:'--' }}
                             </td>
                             <td>
-                                --
+                                {{ obj.online|default:'--' }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -72,10 +72,10 @@
                         <td></td>
                         <td></td>
                         <td>
-                            {{ data.users }}
+                            {{ data.total }}
                         </td>
                         <td>
-                            --
+                            {{ data.online|default:'--' }}
                         </td>
                     </tr>
                 </tfoot>

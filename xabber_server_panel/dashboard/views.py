@@ -14,11 +14,26 @@ class DashboardView(TemplateView):
         hosts = VirtualHost.objects.all()
 
         data = {
-            'hosts': {
-                host.name: User.objects.filter(host=host.name).count() for host in hosts
-            },
-            'users': User.objects.all().count()
+            'hosts': [
+                {
+                    'host': host.name,
+                    'total': self.request.user.api.xabber_registered_users_count({"host": host.name}).get('count'),
+                    'online': self.request.user.api.stats_host({"host": host.name}).get('count')
+                }
+                 for host in hosts
+            ],
         }
+
+        total_count = 0
+        online_count = 0
+
+        for entry in data['hosts']:
+            total_count += entry.get('total', 0) or 0
+            online_count += entry.get('online', 0) or 0
+
+        data['total'] = total_count
+        data['online'] = online_count
+
         return data
 
     def get(self, request, *args, **kwargs):
@@ -31,7 +46,7 @@ class DashboardView(TemplateView):
 
     def post(self, request, *args, **kwargs):
 
-        if request.user.django_user.is_admin:
+        if request.user.is_admin:
             start = request.POST.get('start')
             restart = request.POST.get('restart')
             stop = request.POST.get('stop')

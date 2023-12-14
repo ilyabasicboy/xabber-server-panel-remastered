@@ -102,3 +102,18 @@ def host_is_valid(host_name):
     # Define a regular expression for the host format: 'example.com'
     pattern = re.compile(r'^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
     return bool(pattern.match(host_name))
+
+
+def token_to_int(token: str) -> int:
+    return int(''.join([str(ord(char)).rjust(3, '0') for char in token]))
+
+
+def int_to_token(number: int) -> str:
+    hash_token = str(number).rjust((len(str(number)) + 2) // 3 * 3, '0')
+    return ''.join([chr(int(hash_token[i:i+3])) for i in range(0, len(hash_token), 3)])
+
+
+def get_modules():
+    if os.path.isdir(settings.MODULES_DIR):
+        return os.listdir(settings.MODULES_DIR)
+    return

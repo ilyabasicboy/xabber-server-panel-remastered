@@ -1,3 +1,5 @@
+{% load base_tags %}
+{% get_items_by_model_name 'rootpage' num=1 as rp %}
 <div id="root_page">
     <div>
         Root page
@@ -13,7 +15,7 @@
                     Home page
                 </option>
                 {% for module in modules %}
-                    <option value="{{ module }}">
+                    <option value="{{ module }}" {% if rp.0.module == module %}selected{% endif %}>
                         {{ module }}
                     </option>
                 {% endfor %}

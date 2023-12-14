@@ -9,13 +9,14 @@
             {{ user.full_jid }}
 
             <div>
-                Status:
+                Status: {{ user.status }}
                 <select name="status">
-                    <option value="ACTIVE" {% if user.is_active %}checked{% endif %}>
+                    <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
                         Active
                     </option>
-                    <option value="SUSPENDED" {% if user.status == 'SUSPENDED' or user.status == 'EXPIRED' %}checked{% endif %}>Suspended</option>
-                    <option value="BANNED" {% if user.status == 'BANNED' %}checked{% endif %}>Banned</option>
+                    <option value="SUSPENDED" {% if user.status == 'SUSPENDED' %}selected{% endif %}>Suspended</option>
+                    <option value="EXPIRED" {% if user.status == 'EXPIRED' %}selected{% endif %}>Expired</option>
+                    <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
                 </select>
 
                 <textarea name="reason" cols="30" rows="10" placeholder="Reason for blocking"></textarea>

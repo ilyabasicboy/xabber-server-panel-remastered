@@ -142,3 +142,12 @@ INSTALLED_APPS += ['xabber_server_panel.registration']
 
 # ============ CONFIG ===============#
 INSTALLED_APPS += ['xabber_server_panel.config']
+
+
+# external modules
+if os.path.exists(MODULES_DIR):
+    for folder in os.listdir(MODULES_DIR):
+        folder_path = os.path.join(MODULES_DIR, folder)
+        if os.path.isdir(folder_path):
+            app_name = "modules." + folder
+            INSTALLED_APPS += [app_name]

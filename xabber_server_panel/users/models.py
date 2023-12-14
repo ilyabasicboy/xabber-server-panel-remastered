@@ -1,11 +1,15 @@
 from django.db import models
 from django.utils import timezone
 from django.apps import apps
-
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import _get_backends, load_backend
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
+
+from xabber_server_panel.utils import token_to_int
+from xabber_server_panel.api.api import EjabberdAPI
+
+import pytz
 
 
 class UserManager(BaseUserManager):
@@ -68,6 +72,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+
     AUTH_BACKENDS = [
         ('sql', 'internal'),
         ('ldap', 'LDAP')
@@ -83,6 +88,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
     objects = UserManager()
 
+    token = models.TextField(
+        blank=True,
+        null=True
+    )
     username = models.CharField(
         max_length=256,
         unique=True,
@@ -142,6 +151,17 @@ class User(AbstractBaseUser, PermissionsMixin):
             return u"{}{}".format(self.first_name[0], self.last_name[0])
         else:
             return self.username[0:2]
+
+    @property
+    def api(self):
+        api = EjabberdAPI()
+        if self.token:
+            api.fetch_token(self.token)
+        return api
+
+    @property
+    def is_expired(self):
+        return self.expires and self.expires < timezone.now()
 
     # @property
     # def full_name(self):

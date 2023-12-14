@@ -1,16 +1,6 @@
 {% load base_tags %}
 <div>
-
-    {% get_items_by_model_name 'rootpage' num=1 as rp %}
-    {% if rp %}
-        {% url rp.0.module as rp_url %}
-    {% else %}
-        {% url 'home' as rp_url %}
-    {% endif %}
-    rp module:
-    {{ rp }}
-    {{ rp_url }}
-    <a href="{{ rp_url }}">
+    <a href="{% url 'home' %}">
         Home
     </a>
     <a href="{% url 'dashboard' %}">
@@ -31,4 +21,16 @@
     <a href="{% url 'config:tabs' %}">
         Settings
     </a>
+    {% if modules %}
+        <div>
+            Modules
+        </div>
+        {% for module in modules %}
+            {% with namespace=module|add:':root' %}
+                <a href="{% url namespace %}">
+                    {{ module }}
+                </a>
+            {% endwith %}
+        {% endfor %}
+    {% endif %}
 </div>
