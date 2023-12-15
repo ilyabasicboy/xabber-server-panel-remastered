@@ -3,30 +3,65 @@
 {% block content %}
     <div class="container">
         <div>
-            <a href="#details">
-                Details
-            </a>
-            <a href="#vcard">
-                vCard
-            </a>
-            <a href="#security">
-                Security
-            </a>
-            {% if circles %}
-                <a href="#circles">
-                    Circles
-                </a>
-            {% endif %}
+            <a href="{% url 'users:list' %}">Users</a>
+            <div>
+                {{ user.full_jid }} | {% if user.is_active %}Active{% else %}Blocked{% endif %}
+            </div>
         </div>
+        {% include 'users/parts/links.html' %}
 
-        {% include 'users/parts/details_tab.html' %}
+        <div>
+            <form action="{% url 'users:detail' id=user.id %}" method="POST">
+                {% csrf_token %}
 
-        {% include 'users/parts/vcard_tab.html' %}
+                <div>
+                    {{ user.get_initials }}
+                </div>
+                <div>
+                    {% if user.first_name or user.last_name %}
+                        {% if user.first_name %}
+                            {{ user.first_name }}
+                        {% endif %}
+                        {% if user.last_name %}
+                            {{ user.last_name }}
+                        {% endif %}
+                    {% else %}
+                        {{ user.full_jid }}
+                    {% endif %}
 
-        {% include 'users/parts/security_tab.html' %}
+                    <div>
+                        Status: {{ user.status }}
 
-        {% if circles %}
-            {% include 'users/parts/circles_tab.html' %}
-        {% endif %}
+                        <label>
+                            Change status:
+                            <select name="status">
+                                <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
+                                    Active
+                                </option>
+                                <option value="SUSPENDED" {% if user.status == 'SUSPENDED' %}selected{% endif %}>Suspended</option>
+                                <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Reason:
+                            <textarea name="reason" cols="30" rows="10" placeholder="Reason for blocking"></textarea>
+                        </label>
+                    </div>
+
+                    <div>
+                        Expires:
+                        <input type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
+                    </div>
+                </div>
+
+                <button name="save">
+                    Save
+                </button>
+                <a href="{% url 'users:delete' id=user.id %}">
+                    Delete User
+                </a>
+            </form>
+        </div>
     </div>
 {% endblock %}

@@ -7,7 +7,8 @@ $(document).ready(function(){
         };
 
         $.get(ajax_url, data, function(data){
-            $('.list-js').html(data);
+            $('.list-js').html(data['html']);
+            $('.items-count-js span').html(data['items_count'])
             setCurrentUrl();
         });
     };

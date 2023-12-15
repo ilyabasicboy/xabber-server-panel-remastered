@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div>
+            <a href="{% url 'users:list' %}">Users</a>
+            <div>
+                {{ user.full_jid }} | {% if user.is_active %}Active{% else %}Blocked{% endif %}
+            </div>
+        </div>
+        {% include 'users/parts/links.html' %}
+
+        <div>
+            <form action="{% url 'users:detail' id=user.id %}" method="POST">
+                {% csrf_token %}
+
+                {% for circle in circles %}
+                    <label>
+                        <input type="checkbox" name="circles" {% if circle in user.circles.all %}checked{% endif %} value="{{ circle.id }}">
+                        {{ circle.circle }}
+                    </label>
+                {% endfor %}
+
+                <button>
+                    Save
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

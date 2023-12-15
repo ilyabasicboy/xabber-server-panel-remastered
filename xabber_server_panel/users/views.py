@@ -1,11 +1,12 @@
-from django.shortcuts import render, reverse
+from django.shortcuts import render, reverse, loader
 from django.views.generic import TemplateView
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
+from xabber_server_panel.utils import get_user_data_for_api
 
 from datetime import datetime
 
@@ -51,25 +52,7 @@ class CreateUser(TemplateView):
 
     def create_user_api(self, user, cleaned_data):
         self.request.user.api.create_user(
-            {
-                'username': cleaned_data.get('username'),
-                'host': cleaned_data.get('host'),
-                'password': cleaned_data.get('password'),
-                'nickname': cleaned_data.get('nickname'),
-                'first_name': cleaned_data.get('first_name'),
-                'last_name': cleaned_data.get('last_name'),
-                'photo': None,
-                'is_admin': cleaned_data.get('is_admin'),
-                'expires': cleaned_data.get('expires'),
-                'vcard': {
-                    'nickname': cleaned_data.get('nickname'),
-                    'n': {
-                        'given': cleaned_data.get('first_name'),
-                        'family': cleaned_data.get('last_name')
-                    },
-                    'photo': {'type': '', 'binval': ''}
-                }
-            }
+            get_user_data_for_api(user, cleaned_data.get('password'))
         )
         if user.is_admin:
             user.api.xabber_set_admin(
@@ -85,17 +68,30 @@ class UserDetail(TemplateView):
     template_name = 'users/detail.html'
 
     def get(self, request, id, *args, **kwargs):
-
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        delete = kwargs.get('delete')
+        if delete:
+            if user.full_jid != request.user.full_jid:
+                user.delete()
+                request.user.api.unregister_user(
+                    {
+                        'username': user.username,
+                        'host': user.host
+                    }
+                )
+            else:
+                print('You can not delete yourself')
+            return HttpResponseRedirect(reverse('users:list'))
+
         circles = Circle.objects.filter(host=user.host)
 
         context = {
             'user': user,
-            'circles': circles
+            'circles': circles,
         }
         return self.render_to_response(context)
 
@@ -104,11 +100,6 @@ class UserDetail(TemplateView):
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
-
-        delete = request.POST.get('delete')
-        if delete:
-            self.user.delete()
-            return HttpResponseRedirect(reverse('users:list'))
 
         self.circles = Circle.objects.filter(host=self.user.host)
 
@@ -122,14 +113,6 @@ class UserDetail(TemplateView):
         return self.render_to_response(context)
 
     def update_user(self):
-        if 'nickname' in self.request.POST:
-            self.user.nickname = self.request.POST.get('nickname')
-
-        if 'first_name' in self.request.POST:
-            self.user.first_name = self.request.POST.get('first_name')
-
-        if 'last_name' in self.request.POST:
-            self.user.last_name = self.request.POST.get('last_name')
 
         status = self.request.POST.get('status')
         if status and self.user.status != status:
@@ -138,15 +121,6 @@ class UserDetail(TemplateView):
         # set expires if its provided
         if 'expires' in self.request.POST:
             self.change_expires()
-
-        # change circles in db and send data to server
-        circles = self.request.POST.getlist('circles', [])
-        self.change_circles(circles)
-
-        password = self.request.POST.get('password')
-        confirm_password = self.request.POST.get('confirm_password')
-        if password and confirm_password:
-            self.change_password(password, confirm_password)
 
         self.user.save()
 
@@ -221,7 +195,136 @@ class UserDetail(TemplateView):
                 else:
                     self.user.status = status
 
-    def change_circles(self, circles):
+
+class UserVcard(TemplateView):
+
+    template_name = 'users/vcard.html'
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        context = {
+            'user': user,
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, id, *args, **kwargs):
+        try:
+            self.user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        # update user params
+        self.update_user()
+
+        context = {
+            'user': self.user,
+        }
+        return self.render_to_response(context)
+
+    def update_user(self):
+        self.user.nickname = self.request.POST.get('nickname')
+
+        self.user.first_name = self.request.POST.get('first_name')
+
+        self.user.last_name = self.request.POST.get('last_name')
+
+        self.request.user.api.edit_user_vcard(
+            get_user_data_for_api(self.user)
+        )
+
+        self.user.save()
+
+
+class UserSecurity(TemplateView):
+
+    template_name = 'users/security.html'
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        context = {
+            'user': user,
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, id, *args, **kwargs):
+        try:
+            self.user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        # update user params
+        self.update_user()
+
+        context = {
+            'user': self.user,
+        }
+        return self.render_to_response(context)
+
+    def update_user(self):
+        password = self.request.POST.get('password')
+        confirm_password = self.request.POST.get('confirm_password')
+        if password and confirm_password:
+            if password == confirm_password:
+                # Change the user's password
+                self.user.set_password(password)
+
+        self.user.save()
+
+        self.request.user.api.change_password_api(
+            {
+                'password': password,
+                'username': self.user.username,
+                'host': self.user.host
+            }
+        )
+
+
+class UserCircles(TemplateView):
+
+    template_name = 'users/circles.html'
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        self.circles = Circle.objects.filter(host=user.host)
+
+        context = {
+            'user': user,
+            'circles': self.circles
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, id, *args, **kwargs):
+        try:
+            self.user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        self.circles = Circle.objects.filter(host=self.user.host)
+
+        # update user params
+        self.update_user()
+
+        context = {
+            'user': self.user,
+            'circles': self.circles
+        }
+        return self.render_to_response(context)
+
+    def update_user(self):
+        # change circles in db and send data to server
+        circles = self.request.POST.getlist('circles', [])
 
         new_circles = set(map(int, circles))
         existing_circles = set(self.user.circles.values_list('id', flat=True))
@@ -255,10 +358,7 @@ class UserDetail(TemplateView):
             )
         self.user.circles.set(circles)
 
-    def change_password(self, password, confirm_password):
-        if password == confirm_password:
-            # Change the user's password
-            self.user.set_password(password)
+        self.user.save()
 
 
 class UserList(TemplateView):
@@ -269,28 +369,37 @@ class UserList(TemplateView):
         hosts = VirtualHost.objects.all()
         self.users = User.objects.all()
 
-        if hosts.exists():
-            host = request.GET.get('host', hosts.first().name)
-
-            self.check_users(host)
-
-            users = self.users.filter(host=host)
-
         context = {
             'hosts': hosts,
-            'users': users,
         }
 
+        if hosts.exists():
+            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+            request.session['host'] = host
+            context['curr_host'] = host
+            self.check_users(host)
+
+            self.users = self.users.filter(host=host)
+
+        context['users'] = self.users
+
         if request.is_ajax():
-            return render(request, 'users/parts/user_list.html', context)
+            html = loader.render_to_string('users/parts/user_list.html', context, request)
+            response_data = {
+                'html': html,
+                'items_count': self.users.count(),
+            }
+            return JsonResponse(response_data)
 
         return self.render_to_response(context)
 
     def check_users(self, host):
+
         """
             Check registered users and create
             if it doesn't exist in django db
         """
+
         try:
             registered_users = self.request.user.api.xabber_registered_users({"host": host}).get('users')
         except:
@@ -300,9 +409,13 @@ class UserList(TemplateView):
             # Get a list of existing usernames from the User model
             existing_usernames = self.users.values_list('username', flat=True)
 
+            # get registered usernames list
+            registered_usernames = [user['username'] for user in registered_users]
+
             # Filter the user_list to exclude existing usernames
             unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
 
+            # create in db unknown users
             if unknown_users:
                 users_to_create = [
                     User(
@@ -314,4 +427,9 @@ class UserList(TemplateView):
                 ]
                 User.objects.bulk_create(users_to_create)
 
-                self.users = User.objects.all()
+            # get unregistered users in db and delete
+            users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
+            if users_to_delete:
+                users_to_delete.delete()
+
+        self.users = User.objects.all()

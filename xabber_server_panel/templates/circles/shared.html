@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+
+        <div>
+            <a href="{% url 'circles:list' %}">Circles</a>
+            <div>
+                {{ circle.circle }} | {{ circle.host }}
+            </div>
+        </div>
+
+        {% include 'circles/parts/links.html' %}
+
+        <div id="shared_contacts">
+            <form action="{% url 'circles:shared' id=circle.id %}" method="post">
+                {% csrf_token %}
+
+                {% for contact in circles %}
+                    <label>
+                        <input type="checkbox" {% if contact.circle in circle.get_subscribes %}checked{% endif %} value="{{ contact.circle }}" name="contacts">
+                        {{ contact.circle }}
+                        {{ contact.members.count }} members
+                    </label>
+                {% endfor %}
+
+                <button>
+                    Save
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

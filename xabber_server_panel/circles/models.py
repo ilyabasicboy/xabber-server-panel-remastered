@@ -15,6 +15,10 @@ def validate_circle(value):
 
 
 class Circle(models.Model):
+
+    class Meta:
+        ordering = ['circle']
+
     circle = models.CharField(
         max_length=256,
         validators=[validate_circle]
@@ -61,7 +65,17 @@ class Circle(models.Model):
 
     @property
     def get_subscribes(self):
-        return self.subscribes.split(',')
+        if self.subscribes:
+            return self.subscribes.split(',')
+        else:
+            return []
+
+    @property
+    def get_members_list(self):
+        members = []
+        for member in self.members.all():
+            members += [member.full_jid]
+        return members
 
     def __str__(self):
         return self.full_jid

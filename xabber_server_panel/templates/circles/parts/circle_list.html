@@ -24,13 +24,15 @@
                         </a>
                     </td>
                     <td>
-                        {{ circle.name }}
+                        {{ circle.name|default:'-' }}
                     </td>
                     <td>
                         {{ circle.members.count }}
                     </td>
                     <td>
-
+                        <a href="{% url 'circles:delete' id=circle.id %}">
+                            Delete circle
+                        </a>
                     </td>
                 </tr>
             {% endfor %}

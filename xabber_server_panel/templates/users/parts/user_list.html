@@ -50,6 +50,17 @@
                     <td>
                         {{ user.status|title }}
                     </td>
+                    <td>
+                        <a href="{% url 'users:vcard' id=user.id %}">
+                            Edit vcard
+                        </a>
+                        <a href="{% url 'users:delete' id=user.id %}">
+                            Delete user
+                        </a>
+                        <a href="#">
+                            Block user
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

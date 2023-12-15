@@ -1,0 +1,14 @@
+<div>
+    <a href="{% url 'users:detail' id=user.id %}">
+        Details
+    </a>
+    <a href="{% url 'users:vcard' id=user.id %}">
+        vCard
+    </a>
+    <a href="{% url 'users:security' id=user.id %}">
+        Security
+    </a>
+    <a href="{% url 'users:circles' id=user.id %}">
+        Circles
+    </a>
+</div>

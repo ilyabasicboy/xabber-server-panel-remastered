@@ -74,7 +74,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     AUTH_BACKENDS = [
-        ('sql', 'internal'),
+        ('sql', 'sql'),
         ('ldap', 'LDAP')
     ]
 
