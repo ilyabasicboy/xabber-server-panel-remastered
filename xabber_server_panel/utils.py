@@ -116,7 +116,7 @@ def int_to_token(number: int) -> str:
 def get_modules():
     if os.path.isdir(settings.MODULES_DIR):
         return os.listdir(settings.MODULES_DIR)
-    return
+    return []
 
 
 def get_user_data_for_api(user, password=None):
