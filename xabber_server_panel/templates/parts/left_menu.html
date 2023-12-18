@@ -1,36 +1,53 @@
 {% load base_tags %}
-<div>
-    <a href="{% url 'home' %}">
-        Home
-    </a>
-    <a href="{% url 'dashboard' %}">
-        Dashboard
-    </a>
-    <a href="{% url 'users:list' %}">
-        Users
-    </a>
-    <a href="{% url 'circles:list' %}">
-        Circles
-    </a>
-    <a href="{% url 'groups:list' %}">
-        Groups
-    </a>
-    <a href="{% url 'registration:list' %}">
-        Registration
-    </a>
-    <a href="{% url 'config:tabs' %}">
-        Settings
-    </a>
-    {% if modules %}
-        <div>
-            Modules
-        </div>
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item">
+        <a href="{% url 'home' %}" class="nav-link active" aria-current="page">
+            Home
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'dashboard' %}" class="nav-link text-white">
+            Dashboard
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'users:list' %}" class="nav-link text-white">
+            Users
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'circles:list' %}" class="nav-link text-white">
+            Circles
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'groups:list' %}" class="nav-link text-white">
+            Groups
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'registration:list' %}" class="nav-link text-white">
+            Registration
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'config:tabs' %}" class="nav-link text-white">
+            Settings
+        </a>
+    </li>
+</ul>
+
+{% if modules %}
+    <hr>
+    <ul class="nav nav-pills flex-column">
         {% for module in modules %}
             {% with namespace=module|add:':root' %}
-                <a href="{% url namespace %}">
-                    {{ module }}
-                </a>
+                <li>
+                    <a href="{% url namespace %}" class="nav-link text-white">
+                        {{ module }}
+                    </a>
+                </li>
             {% endwith %}
         {% endfor %}
-    {% endif %}
-</div>
+    </ul>
+{% endif %}
