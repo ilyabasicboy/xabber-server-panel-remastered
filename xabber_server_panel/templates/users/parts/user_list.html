@@ -2,69 +2,76 @@
 
 {% if users %}
     {% paginate users 5 as paginated_users %}
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Created</th>
-                <th>Expires</th>
-                <th>Auth</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in paginated_users %}
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        {{ user.get_initials }}
-                    </td>
-                    <td>
-                        <a href="{% url 'users:detail' id=user.id %}">
-                            {{ user.username }}
-                        </a>
-                    </td>
-                    <td>
-                        {% if user.first_name %}
-                            {{ user.first_name }}
-                        {% endif %}
-                        {% if user.last_name %}
-                            {{ user.last_name }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ user.created|date:"M d, Y H:i" }}, UTC
-                    </td>
-                    <td>
-                        {% if user.expires %}
-                            {{ user.expires|date:"M d, Y H:i" }}, UTC
-                        {% else %}
-                            Never
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ user.get_auth_backend_display }}
-                    </td>
-                    <td>
-                        {{ user.status|title }}
-                    </td>
-                    <td>
-                        <a href="{% url 'users:vcard' id=user.id %}">
-                            Edit vcard
-                        </a>
-                        <a href="{% url 'users:delete' id=user.id %}">
-                            Delete user
-                        </a>
-                        <a href="#">
-                            Block user
-                        </a>
-                    </td>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Created</th>
+                    <th>Expires</th>
+                    <th>Auth</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for user in paginated_users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex">
+                                <div class="d-flex align-items-center justify-content-center bg-primary rounded-circle text-white p-3 lh-1">
+                                    {{ user.get_initials }}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{% url 'users:detail' id=user.id %}">
+                                {{ user.username }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if user.first_name %}
+                                {{ user.first_name }}
+                            {% endif %}
+                            {% if user.last_name %}
+                                {{ user.last_name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ user.created|date:"M d, Y H:i" }}, UTC
+                        </td>
+                        <td>
+                            {% if user.expires %}
+                                {{ user.expires|date:"M d, Y H:i" }}, UTC
+                            {% else %}
+                                Never
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ user.get_auth_backend_display }}
+                        </td>
+                        <td>
+                            {{ user.status|title }}
+                        </td>
+                        <td>
+                            <a href="{% url 'users:vcard' id=user.id %}">
+                                Edit vcard
+                            </a>
+                            <a href="{% url 'users:delete' id=user.id %}">
+                                Delete user
+                            </a>
+                            <a href="#">
+                                Block user
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     {% include 'parts/pagination.html' with objects=paginated_users %}
 {% endif %}
