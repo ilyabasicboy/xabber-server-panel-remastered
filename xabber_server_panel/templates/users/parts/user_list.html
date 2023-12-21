@@ -41,31 +41,55 @@
                             {% endif %}
                         </td>
                         <td>
-                            {{ user.created|date:"M d, Y H:i" }}, UTC
+                            <span class="text-body-secondary">
+                                {{ user.created|date:"M d, Y H:i" }}, UTC
+                            </span>
                         </td>
                         <td>
-                            {% if user.expires %}
-                                {{ user.expires|date:"M d, Y H:i" }}, UTC
-                            {% else %}
-                                Never
-                            {% endif %}
+                            <span class="text-body-secondary">
+                                {% if user.expires %}
+                                    {{ user.expires|date:"M d, Y H:i" }}, UTC
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </span>
                         </td>
                         <td>
-                            {{ user.get_auth_backend_display }}
+                            <span class="text-body-secondary">
+                                {{ user.get_auth_backend_display }}
+                            </span>
                         </td>
                         <td>
-                            {{ user.status|title }}
+                            <span class="text-success {% if not user.is_active %}text-danger{% endif %}">
+                                {{ user.status|title }}
+                            </span>
                         </td>
                         <td>
-                            <a href="{% url 'users:vcard' id=user.id %}">
-                                Edit vcard
-                            </a>
-                            <a href="{% url 'users:delete' id=user.id %}">
-                                Delete user
-                            </a>
-                            <a href="#">
-                                Block user
-                            </a>
+                            <div class="d-flex">
+                                <div class="dropdown">
+                                    <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical d-flex"></i>
+                                    </div>
+
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item text-wrap" href="{% url 'users:vcard' id=user.id %}">
+                                                Edit vcard
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-wrap text-danger" href="{% url 'users:delete' id=user.id %}">
+                                                 Delete user
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-wrap text-info" href="#">
+                                                 Block user
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}

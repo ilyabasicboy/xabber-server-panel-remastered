@@ -80,12 +80,15 @@
                 </ul>
             </header>
 
-            <div class="container-fluid flex-md-grow-1 overflow-auto">
+            <div class="container-fluid flex-md-grow-1 overflow-auto" data-bs-theme="dark">
                 <div class="row h-100">
                     <div class="sidebar col-md-3 col-lg-2 p-md-3 text-bg-dark">
                         <div class="offcanvas-md offcanvas-end" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
                             <div class="offcanvas-header">
-                                <h5 class="offcanvas-title" id="sidebarMenuLabel">Company name</h5>
+                                <a class="navbar-brand d-flex align-items-center fs-4 p-0" href="/" id="sidebarMenuLabel">
+                                    <img class="me-2" src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
+                                    <span class="fs-4">Xabber</span>
+                                </a>
                                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
                             </div>
 
@@ -97,7 +100,7 @@
                         </div>
                     </div>
 
-                    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4" data-bs-theme="dark">
+                    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
                         {% block section_title %}
                             <h2 class="mb-4 col-12">
                                 {% block title %}{% endblock %}

@@ -1,40 +1,62 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    Create new user
+{% endblock %}
+
 {% block content %}
-  <div class="container">
+    <div class="col-12">
         <form action="{% url 'users:create' %}" method="POST">
             {% csrf_token %}
-            {{ form.errors }}
-            <div>
-              <label class="{% if form.username.errors %}error{% endif %}">
-                  Username *
-                  <input type="text" name="username" placeholder="Username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
 
-                  {% if hosts %}
-                      <select name="host">
-                          {% for host in hosts %}
-                              <option value="{{ host.name }}">
-                                {{ host.name }}
-                              </option>
-                          {% endfor %}
-                      </select>
-                  {% endif %}
-              </label>
+            <div class="d-flex flex-column mb-4">
+                <h4 class="text-secondary mt-0">
+                    Credentials
+                </h4>
+                <div class="d-flex mb-3">
+                    <label class="col-form-label col-sm-3 {% if form.username.errors %}text-danger{% endif %}">Username *</label>
 
-              <label class="{% if form.password.errors %}error{% endif %}">
-                  Password *
-                  <input type="text" placeholder="Password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
-              </label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" placeholder="Username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
+
+                            {% if hosts %}
+                                <select class="form-select" name="host">
+                                    {% for host in hosts %}
+                                        <option value="{{ host.name }}">
+                                            @{{ host.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <label class="col-form-label col-sm-3 {% if form.password.errors %}text-danger{% endif %}">Password *</label>
+
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="text" name="password" placeholder="Password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
+                            <button class="btn btn-primary" type="button">Generate</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div>
-                User details
+            <div class="d-flex flex-column mb-4">
+                <h4 class="text-secondary mt-0">
+                    User details
+                </h4>
+                <div class="d-flex mb-3">
+                    <label class="col-form-label col-sm-3">Nickname</label>
 
-                <label>
-                    Nickname
-                    <input type="text" name="nickname" placeholder="John Doe" {% if form.nickname.data %}value="{{ form.nickname.data }}"{% endif %}>
-                    <span>Nickname will be seen to user's contact.</span>
-                </label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if form.password.data %}value="{{ form.nickname.data }}"{% endif %}>
+                        <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
+                    </div>
+                </div>
+
                 <label>
                     First name
                     <input type="text" name="first_name" placeholder="John" {% if form.first_name.data %}value="{{ form.first_name.data }}"{% endif %}>
@@ -55,7 +77,8 @@
                     Administrator
                 </label>
             </div>
-            <button>Create user</button>
+
+            <button type="submit">Create user</button>
         </form>
-  </div>
+    </div>
 {% endblock %}
