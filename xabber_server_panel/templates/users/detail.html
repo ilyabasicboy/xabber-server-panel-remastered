@@ -1,67 +1,89 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <div>
-            <a href="{% url 'users:list' %}">Users</a>
-            <div>
-                {{ user.full_jid }} | {% if user.is_active %}Active{% else %}Blocked{% endif %}
-            </div>
-        </div>
-        {% include 'users/parts/links.html' %}
+    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+        <div class="d-flex align-items-center me-4">
+            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a class="fs-4" href="{% url 'users:list' %}">
+                            Users
+                        </a>
+                    </li>
 
-        <div>
-            <form action="{% url 'users:detail' id=user.id %}" method="POST">
-                {% csrf_token %}
+                    <li class="breadcrumb-item">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </li>
 
-                <div>
-                    {{ user.get_initials }}
-                </div>
-                <div>
-                    {% if user.first_name or user.last_name %}
-                        {% if user.first_name %}
-                            {{ user.first_name }}
-                        {% endif %}
-                        {% if user.last_name %}
-                            {{ user.last_name }}
-                        {% endif %}
-                    {% else %}
+                    <li class="breadcrumb-item text-body-emphasis active fs-4" aria-current="page">
                         {{ user.full_jid }}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="vr mx-3"></div>
+
+            <h6 class="mb-0 text-body-tertiary">
+                {% if user.is_active %}Active{% else %}Blocked{% endif %}
+            </h6>
+        </div>
+    </div>
+
+    {% include 'users/parts/links.html' %}
+
+    <div>
+        <form action="{% url 'users:detail' id=user.id %}" method="POST">
+            {% csrf_token %}
+
+            <div>
+                {{ user.get_initials }}
+            </div>
+            <div>
+                {% if user.first_name or user.last_name %}
+                    {% if user.first_name %}
+                        {{ user.first_name }}
                     {% endif %}
+                    {% if user.last_name %}
+                        {{ user.last_name }}
+                    {% endif %}
+                {% else %}
+                    {{ user.full_jid }}
+                {% endif %}
 
-                    <div>
-                        Status: {{ user.status }}
+                <div>
+                    Status: {{ user.status }}
 
-                        <label>
-                            Change status:
-                            <select name="status">
-                                <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
-                                    Active
-                                </option>
-                                <option value="SUSPENDED" {% if user.status == 'SUSPENDED' %}selected{% endif %}>Suspended</option>
-                                <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
-                            </select>
-                        </label>
+                    <label>
+                        Change status:
+                        <select name="status">
+                            <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
+                                Active
+                            </option>
+                            <option value="SUSPENDED" {% if user.status == 'SUSPENDED' %}selected{% endif %}>Suspended</option>
+                            <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
+                        </select>
+                    </label>
 
-                        <label>
-                            Reason:
-                            <textarea name="reason" cols="30" rows="10" placeholder="Reason for blocking"></textarea>
-                        </label>
-                    </div>
-
-                    <div>
-                        Expires:
-                        <input type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
-                    </div>
+                    <label>
+                        Reason:
+                        <textarea name="reason" cols="30" rows="10" placeholder="Reason for blocking"></textarea>
+                    </label>
                 </div>
 
-                <button name="save">
-                    Save
-                </button>
-                <a href="{% url 'users:delete' id=user.id %}">
-                    Delete User
-                </a>
-            </form>
-        </div>
+                <div>
+                    Expires:
+                    <input type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
+                </div>
+            </div>
+
+            <button name="save">
+                Save
+            </button>
+            <a href="{% url 'users:delete' id=user.id %}">
+                Delete User
+            </a>
+        </form>
     </div>
 {% endblock %}

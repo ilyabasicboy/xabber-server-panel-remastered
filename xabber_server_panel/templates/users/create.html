@@ -56,29 +56,45 @@
                         <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
                     </div>
                 </div>
+                <div class="d-flex mb-3">
+                    <label class="col-form-label col-sm-3">First name</label>
 
-                <label>
-                    First name
-                    <input type="text" name="first_name" placeholder="John" {% if form.first_name.data %}value="{{ form.first_name.data }}"{% endif %}>
-                    <span>Permitted symbols are a..z, 0..9, dots and underscores.</span>
-                </label>
-                <label>
-                    Last name
-                    <input type="text" name="last_name" placeholder="Doe" {% if form.last_name.data %}value="{{ form.last_name.data }}"{% endif %}>
-                    <span>Permitted symbols are a..z, 0..9, dots and underscores.</span>
-                </label>
-                <label>
-                    Expires
-                    <input type="date" name="expires" placeholder="2022-04-15" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
-                    <span>A string of characters of the format YYYY-MM-DD; where YYYY shall contain year, MM shall contain the month, and DD shall contain the day.</span>
-                </label>
-                <label>
-                    <input type="checkbox" name="is_admin">
-                    Administrator
-                </label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="first_name" placeholder="John" {% if form.first_name.data %}value="{{ form.first_name.data }}"{% endif %}>
+                        <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    <label class="col-form-label col-sm-3">Last name</label>
+
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="last_name" placeholder="Doe" {% if form.last_name.data %}value="{{ form.last_name.data }}"{% endif %}>
+                        <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    <label class="col-form-label col-sm-3">Expires</label>
+
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="expires" placeholder="2022-04-15" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
+                        <span class="form-text text-secondary">A string of characters of the format YYYY-MM-DD; where YYYY shall contain year, MM shall contain the month, and DD shall contain the day.</span>
+                    </div>
+                </div>
+                <div class="d-flex mb-3">
+                    <div class="col-sm-3"></div>
+
+                    <div class="col-sm-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_admin" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Administrator
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit">Create user</button>
+            <button class="btn btn-primary" type="submit">Create user</button>
         </form>
     </div>
 {% endblock %}
