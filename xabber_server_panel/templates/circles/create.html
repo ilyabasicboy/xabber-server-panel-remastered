@@ -1,40 +1,50 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    Create new circle
+{% endblock %}
+
 {% block content %}
-  <div class="container">
+    <div class="col-12">
         <form action="{% url 'circles:create' %}" method="POST">
             {% csrf_token %}
-            {{ form.errors }}
-            <div>
-                <label class="{% if form.circle.errors %}error{% endif %}">
-                  Circle *
-                  <input type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>
 
-                  {% if hosts %}
-                      <select name="host">
-                          {% for host in hosts %}
-                              <option value="{{ host.name }}">
-                                {{ host.name }}
-                              </option>
-                          {% endfor %}
-                      </select>
-                  {% endif %}
-                </label>
+            <div class="row mb-3">
+                <label class="col-form-label col-sm-3 {% if form.circle.errors %}text-danger{% endif %}">Username *</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>
 
-                <label class="{% if form.name.errors %}error{% endif %}">
-                  Name *
-                  <input type="text" placeholder="Name" name="name" {% if form.name.data %}value="{{ form.name.data }}"{% endif %}>
-                </label>
-
-                <label>
-                    Description
-                    <textarea name="description" cols="30" rows="10">
-                        {% if form.description.data %}{{ form.description.data }}{% endif %}
-                    </textarea>
-                </label>
+                        {% if hosts %}
+                            <select class="form-select" name="host">
+                                {% for host in hosts %}
+                                    <option value="{{ host.name }}">
+                                        @{{ host.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
-            <button>Create circle</button>
+            <div class="row mb-3">
+                <label class="col-form-label col-sm-3 {% if form.name.errors %}text-danger{% endif %}">Name *</label>
+                <div class="col-sm-9">
+                    <input class="form-control {% if form.name.errors %}is-invalid{% endif %}" type="text" placeholder="Name" name="name" {% if form.name.data %}value="{{ form.name.data }}"{% endif %}>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-sm-3">Description</label>
+                <div class="col-sm-9">
+                    <textarea class="form-control" name="description" cols="30" rows="10">
+                        {% if form.description.data %}{{ form.description.data }}{% endif %}
+                    </textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Create circle</button>
         </form>
-  </div>
+    </div>
 {% endblock %}

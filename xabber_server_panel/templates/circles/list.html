@@ -1,26 +1,30 @@
 {% extends 'base.html' %}
 
+{% block section_title %}{% endblock %}
+
 {% block content %}
     {% url 'circles:list' as url %}
-    <div class="container">
-        <div>
-            <h1>Circles</h1>
-            <div>
-                <div class="items-count-js">
-                    <span>
-                        {{ circles.count }}
-                    </span> circles
-                </div>
-                {% if hosts %}
-                    <div>
-                        {% include 'parts/host_select.html' %}
-                    </div>
-                {% endif %}
-            </div>
+    <div class="mb-4 col-12 d-flex">
+        <div class="d-flex align-items-center me-4">
+            <h2 class="mb-0">
+                Circles
+            </h2>
+            <div class="vr mx-3"></div>
+            <h4 class="mb-0 text-secondary fw-normal items-count-js">
+                <span>
+                    {{ circles.count }}
+                </span> circles
+            </h4>
         </div>
 
-        <div class="list-js" data-url="{{ url }}">
-            {% include 'circles/parts/circle_list.html' %}
-        </div>
+        {% if hosts %}
+            <div class="ms-auto">
+                {% include 'parts/host_select.html' %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4 list-js" data-url="{{ url }}">
+        {% include 'circles/parts/circle_list.html' %}
     </div>
 {% endblock %}

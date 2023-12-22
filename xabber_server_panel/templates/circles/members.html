@@ -1,66 +1,105 @@
 {% extends 'base.html' %}
 
+{% block section_title %}{% endblock %}
+
 {% block content %}
-    <div class="container">
+    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+        <div class="d-flex align-items-center me-4">
+            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a class="fs-4" href="{% url 'circles:list' %}">
+                            Circles
+                        </a>
+                    </li>
 
-        <div>
-            <a href="{% url 'circles:list' %}">Circles</a>
-            <div>
-                {{ circle.circle }} | {{ circle.host }}
-            </div>
+                    <li class="breadcrumb-item">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </li>
+
+                    <li class="breadcrumb-item text-body-emphasis active fs-4" aria-current="page">
+                        {{ circle.circle }}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="vr mx-3"></div>
+
+            <h6 class="mb-0 text-body-tertiary">
+                {{ circle.host }}
+            </h6>
         </div>
+    </div>
 
+    <div class="mb-4 col-12" data-bs-theme="light">
         {% include 'circles/parts/links.html' %}
+    </div>
 
-        <div id="members">
-            <div>
-                Members <span>{{ circle.members.count }} members</span>
+    <div class="col-12">
+        <div class="row" data-bs-theme="light">
+            <div class="col-6 d-flex align-items-center">
+                <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.members.count }} members</span>
+            </div>
 
-                <a href="#add_member">
+            <div class="col-6 d-flex justify-content-end">
+                <a class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#add_member">
                     Add
                 </a>
-                <a href="#manage">
+                <a class="btn btn-primary" href="#manage">
                     Manage
                 </a>
             </div>
+        </div>
 
-            <div id="add_member">
-              <form action="{% url 'circles:members' id=circle.id %}" method="POST">
-                  {% csrf_token %}
+        <div class="modal fade" id="add_member" tabindex="-1" aria-labelledby="add_member_label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="add_member_label">Add new member</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-                <input type="text" placeholder="username@example.com" name="add_member">
+                    <div class="modal-body">
+                        <form action="{% url 'circles:members' id=circle.id %}" method="POST">
+                            {% csrf_token %}
+
+                            <input class="form-control" type="text" placeholder="username@example.com" name="add_member">
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="add_member">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add member</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="manage">
+            Manage members
+            <form action="{% url 'circles:members' id=circle.id %}" method="POST">
+                {% csrf_token %}
+
+                {% for user in users %}
+                    <label>
+                        <input type="checkbox" {% if user in circle.members.all %}checked{% endif %} name="members" value="{{ user.id }}">
+                        {{ user.full_jid }}
+                    </label>
+                {% endfor %}
 
                 <button type="button">
                   Cancel
                 </button>
                 <button>
-                  Add member
+                  Save
                 </button>
-              </form>
-            </div>
+            </form>
+        </div>
 
-            <div id="manage">
-                Manage members
-                <form action="{% url 'circles:members' id=circle.id %}" method="POST">
-                    {% csrf_token %}
-
-                    {% for user in users %}
-                        <label>
-                            <input type="checkbox" {% if user in circle.members.all %}checked{% endif %} name="members" value="{{ user.id }}">
-                            {{ user.full_jid }}
-                        </label>
-                    {% endfor %}
-
-                    <button type="button">
-                      Cancel
-                    </button>
-                    <button>
-                      Save
-                    </button>
-                </form>
-            </div>
-
-            <table>
+        <div class="table-responsive">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -84,7 +123,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-
         </div>
     </div>
 {% endblock %}

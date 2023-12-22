@@ -1,14 +1,22 @@
-<div>
-    <a href="{% url 'users:detail' id=user.id %}">
-        Details
-    </a>
-    <a href="{% url 'users:vcard' id=user.id %}">
-        vCard
-    </a>
-    <a href="{% url 'users:security' id=user.id %}">
-        Security
-    </a>
-    <a href="{% url 'users:circles' id=user.id %}">
-        Circles
-    </a>
-</div>
+<ul class="nav nav-pills">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url 'users:detail' id=user.id %}">
+            Details
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users:vcard' id=user.id %}">
+            vCard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users:security' id=user.id %}">
+            Security
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users:circles' id=user.id %}">
+            Circles
+        </a>
+    </li>
+</ul>

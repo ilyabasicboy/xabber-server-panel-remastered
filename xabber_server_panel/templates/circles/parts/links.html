@@ -1,11 +1,17 @@
-<div>
-    <a href="{% url 'circles:detail' id=circle.id %}">
-        Details
-    </a>
-    <a href="{% url 'circles:members' id=circle.id %}">
-        Members
-    </a>
-    <a href="{% url 'circles:shared' id=circle.id %}">
-        Shared contacts
-    </a>
-</div>
+<ul class="nav nav-pills">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url 'circles:detail' id=circle.id %}">
+            Details
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'circles:members' id=circle.id %}">
+            Members
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'circles:shared' id=circle.id %}">
+            Shared contacts
+        </a>
+    </li>
+</ul>
