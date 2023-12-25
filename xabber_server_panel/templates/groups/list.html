@@ -1,25 +1,30 @@
 {% extends 'base.html' %}
 
+{% block section_title %}{% endblock %}
+
 {% block content %}
     {% url 'groups:list' as url %}
-    <div class="container">
-        <div>
-            <h1>Groups</h1>
-            <div>
-                <div>
-                    {{ groups|length }} groups
-                </div>
+    <div class="mb-4 col-12 d-flex">
+        <div class="d-flex align-items-center me-4">
+            <h2 class="mb-0">
+                Groups
+            </h2>
+            <div class="vr mx-3"></div>
+            <h4 class="mb-0 text-secondary fw-normal items-count-js">
+                <span>
+                    {{ groups|length }}
+                </span> users
+            </h4>
+        </div>
 
-                {% if hosts %}
-                    <div>
-                        {% include 'parts/host_select.html' %}
-                    </div>
-                {% endif %}
+        {% if hosts %}
+            <div class="ms-auto">
+                {% include 'parts/host_select.html' %}
             </div>
-        </div>
+        {% endif %}
+    </div>
 
-        <div class="list-js" data-url="{{ url }}">
-            {% include 'groups/parts/groups_list.html' %}
-        </div>
+    <div class="mt-4 list-js" data-url="{{ url }}">
+        {% include 'groups/parts/groups_list.html' %}
     </div>
 {% endblock %}

@@ -1,20 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <div>
-        {{ form.errors }}
-    </div>
-    <form method="post" action="{% url 'custom_auth:login' %}">
-        {% csrf_token %}
-        {{ form.username }}
-        {{ form.password }}
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block body %}
+    <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-cover bg-repeat bg-center" style="background-image: url('{% static 'img/bg-login.png' %}');">
+        <div class="container-fluid d-flex flex-column justify-content-start flex-md-grow-1 overflow-auto">
+            <a class="d-flex justify-content-center py-4" href="https://www.xabber.com/" target="_blank">
+                <img class="me-2" src="{% static 'img/logo.png' %}" width="128" height="128" alt="Xabber">
+            </a>
+
+            <div class="bg-white rounded-2 p-5 mx-auto text-center w-100 cmw-480">
+                <form method="post" action="{% url 'custom_auth:login' %}">
+                    {% csrf_token %}
+
+                    <div class="mb-5">
+                        <h2 class="fw-normal">Xabber Server</h2>
+                        <p class="text-secondary">
+                            Management panel
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" autofocus="" placeholder="username@example.com" autocomplete="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
+                    </div>
+
+                    <div class="mb-3">
+                        <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="password" name="password" placeholder="Password" autocomplete="current-password" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Login</button>
+                </form>
+            </div>
+
+            <div class="d-flex justify-content-center mt-auto py-4">
+                <a class="text-white" href="https://www.xabber.com/">www.xabber.com</a>
+            </div>
+        </div>
+    </body>
+{% endblock %}
