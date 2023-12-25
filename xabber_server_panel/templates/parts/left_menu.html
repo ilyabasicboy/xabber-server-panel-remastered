@@ -2,7 +2,7 @@
 <ul class="nav nav-pills flex-column">
     <li class="nav-item">
         {% url 'home' as home %}
-        <a href="{{ home }}" class="nav-link {% if request.path_info == home %}active{% endif %}" aria-current="page">
+        <a href="{{ home }}" class="nav-link text-white {% if request.path_info == home %}active{% endif %}" aria-current="page">
             Home
         </a>
     </li>

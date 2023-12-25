@@ -2,16 +2,21 @@
     <nav>
         <ul class="pagination">
             {% if objects.has_previous %}
-                <li class="page-item">
-                    {% if objects.number > 2 %}
+                {% if objects.number > 2 %}
+                    <li class="page-item">
                         <a class="page-link" href="?page=1">
                             1
                         </a>
-                        {% if objects.number > 3 %}
-                            <span class="page-link">...</span>
-                        {% endif %}
-                    {% endif %}
+                    </li>
 
+                    {% if objects.number > 3 %}
+                        <li class="page-item">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                <li class="page-item">
                     <a class="page-link" href="?page={{ objects.previous_page_number }}">
                         {{ objects.previous_page_number }}
                     </a>
@@ -29,17 +34,21 @@
                     <a class="page-link" href="?page={{ objects.next_page_number }}">
                         {{ objects.next_page_number }}
                     </a>
+                </li>
 
-                    {% if objects.paginator.num_pages >= objects.next_page_number|add:1 %}
-                        {% if objects.next_page_number|add:1 != objects.paginator.num_pages %}
+                {% if objects.paginator.num_pages >= objects.next_page_number|add:1 %}
+                    {% if objects.next_page_number|add:1 != objects.paginator.num_pages %}
+                        <li class="page-item">
                             <span class="page-link">...</span>
-                        {% endif %}
+                        </li>
+                    {% endif %}
 
+                    <li class="page-item">
                         <a class="page-link" href="?page={{ objects.paginator.num_pages }}">
                             {{ objects.paginator.num_pages }}
                         </a>
-                    {% endif %}
-                </li>
+                    </li>
+                {% endif %}
             {% endif %}
         </ul>
     </nav>
