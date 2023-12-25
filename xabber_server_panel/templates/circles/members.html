@@ -92,8 +92,8 @@
                             {% for user in users %}
                                 <div class="{% if not forloop.last %}mb-3{% endif %}">
                                     <div class="form-check text-white">
-                                        <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ circle.id }}">
-                                        <label class="form-check-label" for="user_{{ circle.id }}">
+                                        <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
+                                        <label class="form-check-label" for="user_{{ user.id }}">
                                             {{ user.full_jid }}
                                         </label>
                                     </div>
