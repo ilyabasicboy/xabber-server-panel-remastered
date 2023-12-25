@@ -211,6 +211,7 @@ class CircleMembers(TemplateView):
 
         # add member by jid
         add_member = self.request.POST.get('add_member')
+        members = self.request.POST.getlist('members')
         if add_member:
             try:
                 username, host = add_member.split('@')
@@ -224,8 +225,7 @@ class CircleMembers(TemplateView):
                 print('user is undefined')
 
         # select multiple members
-        members = self.request.POST.getlist('members')
-        if members:
+        else:
             users = User.objects.filter(id__in=members)
             self.circle.members.set(users)
 
