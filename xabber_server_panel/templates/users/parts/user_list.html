@@ -97,5 +97,7 @@
         </table>
     </div>
 
-    {% include 'parts/pagination.html' with objects=paginated_users %}
+    {% if users.count > 5 %}
+        {% include 'parts/pagination.html' with objects=paginated_users %}
+    {% endif %}
 {% endif %}

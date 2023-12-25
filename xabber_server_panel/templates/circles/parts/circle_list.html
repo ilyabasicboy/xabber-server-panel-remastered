@@ -58,5 +58,7 @@
         </table>
     </div>
 
-    {% include 'parts/pagination.html' with objects=paginated_circles %}
+    {% if circles.count > 5 %}
+        {% include 'parts/pagination.html' with objects=paginated_circles %}
+    {% endif %}
 {% endif %}

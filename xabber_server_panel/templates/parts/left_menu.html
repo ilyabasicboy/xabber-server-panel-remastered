@@ -1,37 +1,44 @@
 {% load base_tags %}
 <ul class="nav nav-pills flex-column">
     <li class="nav-item">
-        <a href="{% url 'home' %}" class="nav-link active" aria-current="page">
+        {% url 'home' as home %}
+        <a href="{{ home }}" class="nav-link {% if request.path_info == home %}active{% endif %}" aria-current="page">
             Home
         </a>
     </li>
     <li>
-        <a href="{% url 'dashboard' %}" class="nav-link text-white">
+        {% url 'dashboard' as dashboard %}
+        <a href="{{ dashboard }}" class="nav-link text-white {% if request.path_info == dashboard %}active{% endif %}">
             Dashboard
         </a>
     </li>
     <li>
-        <a href="{% url 'users:list' %}" class="nav-link text-white">
+        {% url 'users:list' as users %}
+        <a href="{{ users }}" class="nav-link text-white {% if users in request.path_info %}active{% endif %}">
             Users
         </a>
     </li>
     <li>
-        <a href="{% url 'circles:list' %}" class="nav-link text-white">
+        {% url 'circles:list' as circles %}
+        <a href="{{ circles }}" class="nav-link text-white {% if circles in request.path_info %}active{% endif %}">
             Circles
         </a>
     </li>
     <li>
-        <a href="{% url 'groups:list' %}" class="nav-link text-white">
+        {% url 'groups:list' as groups %}
+        <a href="{{ groups }}" class="nav-link text-white {% if groups in request.path_info %}active{% endif %}">
             Groups
         </a>
     </li>
     <li>
-        <a href="{% url 'registration:list' %}" class="nav-link text-white">
+        {% url 'registration:list' as registration %}
+        <a href="{{ registration }}" class="nav-link text-white {% if registration in request.path_info %}active{% endif %}">
             Registration
         </a>
     </li>
     <li>
-        <a href="{% url 'config:tabs' %}" class="nav-link text-white">
+        {% url 'config:tabs' as config %}
+        <a href="{{ config }}" class="nav-link text-white {% if config in request.path_info %}active{% endif %}">
             Settings
         </a>
     </li>
@@ -43,7 +50,8 @@
         {% for module in modules %}
             {% with namespace=module|add:':root' %}
                 <li>
-                    <a href="{% url namespace %}" class="nav-link text-white">
+                    {% url namespace as module_url %}
+                    <a href="{{ module_url }}" class="nav-link text-white {% if module_url in request.path_info %}active{% endif %}">
                         {{ module }}
                     </a>
                 </li>

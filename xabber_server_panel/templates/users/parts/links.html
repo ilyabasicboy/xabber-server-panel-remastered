@@ -1,21 +1,25 @@
 <ul class="nav nav-pills">
     <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="{% url 'users:detail' id=user.id %}">
+        {% url 'users:detail' id=user.id as detail %}
+        <a class="nav-link {% if request.path_info == detail %}active{% endif %}" aria-current="page" href="{{ detail }}">
             Details
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'users:vcard' id=user.id %}">
+        {% url 'users:vcard' id=user.id as vcard %}
+        <a class="nav-link {% if request.path_info == vcard %}active{% endif %}" href="{{ vcard }}">
             vCard
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'users:security' id=user.id %}">
+        {% url 'users:security' id=user.id as security %}
+        <a class="nav-link {% if request.path_info == security %}active{% endif %}" href="{{ security }}">
             Security
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'users:circles' id=user.id %}">
+        {% url 'users:circles' id=user.id as circles %}
+        <a class="nav-link {% if request.path_info == circles %}active{% endif %}" href="{{ circles }}">
             Circles
         </a>
     </li>
