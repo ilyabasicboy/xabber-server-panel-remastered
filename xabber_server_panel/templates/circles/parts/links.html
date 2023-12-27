@@ -1,16 +1,19 @@
 <ul class="nav nav-pills">
     <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="{% url 'circles:detail' id=circle.id %}">
+        {% url 'circles:detail' id=circle.id as detail %}
+        <a class="nav-link {% if request.path_info == detail %}active{% endif %}" aria-current="page" href="{{ detail }}">
             Details
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'circles:members' id=circle.id %}">
+        {% url 'circles:members' id=circle.id as members %}
+        <a class="nav-link {% if request.path_info == members %}active{% endif %}" href="{{ members }}">
             Members
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{% url 'circles:shared' id=circle.id %}">
+        {% url 'circles:shared' id=circle.id as shared %}
+        <a class="nav-link {% if request.path_info == shared %}active{% endif %}" href="{{ shared }}">
             Shared contacts
         </a>
     </li>

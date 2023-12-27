@@ -196,13 +196,13 @@ class CircleMembers(TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        users = User.objects.filter(status='ACTIVE')
+        self.users = User.objects.filter(status='ACTIVE')
 
         self.update_circle()
 
         context = {
             'circle': self.circle,
-            'users': users,
+            'users': self.users,
         }
 
         return self.render_to_response(context)
@@ -210,36 +210,73 @@ class CircleMembers(TemplateView):
     def update_circle(self):
 
         # add member by jid
-        add_member = self.request.POST.get('add_member')
-        members = self.request.POST.getlist('members')
-        if add_member:
-            try:
-                username, host = add_member.split('@')
-            except:
-                print('jid is incorrect')
+        self.add_member = self.request.POST.get('add_member')
+        self.members = self.request.POST.getlist('members')
 
-            user = User.objects.filter(username=username, host=host).first()
-            if user:
-                self.circle.members.add(user)
-            else:
-                print('user is undefined')
-
+        if self.add_member:
+            self.add_member_api()
         # select multiple members
         else:
-            users = User.objects.filter(id__in=members)
-            self.circle.members.set(users)
+            self.members_api()
 
         # send data to server if members was changed
-        if add_member or members:
+        self.circle.save()
+
+    def add_member_api(self):
+        try:
+            username, host = self.add_member.split('@')
+        except:
+            print('jid is incorrect')
+
+        user = User.objects.filter(username=username, host=host).first()
+        if user:
+            self.circle.members.add(user)
+        else:
+            print('user is undefined')
+
+        self.request.user.api.srg_user_add_api(
+            {
+                'circle': self.circle.circle,
+                'host': self.circle.host,
+                'members': [self.add_member]
+            }
+        )
+
+    def members_api(self):
+        members = User.objects.filter(id__in=self.members)
+
+        new_members = set(map(int, self.members))
+        existing_members = set(self.circle.members.values_list('id', flat=True))
+
+        # Added circles id list
+        ids_to_add = new_members - existing_members
+
+        # Removed circles id list
+        ids_to_delete = existing_members - new_members
+
+        # add circles
+        members_to_add = self.users.filter(id__in=ids_to_add)
+        for member in members_to_add:
             self.request.user.api.srg_user_add_api(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
-                    'members': self.circle.get_members_list
+                    'members': [member.full_jid]
                 }
             )
 
-        self.circle.save()
+        # delete circles
+        members_to_delete = self.users.filter(id__in=ids_to_delete)
+        for member in members_to_delete:
+            self.request.user.api.srg_user_del_api(
+                {
+                    'circle': self.circle.circle,
+                    'host': self.circle.host,
+                    'members': [member.full_jid]
+                }
+            )
+
+        self.circle.members.set(members)
 
 
 class CircleShared(TemplateView):
@@ -284,9 +321,25 @@ class CircleShared(TemplateView):
 
         # shared contacts logic
         contacts = self.request.POST.getlist('contacts')
-        if 'contacts' in self.request.POST and contacts:
-            if isinstance(contacts, list):
-                contacts = ','.join(contacts)
-            self.circle.subscribes = contacts
+        if isinstance(contacts, list):
+            str_contacts = ','.join(contacts)
+
+        print({
+                'group': self.circle.circle,
+                'host': self.circle.host,
+                'name': self.circle.name,
+                'description': self.circle.description,
+                'displayed_groups': contacts
+            })
+        self.request.user.api.create_group(
+            {
+                'group': self.circle.circle,
+                'host': self.circle.host,
+                'name': self.circle.name,
+                'description': self.circle.description,
+                'displayed_groups': contacts
+            }
+        )
+        self.circle.subscribes = str_contacts
 
         self.circle.save()

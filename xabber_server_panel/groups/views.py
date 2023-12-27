@@ -1,6 +1,6 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView
-from django.conf import settings
+from django.shortcuts import loader
+from django.http import JsonResponse
 
 from xabber_server_panel.dashboard.models import VirtualHost
 
@@ -28,5 +28,10 @@ class GroupList(TemplateView):
         }
 
         if request.is_ajax():
-            return render(request, 'groups/parts/groups_list.html', context)
+            html = loader.render_to_string('groups/parts/groups_list.html', context, request)
+            response_data = {
+                'html': html,
+                'items_count': len(chats),
+            }
+            return JsonResponse(response_data)
         return self.render_to_response(context)
