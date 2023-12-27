@@ -20,13 +20,13 @@
                             {{ forloop.counter }}
                         </td>
                         <td>
+                            {{ group.name }}
+                        </td>
+                        <td>
                             {% get_user_by_jid group.owner as user %}
                             <a {% if user %}href="{% url 'users:detail' id=user.id %}"{% endif %}>
                                 {{ group.owner }}
                             </a>
-                        </td>
-                        <td>
-                            {{ group.name }}
                         </td>
                         <td>
                             {{ group.size }}

@@ -375,7 +375,10 @@ class UserList(TemplateView):
 
         if hosts.exists():
             host = request.GET.get('host', request.session.get('host', hosts.first().name))
+
+            # write current host on session
             request.session['host'] = host
+
             context['curr_host'] = host
             self.check_users(host)
 

@@ -13,7 +13,10 @@ class GroupList(TemplateView):
         hosts = VirtualHost.objects.all()
 
         if hosts.exists():
-            host = request.GET.get('host', hosts.first().name)
+            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+
+            # write current host on session
+            request.session['host'] = host
         else:
             host = ''
 
@@ -22,9 +25,11 @@ class GroupList(TemplateView):
                 "host": host
             }
         ).get('groups')
+
         context = {
             'groups': chats,
-            'hosts': hosts
+            'hosts': hosts,
+            'curr_host': host
         }
 
         if request.is_ajax():

@@ -21,7 +21,10 @@ class CircleList(TemplateView):
 
         if hosts.exists():
             host = request.GET.get('host', request.session.get('host', hosts.first().name))
+
+            # write current host on session
             request.session['host'] = host
+
             context['curr_host'] = host
 
             # check circles from server
@@ -323,14 +326,6 @@ class CircleShared(TemplateView):
         contacts = self.request.POST.getlist('contacts')
         if isinstance(contacts, list):
             str_contacts = ','.join(contacts)
-
-        print({
-                'group': self.circle.circle,
-                'host': self.circle.host,
-                'name': self.circle.name,
-                'description': self.circle.description,
-                'displayed_groups': contacts
-            })
         self.request.user.api.create_group(
             {
                 'group': self.circle.circle,

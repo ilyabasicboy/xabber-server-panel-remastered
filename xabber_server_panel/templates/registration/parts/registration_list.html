@@ -57,7 +57,15 @@
                             {{ obj.description }}
                         </td>
                         <td>
-
+                            <a href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
+                                Change
+                            </a>
+                            <a href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
+                                Delete
+                            </a>
+                            <a class="show-url-js" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}">
+                                Show link
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
