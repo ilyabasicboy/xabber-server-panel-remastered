@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load config_tags %}
+
+{% block content %}
+    {% url 'config:tabs' as url %}
+    <div class="container">
+        <div>
+            <h1>Server settings</h1>
+        </div>
+
+        <div>
+            {% include 'config/parts/links.html' %}
+
+            <div>
+                {% if hosts %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Virtual host</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for host in hosts %}
+                                <tr>
+                                    <td>
+                                        {{ forloop.counter }}
+                                    </td>
+                                    <td>
+                                        {{ host.name }}
+                                    </td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <a href="{% url 'config:host_create' %}">
+                    Add virtual host
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

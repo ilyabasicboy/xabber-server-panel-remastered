@@ -1,0 +1,21 @@
+<div>
+    {% url 'config:hosts' as hosts %}
+    <a class="{% if hosts == request.path_info %}active{% endif %}" href="{{ hosts }}">
+        Virtual hosts
+    </a>
+    {% url 'config:admins' as admins %}
+    <a class="{% if admins == request.path_info %}active{% endif %}" href="{{ admins }}">
+        Administrators
+    </a>
+    <a href="#ldap">
+        LDAP
+    </a>
+    <a href="#modules">
+        Modules
+    </a>
+    {% if modules %}
+        <a href="#root_page">
+            Root page
+        </a>
+    {% endif %}
+</div>

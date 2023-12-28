@@ -114,6 +114,46 @@ class ConfigList(TemplateView):
         ldap_settings.servers.exclude(server__in=self.server_list).delete()
 
 
+class ConfigHosts(TemplateView):
+    template_name = 'config/hosts.html'
+
+    def get(self, request, *args, **kwargs):
+        hosts = VirtualHost.objects.all()
+
+        context = {
+            'hosts': hosts,
+        }
+        return self.render_to_response(context)
+
+
+class ConfigAdmins(TemplateView):
+    template_name = 'config/admins.html'
+
+    def get(self, request, *args, **kwargs):
+        admins = User.objects.filter(is_admin=True)
+        users = User.objects.all()
+        context = {
+            'admins': admins,
+            'users': users
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        request_data = dict(request.POST)
+        users = User.objects.all()
+        admins = request_data.get('admins', [])
+
+        users.filter(id__in=admins, is_admin=False).update(is_admin=True)
+        users.exclude(id__in=admins, is_admin=True).update(is_admin=False)
+
+        context = {
+            'admins': users.filter(id__in=admins),
+            'users': users
+        }
+        return self.render_to_response(context)
+
+
+
 class CreateHost(TemplateView):
     template_name = 'config/host_create.html'
 
@@ -132,29 +172,6 @@ class CreateHost(TemplateView):
         context = {
         }
         return self.render_to_response(context)
-
-
-class ManageAdmins(TemplateView):
-    template_name = 'config/manage_admins.html'
-
-    def get(self, request, *args, **kwargs):
-        users = User.objects.all()
-
-        context = {
-            'users': users
-        }
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        request_data = dict(request.POST)
-        users = User.objects.all()
-        admins = request_data.get('admins', [])
-
-        users.filter(id__in=admins).update(is_admin=True)
-        users.exclude(id__in=admins).update(is_admin=False)
-        return HttpResponseRedirect(
-            reverse('config:tabs')
-        )
 
 
 class Modules(TemplateView):

@@ -37,7 +37,7 @@
         </a>
     </li>
     <li>
-        {% url 'config:tabs' as config %}
+        {% url 'config:hosts' as config %}
         <a href="{{ config }}" class="nav-link text-white {% if config in request.path_info %}active{% endif %}">
             Settings
         </a>

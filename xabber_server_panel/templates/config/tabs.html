@@ -11,25 +11,7 @@
         </div>
 
         <div>
-            <div>
-                <a href="#hosts">
-                    Virtual hosts
-                </a>
-                <a href="#admins">
-                    Administrators
-                </a>
-                <a href="#ldap">
-                    LDAP
-                </a>
-                <a href="#modules">
-                    Modules
-                </a>
-                {% if modules %}
-                    <a href="#root_page">
-                        Root page
-                    </a>
-                {% endif %}
-            </div>
+
 
             {% include 'config/parts/hosts_tab.html' %}
             {% include 'config/parts/admins_tab.html' %}

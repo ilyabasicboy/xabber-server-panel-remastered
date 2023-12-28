@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import ConfigList, CreateHost, ManageAdmins, Modules, RootPageView
+from .views import CreateHost, Modules, RootPageView, ConfigHosts, ConfigAdmins
 
 
 urlpatterns = [
-    path('', ConfigList.as_view(), name='tabs'),
+    path('hosts/', ConfigHosts.as_view(), name='hosts'),
+    path('admins/', ConfigAdmins.as_view(), name='admins'),
     path('host/create/', CreateHost.as_view(), name='host_create'),
-    path('admins/manage/', ManageAdmins.as_view(), name='manage_admins'),
     path('modules/', Modules.as_view(), name='modules'),
     path('root_page/', RootPageView.as_view(), name='root_page'),
 ]
