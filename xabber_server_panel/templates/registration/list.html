@@ -1,19 +1,24 @@
 {% extends 'base.html' %}
 
+{% block section_title %}{% endblock %}
+
 {% block content %}
     {% url 'registration:list' as url %}
-    <div class="container">
-        <div>
-            <h1>Registration</h1>
-            {% if hosts %}
-                <div>
-                    {% include 'parts/host_select.html' %}
-                </div>
-            {% endif %}
+    <div class="mb-4 col-12 d-flex">
+        <div class="d-flex align-items-center me-4">
+            <h2 class="mb-0">
+                Registration
+            </h2>
         </div>
 
-        <div class="list-js" data-url="{{ url }}">
-            {% include 'registration/parts/registration_list.html' %}
-        </div>
+        {% if hosts %}
+            <div class="ms-auto">
+                {% include 'parts/host_select.html' %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4 list-js" data-url="{{ url }}">
+        {% include 'registration/parts/registration_list.html' %}
     </div>
 {% endblock %}

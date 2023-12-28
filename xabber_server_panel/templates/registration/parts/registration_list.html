@@ -1,80 +1,137 @@
 {% load base_tags %}
 
-<div>
-    Registration:
+<div class="mb-4 overflow-hidden">
     <form method="post">
         {% csrf_token %}
         <input type="hidden" name="host" value="{{ settings.host.name }}">
-        <select name="status">
-          <option value="disabled">disabled</option>
-          <option value="link" {% if settings.status == 'link' %}selected{% endif %}>link</option>
-          <option value="public" {% if settings.status == 'public' %}selected{% endif %}>public</option>
-        </select>
 
-        <button>
-            Save
-        </button>
+        <div class="d-flex flex-wrap mb-n3 me-n3">
+            <div class="me-3 mb-3">
+                <label class="col-form-label">Registration:</label>
+            </div>
+            <div class="me-3 mb-3">
+                <select class="form-select" name="status">
+                    <option value="disabled">disabled</option>
+                    <option value="link" {% if settings.status == 'link' %}selected{% endif %}>link</option>
+                    <option value="public" {% if settings.status == 'public' %}selected{% endif %}>public</option>
+                </select>
+            </div>
+            <div class="me-3 mb-3">
+                <button class="btn btn-primary" type="submit">
+                    Save
+                </button>
+            </div>
+        </div>
     </form>
 </div>
 
 {% if settings.status == 'link' %}
-    <div>
-        Web client url:
-        <span class="current-url-js">
-            {{ settings.url|default:'' }}
-        </span>
+    <div class="mb-4 overflow-hidden" data-bs-theme="light">
+        <div class="d-flex flex-wrap align-items-center mb-n3 me-n3">
+            <span class="me-3 mb-3">
+                Web client url:
+            </span>
 
-        <a href="{% url 'registration:url' id=settings.id %}">
-            Edit
-        </a>
+            <a class="me-3 mb-3 current-url-js" href="{{ settings.url|default:'' }}">
+                {{ settings.url|default:'' }}
+            </a>
+
+            <a class="me-3 mb-3" href="{% url 'registration:url' id=settings.id %}">
+                Edit
+            </a>
+        </div>
     </div>
 
     {% if keys %}
-        {% paginate keys 1 as paginated_keys %}
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Key</th>
-                    <th>Expires</th>
-                    <th>Description</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for obj in paginated_keys %}
+        {% paginate keys 10 as paginated_keys %}
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td>
-                            {{ forloop.counter }}
-                        </td>
-                        <td>
-                            {{ obj.key }}
-                        </td>
-                        <td>
-                            {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
-                        </td>
-                        <td>
-                            {{ obj.description }}
-                        </td>
-                        <td>
-                            <a href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
-                                Change
-                            </a>
-                            <a href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
-                                Delete
-                            </a>
-                            <a class="show-url-js" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}">
-                                Show link
-                            </a>
-                        </td>
+                        <th>#</th>
+                        <th>Key</th>
+                        <th>Expires</th>
+                        <th>Description</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% include 'parts/pagination.html' with objects=paginated_keys %}
+                </thead>
+                <tbody>
+                    {% for obj in paginated_keys %}
+                        <tr>
+                            <td>
+                                {{ forloop.counter }}
+                            </td>
+                            <td>
+                                {{ obj.key }}
+                            </td>
+                            <td>
+                                {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
+                            </td>
+                            <td>
+                                {{ obj.description }}
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <div class="dropdown">
+                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical d-flex"></i>
+                                        </div>
+
+                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item text-wrap" href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
+                                                    Change
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
+                                                     Delete
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-info show-url-js" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
+                                                     Show link
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal fade" id="show_link" tabindex="-1" aria-labelledby="show_link_label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 text-white" id="show_link_label">Registration link</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <a class="title-url-js" target="_blank"></a>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary copy-url-js">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if keys.count > 5 %}
+            {% include 'parts/pagination.html' with objects=paginated_keys %}
+        {% endif %}
     {% endif %}
 
-    <a href="{% url 'registration:create' vhost_id=settings.host.id %}">
-        Add
-    </a>
+    <div class="mt-4 text-end">
+        <a class="btn btn-primary" href="{% url 'registration:create' vhost_id=settings.host.id %}">
+            Add
+        </a>
+    </div>
 {% endif %}

@@ -35,18 +35,39 @@ $(function () {
         let schemeAndHost = urlObject.origin;
 
         //Check if the content of the span tag is empty
-        if ($('.current-url-js').length != 0 & $('.current-url-js').text().trim() === '') {
+        if ($('.current-url-js').length != 0 && $('.current-url-js').text().trim() === '') {
             //If it's empty, insert the current URL
             $('.current-url-js').text(schemeAndHost);
         }
 
         //Check if the content of the span tag is empty
-        if ($('.show-url-js').length != 0 & $('.show-url-js').data('link').trim() === '') {
+        if ($('.show-url-js').length != 0 && $('.show-url-js').data('link').trim() === '') {
             //If it's empty, insert the current URL
             $('.show-url-js').data('link', schemeAndHost);
         }
     };
     setCurrentUrl();
+
+    //Add url to title
+    $(document).on('click', '.show-url-js', function() {
+        let url = $(this).data('link');
+        let key = $(this).data('key');
+        let fullLink = url + '/?rkey=' + key;
+
+        $('.title-url-js').attr('href', fullLink).text(fullLink);
+    });
+
+    //Copy url
+    $(document).on('click', '.copy-url-js', function() {
+        let $temp = $("<div>");
+        $("body").append($temp);
+        $temp.attr("contenteditable", true)
+            .html($('.title-url-js').html()).select()
+            .on("focus", function() { document.execCommand('selectAll', false, null); })
+            .focus();
+        document.execCommand("copy");
+        $temp.remove();
+    });
 
     //Generate password on click
     function generatePassword() {
@@ -58,7 +79,7 @@ $(function () {
         }
         return res;
     };
-    $('.generate-password-js').on('click', function() {
+    $(document).on('click', '.generate-password-js', function() {
         $(this).prev().val(generatePassword());
         return false;
     });
