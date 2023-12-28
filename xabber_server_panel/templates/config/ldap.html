@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load config_tags %}
+
+{% block content %}
+    {% url 'config:tabs' as url %}
+    <div class="container">
+        <div>
+            <h1>Server settings</h1>
+        </div>
+
+        <div>
+            {% include 'config/parts/links.html' %}
+
+            <div>
+                <div>
+                    LDAP authentication
+                </div>
+                {% url 'config:tabs' as url %}
+                <form method="post">
+                    {% csrf_token %}
+                    <label>
+                        Host
+                        <select id="host" name="host" data-url="{{ url }}">
+                            {% for host in hosts %}
+                                <option value="{{ host.id }}">
+                                    {{ host.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <div class="list-js" data-url="{{ url }}">
+                        {% include 'config/parts/ldap_fields.html' %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

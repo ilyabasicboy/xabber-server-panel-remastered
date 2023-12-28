@@ -7,7 +7,9 @@
     <a class="{% if admins == request.path_info %}active{% endif %}" href="{{ admins }}">
         Administrators
     </a>
-    <a href="#ldap">
+
+    {% url 'config:ldap' as ldap %}
+    <a class="{% if ldap == request.path_info %}active{% endif %}" href="{{ ldap }}">
         LDAP
     </a>
     <a href="#modules">

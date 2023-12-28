@@ -153,6 +153,101 @@ class ConfigAdmins(TemplateView):
         return self.render_to_response(context)
 
 
+class ConfigLdap(TemplateView):
+    template_name = 'config/ldap.html'
+
+    def get(self, request, *args, **kwargs):
+        hosts = VirtualHost.objects.all()
+
+        context = {
+            'hosts': hosts
+        }
+
+        if hosts:
+            host_name = self.request.GET.get('host')
+
+            if host_name:
+                host = hosts.filter(name=host_name).first()
+            else:
+                host = hosts.first()
+
+            ldap_settings = LDAPSettings.objects.filter(host=host).first()
+            context['ldap_settings'] = ldap_settings
+
+        if request.is_ajax():
+            return render(request, 'config/parts/ldap_fields.html', context)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        self.form = LDAPSettingsForm(request.POST)
+        hosts = VirtualHost.objects.all()
+
+        context = {
+            'hosts': hosts
+        }
+
+        host_id = self.request.POST.get('host')
+
+        try:
+            self.host = VirtualHost.objects.get(id=host_id)
+        except ObjectDoesNotExist:
+            self.form.add_error(
+                'host', 'Host does not exists'
+            )
+
+        self.server_list = self.clean_server_list()
+        if self.form.is_valid():
+            self.update_or_create_ldap()
+            # update_ejabberd_config()
+
+        return self.render_to_response(context)
+
+    def clean_server_list(self):
+        server_list_data = self.request.POST.get('server_list')
+
+        # Split the input strings by commas, semicolons, and line breaks
+        server_list = re.split(r'[;,\n]+', server_list_data.strip())
+
+        # Remove empty strings
+        server_list = [server.strip() for server in server_list if server.strip()]
+
+        invalid_server_list = []
+        for server_name in server_list:
+            server = Server(server_name, get_info=ALL)
+            conn = Connection(server)
+            try:
+                conn.bind()
+            except Exception:
+                invalid_server_list.append(server_name)
+
+        if invalid_server_list:
+            self.form.add_error(
+                'server_list', 'Invalid server list: {}.'.format(', '.join(invalid_server_list))
+            )
+
+        return server_list
+
+    def update_or_create_ldap(self):
+        # prepare data to update excluding special fields
+        defaults = {
+            key: self.form.cleaned_data.get(key) for key in self.form.fields.keys() if key not in ['host', 'server_list']
+        }
+
+        # update settings
+        ldap_settings, created = LDAPSettings.objects.update_or_create(
+            host=self.host,
+            defaults=defaults
+        )
+
+        # create new servers
+        for server in self.server_list:
+            LDAPServer.objects.get_or_create(
+                server=server, settings=ldap_settings
+            )
+
+        # delete old servers
+        ldap_settings.servers.exclude(server__in=self.server_list).delete()
+
 
 class CreateHost(TemplateView):
     template_name = 'config/host_create.html'
