@@ -1,6 +1,6 @@
-from django.shortcuts import reverse, render
+from django.shortcuts import reverse, render, loader
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from ldap3 import Server, Connection, ALL
@@ -17,101 +17,6 @@ import tarfile
 import shutil
 import os
 import re
-
-
-class ConfigList(TemplateView):
-    template_name = 'config/tabs.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data()
-
-        if request.is_ajax():
-            return render(request, 'config/parts/ldap_fields.html', context)
-
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        self.form = LDAPSettingsForm(request.POST)
-
-        host_id = self.request.POST.get('host')
-
-        try:
-            self.host = VirtualHost.objects.get(id=host_id)
-        except ObjectDoesNotExist:
-            self.form.add_error(
-                'host', 'Host does not exists'
-            )
-
-        self.server_list = self.clean_server_list()
-        if self.form.is_valid():
-            self.update_or_create_ldap()
-            # update_ejabberd_config()
-            return HttpResponseRedirect(
-                reverse('config:tabs')
-            )
-
-        return self.render_to_response(self.get_context_data())
-
-    def get_context_data(self, **kwargs):
-        hosts = VirtualHost.objects.all()
-        admins = User.objects.filter(is_admin=True)
-        form = self.form if hasattr(self, 'form') else LDAPSettingsForm()
-        host = self.request.GET.get('host', hosts.first())
-        ldap_settings = LDAPSettings.objects.filter(host=host).first()
-
-        context = {
-            'hosts': hosts,
-            'admins': admins,
-            'form': form,
-            'ldap_settings': ldap_settings
-        }
-        return context
-
-    def clean_server_list(self):
-        server_list_data = self.request.POST.get('server_list')
-
-        # Split the input strings by commas, semicolons, and line breaks
-        server_list = re.split(r'[;,\n]+', server_list_data.strip())
-
-        # Remove empty strings
-        server_list = [server.strip() for server in server_list if server.strip()]
-
-        invalid_server_list = []
-        for server_name in server_list:
-            server = Server(server_name, get_info=ALL)
-            conn = Connection(server)
-            try:
-                conn.bind()
-            except Exception:
-                invalid_server_list.append(server_name)
-
-        if invalid_server_list:
-            self.form.add_error(
-                'server_list', 'Invalid server list: {}.'.format(', '.join(invalid_server_list))
-            )
-
-        return server_list
-
-    def update_or_create_ldap(self):
-        # prepare data to update excluding special fields
-        defaults = {
-            key: self.form.cleaned_data.get(key) for key in self.form.fields.keys() if key not in ['host', 'server_list']
-        }
-
-        # update settings
-        ldap_settings, created = LDAPSettings.objects.update_or_create(
-            host=self.host,
-            defaults=defaults
-        )
-
-        # create new servers
-        for server in self.server_list:
-            LDAPServer.objects.get_or_create(
-                server=server, settings=ldap_settings
-            )
-
-        # delete old servers
-        ldap_settings.servers.exclude(server__in=self.server_list).delete()
 
 
 class ConfigHosts(TemplateView):
@@ -164,10 +69,10 @@ class ConfigLdap(TemplateView):
         }
 
         if hosts:
-            host_name = self.request.GET.get('host')
+            host_id = self.request.GET.get('host')
 
-            if host_name:
-                host = hosts.filter(name=host_name).first()
+            if host_id:
+                host = hosts.filter(id=host_id).first()
             else:
                 host = hosts.first()
 
@@ -175,7 +80,11 @@ class ConfigLdap(TemplateView):
             context['ldap_settings'] = ldap_settings
 
         if request.is_ajax():
-            return render(request, 'config/parts/ldap_fields.html', context)
+            html = loader.render_to_string('config/parts/ldap_fields.html', context, request)
+            response_data = {
+                'html': html
+            }
+            return JsonResponse(response_data)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -183,13 +92,15 @@ class ConfigLdap(TemplateView):
         hosts = VirtualHost.objects.all()
 
         context = {
-            'hosts': hosts
+            'hosts': hosts,
+            'form': self.form
         }
 
         host_id = self.request.POST.get('host')
 
         try:
             self.host = VirtualHost.objects.get(id=host_id)
+            context['curr_host'] = self.host.name
         except ObjectDoesNotExist:
             self.form.add_error(
                 'host', 'Host does not exists'
@@ -261,7 +172,7 @@ class CreateHost(TemplateView):
             )
 
             return HttpResponseRedirect(
-                reverse('config:tabs')
+                reverse('config:hosts')
             )
 
         context = {
@@ -269,10 +180,11 @@ class CreateHost(TemplateView):
         return self.render_to_response(context)
 
 
-class Modules(TemplateView):
+class ConfigModules(TemplateView):
+    template_name = 'config/modules.html'
 
     def get(self, request, *args, **kwargs):
-        return HttpResponseNotFound
+        return self.render_to_response({})
 
     def post(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
@@ -309,15 +221,14 @@ class Modules(TemplateView):
                 shutil.rmtree(temp_extract_dir, ignore_errors=True)
                 print(f"Ошибка при обработке архива: {str(e)}")
 
-        return HttpResponseRedirect(
-            reverse('config:tabs')
-        )
+        return self.render_to_response({})
 
 
 class RootPageView(TemplateView):
+    template_name = 'config/root_page.html'
 
     def get(self, request, *args, **kwargs):
-        return HttpResponseNotFound
+        return self.render_to_response({})
 
     def post(self, request, *args, **kwargs):
 
@@ -329,6 +240,4 @@ class RootPageView(TemplateView):
         else:
             RootPage.objects.create(module=module)
 
-        return HttpResponseRedirect(
-            reverse('config:tabs')
-        )
+        return self.render_to_response({})

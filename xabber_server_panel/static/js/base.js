@@ -35,15 +35,19 @@ $(function () {
         let schemeAndHost = urlObject.origin;
 
         //Check if the content of the span tag is empty
-        if ($('.current-url-js').length != 0 && $('.current-url-js').text().trim() === '') {
-            //If it's empty, insert the current URL
-            $('.current-url-js').text(schemeAndHost);
+        if ($('.current-url-js').length != 0) {
+            if ($('.current-url-js').text().trim() === ''){
+                //If it's empty, insert the current URL
+                $('.current-url-js').text(schemeAndHost);
+            }
         }
 
         //Check if the content of the span tag is empty
-        if ($('.show-url-js').length != 0 && $('.show-url-js').data('link').trim() === '') {
-            //If it's empty, insert the current URL
-            $('.show-url-js').data('link', schemeAndHost);
+        if ($('.show-url-js').length != 0 ) {
+            if ($('.show-url-js').data('link').trim() === ''){
+                //If it's empty, insert the current URL
+                $('.show-url-js').data('link', schemeAndHost);
+            }
         }
     };
     setCurrentUrl();

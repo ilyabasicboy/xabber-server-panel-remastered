@@ -15,14 +15,15 @@
                 <div>
                     LDAP authentication
                 </div>
-                {% url 'config:tabs' as url %}
+                {% url 'config:tabs' as ldap %}
                 <form method="post">
                     {% csrf_token %}
+
                     <label>
                         Host
                         <select id="host" name="host" data-url="{{ url }}">
                             {% for host in hosts %}
-                                <option value="{{ host.id }}">
+                                <option value="{{ host.id }}" {% if host.name == curr_host %}selected{% endif %}>
                                     {{ host.name }}
                                 </option>
                             {% endfor %}
