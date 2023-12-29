@@ -163,6 +163,12 @@ class ConfigLdap(TemplateView):
 class CreateHost(TemplateView):
     template_name = 'config/host_create.html'
 
+    def get(self, request, *args, **kwargs):
+        context = {
+            "hosts": VirtualHost.objects.all()
+        }
+        return self.render_to_response(context)
+
     def post(self, request, *args, **kwargs):
         host_name = request.POST.get('host')
 

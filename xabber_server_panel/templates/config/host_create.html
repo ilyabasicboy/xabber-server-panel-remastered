@@ -2,6 +2,35 @@
 {% load base_tags %}
 
 {% block content %}
+    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+        <div class="d-flex align-items-center me-4">
+            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a class="fs-4" href="{% url 'config:hosts' %}">
+                            Settings
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </li>
+
+                    <li class="breadcrumb-item text-body-emphasis active fs-4" aria-current="page">
+                        Add virtual host
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="vr mx-3"></div>
+
+            <h6 class="mb-0 text-body-tertiary">
+                {{ hosts.count }} hosts
+            </h6>
+        </div>
+    </div>
     <div class="container">
         <form method="post">
             {% csrf_token %}
