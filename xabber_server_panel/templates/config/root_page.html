@@ -1,44 +1,42 @@
 {% extends 'base.html' %}
 {% load config_tags base_tags %}
 
+{% block title %}
+    Server settings
+{% endblock %}
+
 {% block content %}
     {% url 'config:tabs' as url %}
-    <div class="container">
+    <div class="mb-4 col-12" data-bs-theme="light">
+        {% include 'config/parts/links.html' %}
+    </div>
+
+    {% get_items_by_model_name 'rootpage' num=1 as rp %}
+    <div id="root_page">
         <div>
-            <h1>Server settings</h1>
+            Root page
         </div>
 
-        <div>
-            {% include 'config/parts/links.html' %}
+        <form action="{% url 'config:root_page' %}" method="post">
+            {% csrf_token %}
 
-            {% get_items_by_model_name 'rootpage' num=1 as rp %}
-            <div id="root_page">
-                <div>
-                    Root page
-                </div>
+            <label>
+                Module
+                <select name="module">
+                    <option value="home">
+                        Home page
+                    </option>
+                    {% for module in modules %}
+                        <option value="{{ module }}" {% if rp.0.module == module %}selected{% endif %}>
+                            {{ module }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
 
-                <form action="{% url 'config:root_page' %}" method="post">
-                    {% csrf_token %}
-
-                    <label>
-                        Module
-                        <select name="module">
-                            <option value="home">
-                                Home page
-                            </option>
-                            {% for module in modules %}
-                                <option value="{{ module }}" {% if rp.0.module == module %}selected{% endif %}>
-                                    {{ module }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </label>
-
-                    <button>
-                        Save
-                    </button>
-                </form>
-            </div>
-        </div>
+            <button>
+                Save
+            </button>
+        </form>
     </div>
 {% endblock %}

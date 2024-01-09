@@ -1,46 +1,44 @@
 {% extends 'base.html' %}
 {% load config_tags %}
 
+{% block title %}
+    Server settings
+{% endblock %}
+
 {% block content %}
     {% url 'config:tabs' as url %}
-    <div class="container">
-        <div>
-            <h1>Server settings</h1>
-        </div>
+    <div class="mb-4 col-12" data-bs-theme="light">
+        {% include 'config/parts/links.html' %}
+    </div>
 
-        <div>
-            {% include 'config/parts/links.html' %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Module</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for module in modules %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            {{ module }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
             <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Module</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for module in modules %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>
-                                    {{ module }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div>
-                        You can only upload a module in TAR.GZ or TGZ format.
-                    </div>
-                    <input type="file" name="file" accept=".tar.gz, .tgz">
-                    <button>Save</button>
-                </form>
+                You can only upload a module in TAR.GZ or TGZ format.
             </div>
-        </div>
+            <input type="file" name="file" accept=".tar.gz, .tgz">
+            <button>Save</button>
+        </form>
     </div>
 {% endblock %}
