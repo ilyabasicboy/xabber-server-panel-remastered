@@ -1,12 +1,11 @@
 from django.conf import settings
-from django.template.loader import render_to_string
-
-from xabber_server_panel.dashboard.models import VirtualHost
 
 import subprocess
 import time
 import os
 import re
+import random
+import string
 
 
 def write_ejabberd_state(state):
@@ -77,27 +76,6 @@ def reload_ejabberd_config():
     return execute_ejabberd_cmd('reload_config')
 
 
-def update_ejabberd_config():
-    update_vhosts_config()
-    # from modules_installation.utils.config_generator import make_xmpp_config
-    # make_xmpp_config()
-    reload_ejabberd_config()
-
-
-def update_vhosts_config():
-    template = 'ejabberd/vhosts_template.yml'
-    vhosts = VirtualHost.objects.all()
-    if not vhosts.exists():
-        return
-    file = open(
-        os.path.join(
-            settings.EJABBERD_CONFIG_PATH,
-            settings.EJABBERD_VHOSTS_CONFIG_FILE
-        ), 'w+')
-    file.write(render_to_string(template, {'vhosts': vhosts}))
-    file.close()
-
-
 def host_is_valid(host_name):
     # Define a regular expression for the host format: 'example.com'
     pattern = re.compile(r'^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
@@ -141,3 +119,7 @@ def get_user_data_for_api(user, password=None):
     if password:
         data['password'] = password
     return data
+
+
+def get_system_group_suffix():
+    return ''.join(random.choices(string.ascii_lowercase, k=8))

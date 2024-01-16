@@ -55,6 +55,7 @@ class EjabberdAPI(object):
         self._cleanup_for_request()
         method = getattr(self.session, http_method)
         url = self.base_url + relative_url
+        print(http_method, url, data)
         try:
             self._wrapped_call(method, url, success_code, data, http_method)
         except ResponseException as e:

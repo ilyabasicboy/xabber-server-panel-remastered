@@ -32,7 +32,12 @@
                                 {{ host.name }}
                             </td>
                             <td>
-
+                                <a href="{% url 'config:host_detail' id=host.id %}">
+                                    SRV records info
+                                </a>
+                                <a href="{% url 'config:host_delete' id=host.id %}">
+                                    Delete
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

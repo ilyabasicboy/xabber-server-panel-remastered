@@ -7,8 +7,10 @@ from ldap3 import Server, Connection, ALL
 from django.template.utils import get_app_template_dirs
 
 from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.users.models import User
-from xabber_server_panel.utils import host_is_valid, update_ejabberd_config
+from xabber_server_panel.config.utils import update_ejabberd_config
+from xabber_server_panel.utils import host_is_valid, get_system_group_suffix
 
 from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
@@ -31,6 +33,111 @@ class ConfigHosts(TemplateView):
         return self.render_to_response(context)
 
 
+class DeleteHost(TemplateView):
+
+    def get(self, request, id, *args, **kwargs):
+
+        try:
+            host = VirtualHost.objects.get(id=id)
+        except VirtualHost.DoesNotExist:
+            return HttpResponseNotFound
+
+        users = User.objects.filter(host=host.name)
+        for user in users:
+            request.user.api.unregister_user(
+                {
+                    'username': user.username,
+                    'host': host.name
+                }
+            )
+        users.delete()
+
+        circles = Circle.objects.filter(host=host.name)
+        for circle in circles:
+            request.user.api.delete_group(
+                {
+                    'circle': circle.circle,
+                    'host': host.name
+                }
+            )
+        circles.delete()
+
+        host.delete()
+        update_ejabberd_config()
+        return HttpResponseRedirect(
+                reverse('config:hosts')
+            )
+
+
+class DetailHost(TemplateView):
+    template_name = 'config/host_detail.html'
+
+    def get(self, request, id, *args, **kwargs):
+
+        try:
+            host = VirtualHost.objects.get(id=id)
+        except VirtualHost.DoesNotExist:
+            return HttpResponseNotFound
+
+        context = {
+            'host': host
+        }
+        return self.render_to_response(context)
+
+
+class CreateHost(TemplateView):
+    template_name = 'config/host_create.html'
+
+    def get(self, request, *args, **kwargs):
+        context = {
+            "hosts": VirtualHost.objects.all()
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        host = request.POST.get('host')
+
+        if host_is_valid(host):
+            VirtualHost.objects.create(
+                name=host
+            )
+            self.create_everybody_group(request, host)
+            update_ejabberd_config()
+            return HttpResponseRedirect(
+                reverse('config:hosts')
+            )
+
+        context = {
+        }
+        return self.render_to_response(context)
+
+    def create_everybody_group(self, request, host):
+        request.user.api.srg_create_api(
+            {
+                'group': host,
+                'host': host,
+                'name': settings.EJABBERD_DEFAULT_GROUP_NAME,
+                'description': settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
+                'display': []
+            }
+        )
+        request.user.api.srg_user_add_api(
+            {
+                'members': ['@all@'],
+                'host': host,
+                'circle': host
+            }
+        )
+
+        circle = Circle.objects.create(
+            circle=host,
+            host=host,
+            name=settings.EJABBERD_DEFAULT_GROUP_NAME,
+            description=settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
+            prefix=get_system_group_suffix()
+        )
+
+
 class ConfigAdmins(TemplateView):
     template_name = 'config/admins.html'
 
@@ -48,9 +155,29 @@ class ConfigAdmins(TemplateView):
         users = User.objects.all()
         admins = request_data.get('admins', [])
 
-        users.filter(id__in=admins, is_admin=False).update(is_admin=True)
-        users.exclude(id__in=admins, is_admin=True).update(is_admin=False)
+        admins_to_add = users.filter(id__in=admins, is_admin=False)
+        for user in admins_to_add:
+            request.user.api.xabber_set_admin(
+                {
+                    "username": user.username,
+                    "host": user.host
+                }
+            )
 
+        admins_to_add.update(is_admin=True)
+
+        admins_to_delete = users.exclude(id__in=admins, is_admin=True)
+        for user in admins_to_delete:
+            request.user.api.xabber_del_admin(
+                {
+                    "username": user.username,
+                    "host": user.host,
+                }
+            )
+
+        admins_to_delete.update(is_admin=False)
+
+        update_ejabberd_config()
         context = {
             'admins': users.filter(id__in=admins),
             'users': users
@@ -109,7 +236,7 @@ class ConfigLdap(TemplateView):
         self.server_list = self.clean_server_list()
         if self.form.is_valid():
             self.update_or_create_ldap()
-            # update_ejabberd_config()
+            update_ejabberd_config()
 
         return self.render_to_response(context)
 
@@ -160,32 +287,6 @@ class ConfigLdap(TemplateView):
         ldap_settings.servers.exclude(server__in=self.server_list).delete()
 
 
-class CreateHost(TemplateView):
-    template_name = 'config/host_create.html'
-
-    def get(self, request, *args, **kwargs):
-        context = {
-            "hosts": VirtualHost.objects.all()
-        }
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        host_name = request.POST.get('host')
-
-        if host_is_valid(host_name):
-            VirtualHost.objects.create(
-                name=host_name
-            )
-
-            return HttpResponseRedirect(
-                reverse('config:hosts')
-            )
-
-        context = {
-        }
-        return self.render_to_response(context)
-
-
 class ConfigModules(TemplateView):
     template_name = 'config/modules.html'
 
@@ -217,7 +318,6 @@ class ConfigModules(TemplateView):
 
                         # Внесение изменений в settings.py
                         settings.INSTALLED_APPS.append(f'{target_path}')
-                        print(settings.INSTALLED_APPS)
                     # Удаление временной папки
                     shutil.rmtree(temp_extract_dir)
 

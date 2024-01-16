@@ -97,11 +97,14 @@ INSTALLATION_LOCK = os.path.join(PROJECT_ROOT, '.installation_lock')
 PSQL_SCRIPT = os.path.join(PROJECT_ROOT, 'utils/psql/psql')
 EJABBERD_DUMP = os.path.join(PROJECT_ROOT, 'utils/psql/pg.sql')
 EJABBERD_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'xmppserver/etc/ejabberd/')
+EJABBERD_MODULES_CONFIG_FILE = 'modules_config.yml'
 EJABBERDCTL = os.path.join(PROJECT_ROOT, 'xmppserver/bin/ejabberdctl')
 EJABBERD_SHOULD_RELOAD = False
 EJABBERD_STATE = os.path.join(PROJECT_ROOT, 'server_state')
 EJABBERD_STATE_ON = 1
 EJABBERD_STATE_OFF = 0
+EJABBERD_DEFAULT_GROUP_NAME = "All"
+EJABBERD_DEFAULT_GROUP_DESCRIPTION = "Contains all users on this virtual host"
 
 EJABBERD_VHOSTS_CONFIG_FILE = 'virtual_hosts.yml'
 
