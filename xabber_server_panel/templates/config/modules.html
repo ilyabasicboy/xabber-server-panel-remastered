@@ -17,6 +17,7 @@
                 <tr>
                     <th>#</th>
                     <th>Module</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +26,11 @@
                         <td>{{ forloop.counter }}</td>
                         <td>
                             {{ module }}
+                        </td>
+                        <td>
+                            <a href="{% url 'config:delete_module' module=module %}">
+                                Delete
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}

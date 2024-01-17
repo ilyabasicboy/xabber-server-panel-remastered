@@ -6,18 +6,25 @@ from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.utils import reload_ejabberd_config
 from xabber_server_panel.config.models import BaseXmppModule, BaseXmppOption
 
-import os
 import copy
-import importlib
+import os
+from importlib import util, import_module
 
 
 def get_value(key, value, level):
+
+    """ Helper function to format key-value pairs with proper indentation """
+
     shift = '  ' * level
     result = ''
+
+    # Handle lists
     if isinstance(value, list):
         result += "{}:\n".format(key)
         for el in value:
             result += shift + "  - {}\n".format(el)
+
+    # Handle dictionaries
     elif isinstance(value, dict):
         if value:
             result += "{}:\n".format(key)
@@ -25,51 +32,88 @@ def get_value(key, value, level):
                 result += get_value(subkey, subvalue, level + 1)
         else:
             result += "{}: {}\n".format(key, "{}")
+
+    # Handle other types
     else:
         result += "{}: {}\n".format(key, value)
     return shift + result
 
 
 def get_modules_config():
+
+    """ Returns list of xmpp module or xrmpp option configs """
+
     configs = []
+
+    # loop over all apps and check xmpp_server_config
     for app in apps.app_configs.values():
-        try:
-            module_config = importlib.import_module(".config", package=app.name)
-            configs.extend(module_config.get_xmpp_server_config())
-        except Exception:
-            pass
-    return [el.get_config() for el in configs if isinstance(el, BaseXmppModule) or isinstance(el, BaseXmppOption)]
+
+        # Check if the module exists before attempting to import it
+        module_spec = util.find_spec(".config", package=app.name)
+        if module_spec:
+            module_config = import_module('.config', package=app.name)
+            if hasattr(module_config, 'get_xmpp_server_config'):
+                config_list = module_config.get_xmpp_server_config()
+                configs += [config.get_config() for config in config_list if isinstance(config, (BaseXmppModule, BaseXmppOption))]
+    return configs
 
 
 def make_xmpp_config():
+    # Get module configurations from settings
     module_configs = get_modules_config()
+
+    # Define the path for the Ejabberd configuration file
     config_path = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
-    vhosts = VirtualHost.objects.all()
+
+    # Get all virtual hosts
+    hosts = VirtualHost.objects.all()
+
+    # Initialize dictionaries to store global and per-host configurations
     global_options = {}
-    host_config = {el.name: {} for el in vhosts}
+    host_config = {host.name: {} for host in hosts}
     append_host_config = copy.deepcopy(host_config)
-    for config in module_configs:
+
+    # Loop through module configurations
+    for module_config in module_configs:
         try:
-            if config.get('type') == "module":
-                if config.get('vhost') == "global":
-                    [el.update({config.get('name'): config.get('module_options')}) for el in
-                     append_host_config.values()]
+            # Check if the configuration is a module
+            if module_config.get('type') == "module":
+                # Check if the module is for global or a specific virtual host
+                if module_config.get('vhost') == "global":
+                    # Update all host configurations with the module options
+                    for config in append_host_config.values():
+                        config.update({module_config.get('name'): module_config.get('module_options')})
                 else:
-                    [value.update({config.get('name'): config.get('module_options')}) for key, value in
-                     append_host_config.items() if key == config.get('vhost')]
-            if config.get('type') == "option":
-                if config.get('vhost') == "global":
-                    global_options.update({config.get('name'): config.get('value')})
+                    # Update the specific virtual host configuration with the module options
+                    for key, value in append_host_config.items():
+                        if key == module_config.get('vhost'):
+                            value.update({module_config.get('name'): module_config.get('module_options')})
+
+            # Check if the configuration is an option
+            elif module_config.get('type') == "option":
+                # Check if the option is for global or a specific virtual host
+                if module_config.get('vhost') == "global":
+                    # Update global options with the option value
+                    global_options.update({module_config.get('name'): module_config.get('value')})
                 else:
-                    host_config.get(config.get('vhost')).update({config.get('name'): config.get('value')})
-        except Exception:
+                    # Update the specific virtual host configuration with the option value
+                    host_config.get(module_config.get('vhost')).update(
+                        {module_config.get('name'): module_config.get('value')})
+
+        except Exception as e:
+            # Print any exceptions that occur, but continue with the next iteration
+            print(e)
             pass
 
+    # Write the configurations to the Ejabberd configuration file
     with open(config_path, "w") as f:
+        # Write global options to the file
         for key, value in global_options.items():
             f.write(get_value(key, value, level=0))
 
-        if [el for el in host_config.values() if el]:
+        # Write host configurations to the file
+        config_values = [config for config in host_config.values() if config]
+        if config_values:
             f.write("host_config:\n")
             for key, value in host_config.items():
                 if value:
@@ -77,6 +121,7 @@ def make_xmpp_config():
                     for key1, val1 in value.items():
                         f.write(get_value(key1, val1, level=3))
 
+        # Write append_host_config to the file
         f.write("append_host_config:\n")
         for key, value in append_host_config.items():
             if value:

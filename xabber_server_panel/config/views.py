@@ -9,7 +9,7 @@ from django.template.utils import get_app_template_dirs
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.users.models import User
-from xabber_server_panel.config.utils import update_ejabberd_config
+from xabber_server_panel.config.utils import update_ejabberd_config, make_xmpp_config
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix
 
 from .models import LDAPSettings, LDAPServer, RootPage
@@ -21,7 +21,7 @@ import os
 import re
 
 
-class ConfigHosts(TemplateView):
+class Hosts(TemplateView):
     template_name = 'config/hosts.html'
 
     def get(self, request, *args, **kwargs):
@@ -138,7 +138,7 @@ class CreateHost(TemplateView):
         )
 
 
-class ConfigAdmins(TemplateView):
+class Admins(TemplateView):
     template_name = 'config/admins.html'
 
     def get(self, request, *args, **kwargs):
@@ -185,7 +185,7 @@ class ConfigAdmins(TemplateView):
         return self.render_to_response(context)
 
 
-class ConfigLdap(TemplateView):
+class Ldap(TemplateView):
     template_name = 'config/ldap.html'
 
     def get(self, request, *args, **kwargs):
@@ -287,7 +287,7 @@ class ConfigLdap(TemplateView):
         ldap_settings.servers.exclude(server__in=self.server_list).delete()
 
 
-class ConfigModules(TemplateView):
+class Modules(TemplateView):
     template_name = 'config/modules.html'
 
     def get(self, request, *args, **kwargs):
@@ -321,6 +321,7 @@ class ConfigModules(TemplateView):
                     # Удаление временной папки
                     shutil.rmtree(temp_extract_dir)
 
+                    make_xmpp_config()
                     print("Модуль успешно добавлен и настроен.")
             except Exception as e:
                 # Удаление временной папки в случае ошибки
@@ -328,6 +329,20 @@ class ConfigModules(TemplateView):
                 print(f"Ошибка при обработке архива: {str(e)}")
 
         return self.render_to_response({})
+
+
+class DeleteModule(TemplateView):
+
+    def get(self, request, module, *args, **kwargs):
+
+        module_path = os.path.join(settings.MODULES_DIR, module)
+        if os.path.isdir(module_path):
+            shutil.rmtree(module_path)
+
+            make_xmpp_config()
+            return HttpResponseRedirect(reverse('config:modules'))
+        else:
+            return HttpResponseNotFound
 
 
 class RootPageView(TemplateView):

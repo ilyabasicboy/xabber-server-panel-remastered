@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import CreateHost, ConfigModules, RootPageView, ConfigHosts, ConfigAdmins, ConfigLdap, DeleteHost, DetailHost
+from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost
 
 
 urlpatterns = [
-    path('hosts/', ConfigHosts.as_view(), name='hosts'),
-    path('admins/', ConfigAdmins.as_view(), name='admins'),
-    path('ldap/', ConfigLdap.as_view(), name='ldap'),
-    path('modules/', ConfigModules.as_view(), name='modules'),
+    path('hosts/', Hosts.as_view(), name='hosts'),
+    path('admins/', Admins.as_view(), name='admins'),
+    path('ldap/', Ldap.as_view(), name='ldap'),
+    path('modules/', Modules.as_view(), name='modules'),
+    path('modules/delete/<str:module>/', DeleteModule.as_view(), name='delete_module'),
     path('host/create/', CreateHost.as_view(), name='host_create'),
     path('host/delete/<int:id>/', DeleteHost.as_view(), name='host_delete'),
     path('host/detail/<int:id>/', DetailHost.as_view(), name='host_detail'),

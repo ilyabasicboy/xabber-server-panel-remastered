@@ -5,6 +5,8 @@ from django.shortcuts import reverse, render, loader
 from datetime import datetime
 
 from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.utils import make_xmpp_config
+from xabber_server_panel.utils import reload_ejabberd_config
 
 from .models import RegistrationSettings
 
@@ -124,6 +126,9 @@ class RegistrationCreate(TemplateView):
         context = {
             'host': host
         }
+
+        make_xmpp_config()
+        reload_ejabberd_config()
         return self.render_to_response(context)
 
 
@@ -187,6 +192,9 @@ class RegistrationChange(TemplateView):
         context = {
             'host': host
         }
+
+        make_xmpp_config()
+        reload_ejabberd_config()
         return self.render_to_response(context)
 
 
