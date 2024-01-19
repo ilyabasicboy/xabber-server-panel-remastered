@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from ldap3 import Server, Connection, ALL
-from django.template.utils import get_app_template_dirs
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
@@ -21,7 +21,7 @@ import os
 import re
 
 
-class Hosts(TemplateView):
+class Hosts(LoginRequiredMixin, TemplateView):
     template_name = 'config/hosts.html'
 
     def get(self, request, *args, **kwargs):
@@ -33,7 +33,7 @@ class Hosts(TemplateView):
         return self.render_to_response(context)
 
 
-class DeleteHost(TemplateView):
+class DeleteHost(LoginRequiredMixin, TemplateView):
 
     def get(self, request, id, *args, **kwargs):
 
@@ -69,7 +69,7 @@ class DeleteHost(TemplateView):
             )
 
 
-class DetailHost(TemplateView):
+class DetailHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_detail.html'
 
     def get(self, request, id, *args, **kwargs):
@@ -85,7 +85,7 @@ class DetailHost(TemplateView):
         return self.render_to_response(context)
 
 
-class CreateHost(TemplateView):
+class CreateHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_create.html'
 
     def get(self, request, *args, **kwargs):
@@ -138,7 +138,7 @@ class CreateHost(TemplateView):
         )
 
 
-class Admins(TemplateView):
+class Admins(LoginRequiredMixin, TemplateView):
     template_name = 'config/admins.html'
 
     def get(self, request, *args, **kwargs):
@@ -185,7 +185,7 @@ class Admins(TemplateView):
         return self.render_to_response(context)
 
 
-class Ldap(TemplateView):
+class Ldap(LoginRequiredMixin, TemplateView):
     template_name = 'config/ldap.html'
 
     def get(self, request, *args, **kwargs):
@@ -287,7 +287,7 @@ class Ldap(TemplateView):
         ldap_settings.servers.exclude(server__in=self.server_list).delete()
 
 
-class Modules(TemplateView):
+class Modules(LoginRequiredMixin, TemplateView):
     template_name = 'config/modules.html'
 
     def get(self, request, *args, **kwargs):
@@ -331,7 +331,7 @@ class Modules(TemplateView):
         return self.render_to_response({})
 
 
-class DeleteModule(TemplateView):
+class DeleteModule(LoginRequiredMixin, TemplateView):
 
     def get(self, request, module, *args, **kwargs):
 
@@ -345,7 +345,7 @@ class DeleteModule(TemplateView):
             return HttpResponseNotFound
 
 
-class RootPageView(TemplateView):
+class RootPageView(LoginRequiredMixin, TemplateView):
     template_name = 'config/root_page.html'
 
     def get(self, request, *args, **kwargs):

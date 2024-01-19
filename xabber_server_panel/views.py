@@ -1,11 +1,12 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.config.models import RootPage
 
 
-class HomePage(TemplateView):
+class HomePage(LoginRequiredMixin, TemplateView):
 
     template_name = 'home.html'
 

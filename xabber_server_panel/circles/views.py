@@ -2,6 +2,7 @@ from django.shortcuts import render, reverse, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.dashboard.models import VirtualHost
@@ -10,7 +11,7 @@ from xabber_server_panel.users.models import User
 from .forms import CircleForm
 
 
-class CircleList(TemplateView):
+class CircleList(LoginRequiredMixin, TemplateView):
     template_name = 'circles/list.html'
 
     def get(self, request, *args, **kwargs):
@@ -78,7 +79,7 @@ class CircleList(TemplateView):
             self.circles = Circle.objects.all()
 
 
-class CircleCreate(TemplateView):
+class CircleCreate(LoginRequiredMixin, TemplateView):
     template_name = 'circles/create.html'
 
     def get(self, request, *args, **kwargs):
@@ -110,7 +111,7 @@ class CircleCreate(TemplateView):
         return self.render_to_response(context)
 
 
-class CircleDetail(TemplateView):
+class CircleDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/detail.html'
 
@@ -173,7 +174,7 @@ class CircleDetail(TemplateView):
         self.circle.save()
 
 
-class CircleMembers(TemplateView):
+class CircleMembers(LoginRequiredMixin, TemplateView):
     template_name = 'circles/members.html'
 
     def get(self, request, id, *args, **kwargs):
@@ -282,7 +283,7 @@ class CircleMembers(TemplateView):
         self.circle.members.set(members)
 
 
-class CircleShared(TemplateView):
+class CircleShared(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/shared.html'
 

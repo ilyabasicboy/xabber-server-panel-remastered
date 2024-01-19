@@ -6,8 +6,8 @@ from django.contrib.auth import _get_backends, load_backend
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
-from xabber_server_panel.utils import token_to_int
 from xabber_server_panel.api.api import EjabberdAPI
+from xabber_server_panel.utils import get_modules
 
 import pytz
 
@@ -133,6 +133,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         blank=True
     )
+    permissions = models.ManyToManyField(
+        'CustomPermission',
+        blank=True
+    )
 
     class Meta:
         unique_together = ('username', 'host')
@@ -217,3 +221,35 @@ class User(AbstractBaseUser, PermissionsMixin):
     #
     #     # Otherwise we need to check the backends.
     #     return _user_has_perm(self, perm, obj)
+
+
+class CustomPermission(models.Model):
+
+    PERMISSIONS = [
+        (0, 'read'),
+        (1, 'write')
+    ]
+
+    APPS = [
+        ('dashboard', 'Dashboard'),
+        ('users', 'Users'),
+        ('circles', 'Circles'),
+        ('groups', 'Groups'),
+        ('registration', 'Registration'),
+        ('settings', 'Settings'),
+        *[(module, module) for module in get_modules()]
+    ]
+
+    permission = models.IntegerField(
+        choices=PERMISSIONS,
+        blank=True,
+        null=True
+    )
+
+    app = models.CharField(
+        choices=APPS,
+        max_length=100
+    )
+
+    def __str__(self):
+        return f'{self.app} - {self.get_permission_display()}'

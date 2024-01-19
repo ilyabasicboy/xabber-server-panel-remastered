@@ -1,14 +1,15 @@
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from xabber_server_panel.users.models import User
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
+from xabber_server_panel.users.decorators import permission_read, permission_write
 
 from .models import VirtualHost
 
 
-class DashboardView(TemplateView):
-    page_section = 'dashboard'
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
+    app = 'dashboard'
 
     def get_users_data(self):
         hosts = VirtualHost.objects.all()
@@ -36,6 +37,7 @@ class DashboardView(TemplateView):
 
         return data
 
+    @permission_read
     def get(self, request, *args, **kwargs):
 
         context = {
@@ -44,6 +46,7 @@ class DashboardView(TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, *args, **kwargs):
 
         if request.user.is_admin:

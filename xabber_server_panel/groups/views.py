@@ -1,11 +1,12 @@
 from django.views.generic import TemplateView
 from django.shortcuts import loader
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.dashboard.models import VirtualHost
 
 
-class GroupList(TemplateView):
+class GroupList(LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/list.html'
 

@@ -2,6 +2,7 @@ from django.shortcuts import render, reverse, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from xabber_server_panel.dashboard.models import VirtualHost
@@ -10,11 +11,11 @@ from xabber_server_panel.utils import get_user_data_for_api
 
 from datetime import datetime
 
-from .models import User
+from .models import User, CustomPermission
 from .forms import UserForm
 
 
-class CreateUser(TemplateView):
+class CreateUser(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/create.html'
 
@@ -63,7 +64,7 @@ class CreateUser(TemplateView):
             )
 
 
-class UserDetail(TemplateView):
+class UserDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/detail.html'
 
@@ -196,7 +197,7 @@ class UserDetail(TemplateView):
                     self.user.status = status
 
 
-class UserVcard(TemplateView):
+class UserVcard(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/vcard.html'
 
@@ -239,7 +240,7 @@ class UserVcard(TemplateView):
         self.user.save()
 
 
-class UserSecurity(TemplateView):
+class UserSecurity(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/security.html'
 
@@ -287,7 +288,7 @@ class UserSecurity(TemplateView):
         )
 
 
-class UserCircles(TemplateView):
+class UserCircles(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/circles.html'
 
@@ -361,7 +362,7 @@ class UserCircles(TemplateView):
         self.user.save()
 
 
-class UserList(TemplateView):
+class UserList(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/list.html'
 
@@ -436,3 +437,51 @@ class UserList(TemplateView):
                 users_to_delete.delete()
 
         self.users = User.objects.all()
+
+
+class UserPermissions(LoginRequiredMixin, TemplateView):
+    template_name = 'users/permissions.html'
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        permissions = {
+            app[0]: CustomPermission.objects.filter(app=app[0])
+            for app in CustomPermission.APPS
+        }
+
+        context = {
+            'user': user,
+            'permissions': permissions
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        is_admin = request.POST.get('is_admin')
+        permission_id_list = request.POST.getlist('permissions')
+
+        if is_admin:
+            user.is_admin = True
+
+        user.permissions.set(permission_id_list)
+
+        permissions = {
+            app[0]: CustomPermission.objects.filter(app=app[0])
+            for app in CustomPermission.APPS
+        }
+
+        user.save()
+
+        context = {
+            'user': user,
+            'permissions': permissions
+        }
+        return self.render_to_response(context)

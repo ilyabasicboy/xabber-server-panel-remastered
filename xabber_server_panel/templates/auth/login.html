@@ -12,6 +12,7 @@
             <div class="w-100 cmw-480 mx-auto px-4 py-5 p-md-5 bg-white rounded-2 text-center">
                 <form method="post" action="{% url 'custom_auth:login' %}">
                     {% csrf_token %}
+                    <input type="hidden" value="{{ request.GET.next }}" name="next">
 
                     <div class="mb-5">
                         <h2 class="fw-normal">Xabber Server</h2>

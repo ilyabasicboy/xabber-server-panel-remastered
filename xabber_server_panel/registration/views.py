@@ -2,6 +2,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import reverse, render, loader
+from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 
 from xabber_server_panel.dashboard.models import VirtualHost
@@ -11,7 +12,7 @@ from xabber_server_panel.utils import reload_ejabberd_config
 from .models import RegistrationSettings
 
 
-class RegistrationList(TemplateView):
+class RegistrationList(LoginRequiredMixin, TemplateView):
     template_name = 'registration/list.html'
 
     def get(self, request, *args, **kwargs):
@@ -82,7 +83,7 @@ class RegistrationList(TemplateView):
             self.context['keys'] = keys
 
 
-class RegistrationCreate(TemplateView):
+class RegistrationCreate(LoginRequiredMixin, TemplateView):
     template_name = 'registration/create.html'
 
     def get(self, request, vhost_id, *args, **kwargs):
@@ -132,7 +133,7 @@ class RegistrationCreate(TemplateView):
         return self.render_to_response(context)
 
 
-class RegistrationChange(TemplateView):
+class RegistrationChange(LoginRequiredMixin, TemplateView):
     template_name = 'registration/change.html'
 
     def get(self, request, vhost_id, key, *args, **kwargs):
@@ -198,7 +199,7 @@ class RegistrationChange(TemplateView):
         return self.render_to_response(context)
 
 
-class RegistrationDelete(TemplateView):
+class RegistrationDelete(LoginRequiredMixin, TemplateView):
     def get(self, request, vhost_id, key, *args, **kwargs):
 
         try:
@@ -213,7 +214,7 @@ class RegistrationDelete(TemplateView):
         )
 
 
-class RegistrationUrl(TemplateView):
+class RegistrationUrl(LoginRequiredMixin, TemplateView):
     template_name = 'registration/url.html'
 
     def get(self, request, id, *args, **kwargs):

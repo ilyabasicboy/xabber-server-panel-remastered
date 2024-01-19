@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block section_title %}{% endblock %}
+
+{% block content %}
+    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+        <div class="d-flex align-items-center me-4">
+            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a class="fs-4" href="{% url 'users:list' %}">
+                            Users
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </li>
+
+                    <li class="breadcrumb-item text-body-emphasis active fs-4" aria-current="page">
+                        {{ user.full_jid }}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="vr mx-3"></div>
+
+            <h6 class="mb-0 text-body-tertiary">
+                {% if user.is_active %}Active{% else %}Blocked{% endif %}
+            </h6>
+        </div>
+    </div>
+
+    <div class="mb-4 col-12" data-bs-theme="light">
+        {% include 'users/parts/links.html' %}
+    </div>
+
+    <div class="col-12 pb-5 mb-5">
+        <form action="{% url 'users:permissions' id=user.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div>
+                Server
+                <input type="checkbox" {% if user.is_admin %}checked{% endif %} name="is_admin" id="is_admin">
+                <label for="is_admin">
+                    Administrator
+                </label>
+            </div>
+
+            <div>
+                {{ user.host }}
+
+                {% for app, permissions in permissions.items %}
+                    <ul class="list-group mb-3">
+                        {{ app }}
+                        {% for permission in permissions %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" name="permissions" {% if permission in user.permissions.all %}checked{% endif %} value="{{ permission.id }}" id="permissions_{{ permission.id }}">
+                                    <label class="form-check-label" for="permissions_{{ permission.id }}">
+                                        {{ permission.get_permission_display }}
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+
+            <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
+                <button class="btn btn-primary" type="submit">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

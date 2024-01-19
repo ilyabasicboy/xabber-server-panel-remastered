@@ -21,6 +21,8 @@ class CustomLoginView(TemplateView):
 
     def post(self, request, *args, **kwargs):
 
+        next = request.POST.get('next')
+
         if is_ejabberd_started():
             form = ApiAuthenticationForm(request.POST)
         else:
@@ -32,7 +34,10 @@ class CustomLoginView(TemplateView):
 
         if form.is_valid():
             login(request, form.user)
-            return HttpResponseRedirect(reverse('home'))
+            if next:
+                return HttpResponseRedirect(next)
+            else:
+                return HttpResponseRedirect(reverse('home'))
 
         return self.render_to_response(context)
 

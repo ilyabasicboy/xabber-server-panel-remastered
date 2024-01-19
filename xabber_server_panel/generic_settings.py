@@ -118,7 +118,9 @@ HTTP_REQUEST_TIMEOUT = 5
 # =========== AUTH ============ #
 INSTALLED_APPS += ['xabber_server_panel.custom_auth']
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/auth/login/'
+LOGIN_URL='/auth/login/'
+
 AUTHENTICATION_BACKENDS = [
     'xabber_server_panel.custom_auth.backends.CustomAuthBackend',
 ]

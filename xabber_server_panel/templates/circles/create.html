@@ -10,7 +10,7 @@
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3 {% if form.circle.errors %}text-danger{% endif %}">Username *</label>
+                <label class="col-form-label col-sm-3 {% if form.circle.errors %}text-danger{% endif %}">Circle *</label>
                 <div class="col-sm-9">
                     <div class="input-group">
                         <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>

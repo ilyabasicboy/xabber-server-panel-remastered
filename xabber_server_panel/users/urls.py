@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from xabber_server_panel.users.views import CreateUser, UserDetail, UserList, UserVcard, UserSecurity, UserCircles
+from xabber_server_panel.users.views import CreateUser, UserDetail, UserList, UserVcard, UserSecurity, UserCircles, UserPermissions
 
 
 urlpatterns = [
@@ -11,4 +11,5 @@ urlpatterns = [
     path('vcard/<int:id>/', UserVcard.as_view(), name='vcard'),
     path('security/<int:id>/', UserSecurity.as_view(), name='security'),
     path('circles/<int:id>/', UserCircles.as_view(), name='circles'),
+    path('permissions/<int:id>/', UserPermissions.as_view(), name='permissions'),
 ]
