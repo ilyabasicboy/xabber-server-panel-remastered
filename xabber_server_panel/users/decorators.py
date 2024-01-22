@@ -1,37 +1,35 @@
 from functools import wraps
 from django.core.exceptions import PermissionDenied
-from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect
+from django.shortcuts import reverse
+from django.contrib import messages
 
 from .utils import check_permissions
 
 
-def permission_read(view=None):
-    '''
-        User read permissions check
-    '''
+def permission_read(func):
 
-    def decorator(view):
-        @wraps(view)
-        def wrapper(view, request, *args, **kwargs):
-            if check_permissions(request.user, view.app):
-                return view(request, *args, **kwargs)
-            else:
-                raise PermissionDenied
-        return wrapper
-    return decorator(view) if view else decorator
+    @wraps(func)
+    def wrapper(view, request, *args, **kwargs):
+
+        if check_permissions(request.user, view.app):
+            return func(view, request, *args, **kwargs)
+        else:
+            messages.error(request, 'You have no permissions for this request.')
+            return HttpResponseRedirect(reverse('home'))
+
+    return wrapper
 
 
-def permission_write(view=None):
-    '''
-        User write permissions check
-    '''
+def permission_write(func):
 
-    def decorator(view):
-        @wraps(view)
-        def wrapper(view, request, *args, **kwargs):
-            if check_permissions(request.user, view.app, permission='write'):
-                return view(request, *args, **kwargs)
-            else:
-                raise PermissionDenied
-        return wrapper
-    return decorator(view) if view else decorator
+    @wraps(func)
+    def wrapper(view, request, *args, **kwargs):
+
+        if check_permissions(request.user, view.app, permission='write'):
+            return func(view, request, *args, **kwargs)
+        else:
+            messages.error(request, 'You have no permissions for this request.')
+            return HttpResponseRedirect(reverse('home'))
+
+    return wrapper

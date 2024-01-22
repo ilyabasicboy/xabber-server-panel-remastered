@@ -77,16 +77,20 @@
                                                 Edit vcard
                                             </a>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item text-wrap text-danger" href="{% url 'users:delete' id=user.id %}">
-                                                 Delete user
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-wrap text-info" href="#">
-                                                 Block user
-                                            </a>
-                                        </li>
+                                        {% if users_write_permissions %}
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'users:delete' id=user.id %}">
+                                                     Delete user
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        {% if users_write_permissions %}
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-info" href="#">
+                                                     Block user
+                                                </a>
+                                            </li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                             </div>

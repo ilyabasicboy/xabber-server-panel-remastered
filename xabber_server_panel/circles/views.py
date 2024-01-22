@@ -7,13 +7,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.users.models import User
+from xabber_server_panel.users.decorators import permission_read, permission_write
 
 from .forms import CircleForm
 
 
 class CircleList(LoginRequiredMixin, TemplateView):
     template_name = 'circles/list.html'
+    app = 'circles'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
 
         hosts = VirtualHost.objects.all()
@@ -81,7 +84,9 @@ class CircleList(LoginRequiredMixin, TemplateView):
 
 class CircleCreate(LoginRequiredMixin, TemplateView):
     template_name = 'circles/create.html'
+    app = 'circles'
 
+    @permission_write
     def get(self, request, *args, **kwargs):
 
         form = CircleForm()
@@ -91,6 +96,7 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, *args, **kwargs):
 
         form = CircleForm(request.POST)
@@ -114,7 +120,9 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
 class CircleDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/detail.html'
+    app = 'circles'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
 
         try:
@@ -122,23 +130,13 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        delete = kwargs.get('delete')
-        if delete:
-            circle.delete()
-            self.request.user.api.delete_group(
-                {
-                    'circle': circle.circle,
-                    'host': circle.host
-                }
-            )
-            return HttpResponseRedirect(reverse('circles:list'))
-
         context = {
             'circle': circle,
         }
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
 
         try:
@@ -174,9 +172,33 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         self.circle.save()
 
 
+class CirclesDelete(LoginRequiredMixin, TemplateView):
+
+    app = 'circles'
+
+    @permission_write
+    def get(self, request, id, *args, **kwargs):
+
+        try:
+            circle = Circle.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        circle.delete()
+        self.request.user.api.delete_group(
+            {
+                'circle': circle.circle,
+                'host': circle.host
+            }
+        )
+        return HttpResponseRedirect(reverse('circles:list'))
+
+
 class CircleMembers(LoginRequiredMixin, TemplateView):
     template_name = 'circles/members.html'
+    app = 'circles'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
 
         try:
@@ -193,6 +215,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
 
         try:
@@ -286,7 +309,9 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 class CircleShared(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/shared.html'
+    app = 'circles'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
 
         try:
@@ -303,6 +328,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
 
         try:

@@ -8,6 +8,7 @@ from django.utils import timezone
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
+from xabber_server_panel.users.decorators import permission_read, permission_write
 
 from datetime import datetime
 
@@ -18,7 +19,9 @@ from .forms import UserForm
 class CreateUser(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/create.html'
+    app = 'users'
 
+    @permission_write
     def get(self, request, *args, **kwargs):
 
         context = {
@@ -28,6 +31,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, *args, **kwargs):
 
         form = UserForm(request.POST)
@@ -67,26 +71,14 @@ class CreateUser(LoginRequiredMixin, TemplateView):
 class UserDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/detail.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
-
-        delete = kwargs.get('delete')
-        if delete:
-            if user.full_jid != request.user.full_jid:
-                user.delete()
-                request.user.api.unregister_user(
-                    {
-                        'username': user.username,
-                        'host': user.host
-                    }
-                )
-            else:
-                print('You can not delete yourself')
-            return HttpResponseRedirect(reverse('users:list'))
 
         circles = Circle.objects.filter(host=user.host)
 
@@ -96,6 +88,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             self.user = User.objects.get(id=id)
@@ -197,10 +190,36 @@ class UserDetail(LoginRequiredMixin, TemplateView):
                     self.user.status = status
 
 
+class UserDelete(LoginRequiredMixin, TemplateView):
+    app = 'users'
+
+    @permission_write
+    def get(self, request, id, *args, **kwargs):
+
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        if user.full_jid != request.user.full_jid:
+            user.delete()
+            request.user.api.unregister_user(
+                {
+                    'username': user.username,
+                    'host': user.host
+                }
+            )
+        else:
+            print('You can not delete yourself')
+        return HttpResponseRedirect(reverse('users:list'))
+
+
 class UserVcard(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/vcard.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -212,6 +231,7 @@ class UserVcard(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             self.user = User.objects.get(id=id)
@@ -243,7 +263,9 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 class UserSecurity(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/security.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -255,6 +277,7 @@ class UserSecurity(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             self.user = User.objects.get(id=id)
@@ -291,7 +314,9 @@ class UserSecurity(LoginRequiredMixin, TemplateView):
 class UserCircles(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/circles.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -306,6 +331,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             self.user = User.objects.get(id=id)
@@ -365,7 +391,9 @@ class UserCircles(LoginRequiredMixin, TemplateView):
 class UserList(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/list.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
         hosts = VirtualHost.objects.all()
         self.users = User.objects.all()
@@ -441,7 +469,9 @@ class UserList(LoginRequiredMixin, TemplateView):
 
 class UserPermissions(LoginRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
+    app = 'users'
 
+    @permission_read
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -459,6 +489,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)

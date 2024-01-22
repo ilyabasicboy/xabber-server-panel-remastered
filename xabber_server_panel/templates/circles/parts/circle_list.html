@@ -36,21 +36,23 @@
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex">
-                                <div class="dropdown">
-                                    <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical d-flex"></i>
-                                    </div>
+                            {% if circles_write_permissions %}
+                                <div class="d-flex">
+                                    <div class="dropdown">
+                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical d-flex"></i>
+                                        </div>
 
-                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                                        <li>
-                                            <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete' id=circle.id %}">
-                                                 Delete circle
-                                            </a>
-                                        </li>
-                                    </ul>
+                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete' id=circle.id %}">
+                                                     Delete circle
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

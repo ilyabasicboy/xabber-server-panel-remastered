@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static base_tags config_tags %}
+{% load static base_tags config_tags users_tags %}
 {% smart_spaceless %}
 <html lang="en">
     <head>
@@ -20,6 +20,20 @@
 
     {% block main_content %}
         {% get_external_modules as modules %}
+
+        {% check_user_permissions request.user 'dashboard' 'write' as dashboard_write_permissions %}
+        {% check_user_permissions request.user 'dashboard' as dashboard_read_permissions %}
+        {% check_user_permissions request.user 'users' 'write' as users_write_permissions %}
+        {% check_user_permissions request.user 'users' as users_read_permissions %}
+        {% check_user_permissions request.user 'circles' 'write' as circles_write_permissions %}
+        {% check_user_permissions request.user 'circles' as circles_read_permissions %}
+        {% check_user_permissions request.user 'groups' 'write' as groups_write_permissions %}
+        {% check_user_permissions request.user 'groups' as groups_read_permissions %}
+        {% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
+        {% check_user_permissions request.user 'registration' as registration_read_permissions %}
+        {% check_user_permissions request.user 'settings' 'write' as settings_write_permissions %}
+        {% check_user_permissions request.user 'settings' as settings_read_permissions %}
+
         <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
             <header class="navbar d-flex justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-0">
                 <a class="navbar-brand d-flex align-items-center col-md-3 col-lg-2 fs-4 text-white p-0 me-4" href="/">
@@ -27,26 +41,33 @@
                     <span class="fs-4">Xabber</span>
                 </a>
 
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Create
-                    </button>
 
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li>
-                            <a class="dropdown-item text-wrap" href="{% url 'users:create' %}">
-                                <b>User</b><br>
-                                Add new user account. Users can send and receive messages, create and join group chats, make audio and video calls.
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item text-wrap" href="{% url 'circles:create' %}">
-                                <b>Circle</b><br>
-                                Circles are used to manage shared contact lists, user permissions and resource quotas.
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                {% if users_write_permissions or circles_write_permissions %}
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Create
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            {% if users_write_permissions %}
+                                <li>
+                                    <a class="dropdown-item text-wrap" href="{% url 'users:create' %}">
+                                        <b>User</b><br>
+                                        Add new user account. Users can send and receive messages, create and join group chats, make audio and video calls.
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if circles_write_permissions %}
+                                <li>
+                                    <a class="dropdown-item text-wrap" href="{% url 'circles:create' %}">
+                                        <b>Circle</b><br>
+                                        Circles are used to manage shared contact lists, user permissions and resource quotas.
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
 
                 {% if request.user.is_authenticated %}
                     <div class="dropdown ms-auto">

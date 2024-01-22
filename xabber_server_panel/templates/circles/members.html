@@ -43,72 +43,76 @@
                 <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.members.count }} members</span>
             </div>
 
-            <div class="col-6 d-flex align-items-start justify-content-end">
-                <a class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#add_member">
-                    Add
-                </a>
-                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage">
-                    Manage
-                </a>
-            </div>
+            {% if circles_write_permissions %}
+                <div class="col-6 d-flex align-items-start justify-content-end">
+                    <a class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#add_member">
+                        Add
+                    </a>
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage">
+                        Manage
+                    </a>
+                </div>
+            {% endif %}
         </div>
 
-        <div class="modal fade" id="add_member" tabindex="-1" aria-labelledby="add_member_label" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form action="{% url 'circles:members' id=circle.id %}" method="POST">
-                        {% csrf_token %}
+        {% if circles_write_permissions %}
+            <div class="modal fade" id="add_member" tabindex="-1" aria-labelledby="add_member_label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'circles:members' id=circle.id %}" method="POST">
+                            {% csrf_token %}
 
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5 text-white" id="add_member_label">Add new member</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-white" id="add_member_label">Add new member</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
 
-                        <div class="modal-body">
-                            <input class="form-control" type="text" placeholder="username@example.com" name="add_member">
-                        </div>
+                            <div class="modal-body">
+                                <input class="form-control" type="text" placeholder="username@example.com" name="add_member">
+                            </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Add member</button>
-                        </div>
-                    </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add member</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal fade" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form action="{% url 'circles:members' id=circle.id %}" method="POST">
-                        {% csrf_token %}
+            <div class="modal fade" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{% url 'circles:members' id=circle.id %}" method="POST">
+                            {% csrf_token %}
 
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5 text-white" id="manage_label">Manage members</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-white" id="manage_label">Manage members</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
 
-                        <div class="modal-body">
-                            {% for user in users %}
-                                <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                    <div class="form-check text-white">
-                                        <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
-                                        <label class="form-check-label" for="user_{{ user.id }}">
-                                            {{ user.full_jid }}
-                                        </label>
+                            <div class="modal-body">
+                                {% for user in users %}
+                                    <div class="{% if not forloop.last %}mb-3{% endif %}">
+                                        <div class="form-check text-white">
+                                            <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
+                                            <label class="form-check-label" for="user_{{ user.id }}">
+                                                {{ user.full_jid }}
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                                {% endfor %}
+                            </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </div>
 
     <div class="mt-4 col-12">

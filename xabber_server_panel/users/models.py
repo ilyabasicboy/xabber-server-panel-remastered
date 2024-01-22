@@ -226,8 +226,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class CustomPermission(models.Model):
 
     PERMISSIONS = [
-        (0, 'read'),
-        (1, 'write')
+        ('read', 'read'),
+        ('write', 'write')
     ]
 
     APPS = [
@@ -240,10 +240,9 @@ class CustomPermission(models.Model):
         *[(module, module) for module in get_modules()]
     ]
 
-    permission = models.IntegerField(
+    permission = models.CharField(
         choices=PERMISSIONS,
-        blank=True,
-        null=True
+        max_length=10
     )
 
     app = models.CharField(

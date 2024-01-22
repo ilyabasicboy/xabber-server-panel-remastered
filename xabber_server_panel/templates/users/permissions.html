@@ -69,11 +69,13 @@
                 {% endfor %}
             </div>
 
-            <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
-                <button class="btn btn-primary" type="submit">
-                    Save
-                </button>
-            </div>
+            {% if users_write_permissions %}
+                <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
+                    <button class="btn btn-primary" type="submit">
+                        Save
+                    </button>
+                </div>
+            {% endif %}
         </form>
     </div>
 {% endblock %}
