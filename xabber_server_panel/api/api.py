@@ -60,6 +60,7 @@ class EjabberdAPI(object):
             self._wrapped_call(method, url, success_code, data, http_method)
         except ResponseException as e:
             print(e)
+            print(self.response)
             self.success = False
             if self.response is None:
                 error = e.get_error_message()

@@ -10,6 +10,6 @@ urlpatterns = [
     path('delete/<int:id>/', UserDelete.as_view(), name='delete'),
     path('vcard/<int:id>/', UserVcard.as_view(), name='vcard'),
     path('security/<int:id>/', UserSecurity.as_view(), name='security'),
-    path('circles/<int:id>/', UserCircles.as_view(), name='circles'),
+    path('manage_circles/<int:id>/', UserCircles.as_view(), name='circles'),
     path('permissions/<int:id>/', UserPermissions.as_view(), name='permissions'),
 ]

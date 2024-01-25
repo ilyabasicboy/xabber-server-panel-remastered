@@ -1,16 +1,17 @@
 from django.shortcuts import reverse, render, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from ldap3 import Server, Connection, ALL
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.users.models import User
 from xabber_server_panel.config.utils import update_ejabberd_config, make_xmpp_config
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix
+from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
 
 from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
@@ -21,9 +22,23 @@ import os
 import re
 
 
+class ConfigRoot(LoginRequiredMixin, TemplateView):
+    app = 'settings'
+
+    @permission_read
+    def get(self, request, *args, **kwargs):
+
+        if request.user.is_admin:
+            return HttpResponseRedirect(reverse('config:hosts'))
+
+        return HttpResponseRedirect(reverse('config:ldap'))
+
+
 class Hosts(LoginRequiredMixin, TemplateView):
     template_name = 'config/hosts.html'
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         hosts = VirtualHost.objects.all()
 
@@ -35,6 +50,9 @@ class Hosts(LoginRequiredMixin, TemplateView):
 
 class DeleteHost(LoginRequiredMixin, TemplateView):
 
+    app = 'settings'
+
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
 
         try:
@@ -62,6 +80,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
             )
         circles.delete()
 
+        messages.success(request, 'Host deleted successfully.')
         host.delete()
         update_ejabberd_config()
         return HttpResponseRedirect(
@@ -71,7 +90,9 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
 
 class DetailHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_detail.html'
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
 
         try:
@@ -87,13 +108,16 @@ class DetailHost(LoginRequiredMixin, TemplateView):
 
 class CreateHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_create.html'
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         context = {
             "hosts": VirtualHost.objects.all()
         }
         return self.render_to_response(context)
 
+    @permission_admin
     def post(self, request, *args, **kwargs):
         host = request.POST.get('host')
 
@@ -103,13 +127,14 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             )
             self.create_everybody_group(request, host)
             update_ejabberd_config()
+
+            messages.success(request, 'Vhost created successfully.')
             return HttpResponseRedirect(
                 reverse('config:hosts')
             )
 
-        context = {
-        }
-        return self.render_to_response(context)
+        messages.error(request, 'Host is invalid.')
+        return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
         request.user.api.srg_create_api(
@@ -140,7 +165,9 @@ class CreateHost(LoginRequiredMixin, TemplateView):
 
 class Admins(LoginRequiredMixin, TemplateView):
     template_name = 'config/admins.html'
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         admins = User.objects.filter(is_admin=True)
         users = User.objects.all()
@@ -150,6 +177,7 @@ class Admins(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_admin
     def post(self, request, *args, **kwargs):
         request_data = dict(request.POST)
         users = User.objects.all()
@@ -176,7 +204,7 @@ class Admins(LoginRequiredMixin, TemplateView):
             )
 
         admins_to_delete.update(is_admin=False)
-
+        messages.success(request, 'Admins changed successfully.')
         update_ejabberd_config()
         context = {
             'admins': users.filter(id__in=admins),
@@ -187,21 +215,32 @@ class Admins(LoginRequiredMixin, TemplateView):
 
 class Ldap(LoginRequiredMixin, TemplateView):
     template_name = 'config/ldap.html'
+    app = 'settings'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
+        host_id = request.GET.get('host')
+        session_host = request.session.get('host')
 
         context = {
             'hosts': hosts
         }
 
         if hosts:
-            host_id = self.request.GET.get('host')
-
+            # get host obj
+            host = None
             if host_id:
                 host = hosts.filter(id=host_id).first()
-            else:
+            elif session_host:
+                host = hosts.filter(name=session_host).first()
+
+            if not host:
                 host = hosts.first()
+
+            # write current host on session
+            request.session['host'] = host.name
+            context['curr_host'] = host.name
 
             ldap_settings = LDAPSettings.objects.filter(host=host).first()
             context['ldap_settings'] = ldap_settings
@@ -214,29 +253,35 @@ class Ldap(LoginRequiredMixin, TemplateView):
             return JsonResponse(response_data)
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, *args, **kwargs):
         self.form = LDAPSettingsForm(request.POST)
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
+        host_id = request.POST.get('host')
 
         context = {
             'hosts': hosts,
             'form': self.form
         }
 
-        host_id = self.request.POST.get('host')
+        if hosts:
+            # get host obj
+            self.host = None
+            if host_id:
+                self.host = hosts.filter(id=host_id).first()
 
-        try:
-            self.host = VirtualHost.objects.get(id=host_id)
+            if not self.host:
+                self.host = hosts.first()
+
             context['curr_host'] = self.host.name
-        except ObjectDoesNotExist:
-            self.form.add_error(
-                'host', 'Host does not exists'
-            )
 
         self.server_list = self.clean_server_list()
         if self.form.is_valid():
             self.update_or_create_ldap()
             update_ejabberd_config()
+            messages.success(request, 'Ldap changed successfully.')
+        else:
+            messages.error(request, 'Form data is incorrect.')
 
         return self.render_to_response(context)
 
@@ -289,10 +334,13 @@ class Ldap(LoginRequiredMixin, TemplateView):
 
 class Modules(LoginRequiredMixin, TemplateView):
     template_name = 'config/modules.html'
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         return self.render_to_response({})
 
+    @permission_admin
     def post(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
 
@@ -322,17 +370,19 @@ class Modules(LoginRequiredMixin, TemplateView):
                     shutil.rmtree(temp_extract_dir)
 
                     make_xmpp_config()
-                    print("Модуль успешно добавлен и настроен.")
+                    messages.success(request, 'Module added successfully.')
             except Exception as e:
                 # Удаление временной папки в случае ошибки
                 shutil.rmtree(temp_extract_dir, ignore_errors=True)
-                print(f"Ошибка при обработке архива: {str(e)}")
+                messages.error(request, 'Archieve reading error.')
 
         return self.render_to_response({})
 
 
 class DeleteModule(LoginRequiredMixin, TemplateView):
+    app = 'settings'
 
+    @permission_admin
     def get(self, request, module, *args, **kwargs):
 
         module_path = os.path.join(settings.MODULES_DIR, module)
@@ -340,6 +390,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
             shutil.rmtree(module_path)
 
             make_xmpp_config()
+            messages.success(request, 'Module deleted successfully.')
             return HttpResponseRedirect(reverse('config:modules'))
         else:
             return HttpResponseNotFound
@@ -347,10 +398,13 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
 
 class RootPageView(LoginRequiredMixin, TemplateView):
     template_name = 'config/root_page.html'
+    app = 'settings'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
         return self.render_to_response({})
 
+    @permission_write
     def post(self, request, *args, **kwargs):
 
         module = request.POST.get('module', 'home')
@@ -360,5 +414,7 @@ class RootPageView(LoginRequiredMixin, TemplateView):
             root_page.save()
         else:
             RootPage.objects.create(module=module)
+
+        messages.success(request, 'Root changed successfully.')
 
         return self.render_to_response({})

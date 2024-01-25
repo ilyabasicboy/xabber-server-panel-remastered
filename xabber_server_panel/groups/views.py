@@ -4,17 +4,23 @@ from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.users.decorators import permission_read
 
 
 class GroupList(LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/list.html'
+    app = 'groups'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
 
         if hosts.exists():
-            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+            host = request.GET.get('host', request.session.get('host'))
+
+            if not hosts.filter(name=host):
+                host = hosts.first().name
 
             # write current host on session
             request.session['host'] = host

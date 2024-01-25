@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from xabber_server_panel.config.models import RootPage
 
 
-class HomePage(LoginRequiredMixin, TemplateView):
+class HomePage(TemplateView):
 
     template_name = 'home.html'
 

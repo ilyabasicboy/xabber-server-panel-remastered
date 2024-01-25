@@ -1,3 +1,6 @@
+{% load users_tags %}
+{% check_user_permissions request.user 'settings' 'write' as settings_write_permissions %}
+
 <div>
     Enable
     <label>
@@ -231,7 +234,9 @@
         </span>
     </label>
 
-    <button>
-        Save
-    </button>
+    {% if settings_write_permissions %}
+        <button>
+            Save
+        </button>
+    {% endif %}
 </div>

@@ -1,4 +1,4 @@
-{% load base_tags %}
+{% load base_tags users_tags %}
 <ul class="nav nav-pills flex-column">
     <li class="nav-item">
         {% url 'home' as home %}
@@ -54,7 +54,7 @@
 
     {% if settings_read_permissions %}
         <li>
-            {% url 'config:hosts' as config %}
+            {% url 'config:root' as config %}
             <a href="{{ config }}" class="nav-link text-white {% if config in request.path_info %}active{% endif %}">
                 Settings
             </a>
@@ -66,13 +66,16 @@
     <hr>
     <ul class="nav nav-pills flex-column">
         {% for module in modules %}
-            {% with namespace=module|add:':root' %}
-                <li>
-                    {% url namespace as module_url %}
-                    <a href="{{ module_url }}" class="nav-link text-white {% if module_url in request.path_info %}active{% endif %}">
-                        {{ module }}
-                    </a>
-                </li>
+            {% with namespace=module|add:':info' %}
+                {% check_user_permissions request.user module as module_read_permissions %}
+                {% if module_read_permissions %}
+                    <li>
+                        {% url namespace as module_url %}
+                        <a href="{{ module_url }}" class="nav-link text-white {% if module_url in request.path_info %}active{% endif %}">
+                            {{ module }}
+                        </a>
+                    </li>
+                {% endif %}
             {% endwith %}
         {% endfor %}
     </ul>

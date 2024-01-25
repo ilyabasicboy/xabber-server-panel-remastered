@@ -35,9 +35,11 @@
                                 <a href="{% url 'config:host_detail' id=host.id %}">
                                     SRV records info
                                 </a>
-                                <a href="{% url 'config:host_delete' id=host.id %}">
-                                    Delete
-                                </a>
+                                {% if settings_write_permissions %}
+                                    <a href="{% url 'config:host_delete' id=host.id %}">
+                                        Delete
+                                    </a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -46,9 +48,11 @@
         {% endif %}
     </div>
 
-    <div class="mt-4 text-end">
-        <a class="btn btn-primary" href="{% url 'config:host_create' %}">
-            Add virtual host
-        </a>
-    </div>
+    {% if settings_write_permissions %}
+        <div class="mt-4 text-end">
+            <a class="btn btn-primary" href="{% url 'config:host_create' %}">
+                Add virtual host
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

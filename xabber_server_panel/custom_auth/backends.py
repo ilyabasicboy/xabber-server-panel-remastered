@@ -12,7 +12,8 @@ class CustomAuthBackend(object):
             )
         except User.DoesNotExist:
             return None
-        if user.is_admin and user.check_password(password):
+
+        if (user.is_admin or user.has_any_permissions) and user.check_password(password):
             if api and api.token:
                 user.token = api.token
                 user.save()

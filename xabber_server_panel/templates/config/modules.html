@@ -28,23 +28,27 @@
                             {{ module }}
                         </td>
                         <td>
-                            <a href="{% url 'config:delete_module' module=module %}">
-                                Delete
-                            </a>
+                            {% if settings_write_permissions %}
+                                <a href="{% url 'config:delete_module' module=module %}">
+                                    Delete
+                                </a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+        {% if settings_write_permissions %}
+            <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-            <div>
-                You can only upload a module in TAR.GZ or TGZ format.
-            </div>
-            <input type="file" name="file" accept=".tar.gz, .tgz">
-            <button>Save</button>
-        </form>
+                <div>
+                    You can only upload a module in TAR.GZ or TGZ format.
+                </div>
+                <input type="file" name="file" accept=".tar.gz, .tgz">
+                <button>Save</button>
+            </form>
+        {% endif %}
     </div>
 {% endblock %}

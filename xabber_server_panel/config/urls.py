@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost
+from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot
 
 
 urlpatterns = [
+    path('', ConfigRoot.as_view(), name='root'),
     path('hosts/', Hosts.as_view(), name='hosts'),
     path('admins/', Admins.as_view(), name='admins'),
     path('ldap/', Ldap.as_view(), name='ldap'),

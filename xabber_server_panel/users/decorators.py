@@ -33,3 +33,17 @@ def permission_write(func):
             return HttpResponseRedirect(reverse('home'))
 
     return wrapper
+
+
+def permission_admin(func):
+
+    @wraps(func)
+    def wrapper(view, request, *args, **kwargs):
+
+        if request.user.is_admin:
+            return func(view, request, *args, **kwargs)
+        else:
+            messages.error(request, 'You have no permissions for this request.')
+            return HttpResponseRedirect(reverse('home'))
+
+    return wrapper

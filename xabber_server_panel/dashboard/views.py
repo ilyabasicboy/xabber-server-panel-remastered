@@ -1,10 +1,10 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
+from django.shortcuts import HttpResponseRedirect, reverse
 
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
 from xabber_server_panel.users.decorators import permission_read, permission_write
-
-from .models import VirtualHost
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -12,7 +12,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     app = 'dashboard'
 
     def get_users_data(self):
-        hosts = VirtualHost.objects.all()
+        hosts = self.request.user.get_allowed_hosts()
 
         data = {
             'hosts': [
@@ -56,6 +56,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
             if start:
                 start_ejabberd()
+                logout(request)
+                next = reverse('dashboard')
+                return HttpResponseRedirect(
+                    reverse(
+                        'custom_auth:login'
+                    ) + f'?next={next}'
+                )
             elif restart:
                 restart_ejabberd()
             elif stop:

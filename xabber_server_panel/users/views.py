@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.utils import timezone
 
 from xabber_server_panel.dashboard.models import VirtualHost
@@ -39,7 +40,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
         if form.is_valid():
             user = form.save()
             self.create_user_api(user, form.cleaned_data)
-
+            messages.success(request, 'User created successfully.')
             return HttpResponseRedirect(
                 reverse(
                     'users:detail',
@@ -100,6 +101,8 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         # update user params
         self.update_user()
 
+        messages.success(request, 'User changed successfully.')
+
         context = {
             'user': self.user,
             'circles': self.circles
@@ -122,13 +125,15 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         """ Change user expires and send data to server """
 
         expires = self.request.POST.get('expires')
-        try:
-            expires_datetime = datetime.strptime(expires, '%Y-%m-%d')
-            self.user.expires = expires_datetime.replace(tzinfo=timezone.utc)
-        except Exception as e:
-            print(e)
+        if expires:
+            try:
+                expires_datetime = datetime.strptime(expires, '%Y-%m-%d')
+                self.user.expires = expires_datetime.replace(tzinfo=timezone.utc)
+            except Exception as e:
+                messages.error(self.request, e)
+                self.user.expires = None
+        else:
             self.user.expires = None
-            pass
 
         # send data to server
         data = {
@@ -209,8 +214,9 @@ class UserDelete(LoginRequiredMixin, TemplateView):
                     'host': user.host
                 }
             )
+            messages.success(request, 'User deleted successfully.')
         else:
-            print('You can not delete yourself')
+            messages.error(request, 'You can not delete yourself.')
         return HttpResponseRedirect(reverse('users:list'))
 
 
@@ -240,6 +246,8 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 
         # update user params
         self.update_user()
+
+        messages.success(request, 'User changed successfully.')
 
         context = {
             'user': self.user,
@@ -299,6 +307,9 @@ class UserSecurity(LoginRequiredMixin, TemplateView):
             if password == confirm_password:
                 # Change the user's password
                 self.user.set_password(password)
+                messages.success(self.request, 'Password changed successfully.')
+            else:
+                messages.error(self.request, 'Password is incorrect.')
 
         self.user.save()
 
@@ -342,6 +353,8 @@ class UserCircles(LoginRequiredMixin, TemplateView):
 
         # update user params
         self.update_user()
+
+        messages.success(self.request, 'User changed successfully.')
 
         context = {
             'user': self.user,
@@ -395,7 +408,7 @@ class UserList(LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
         self.users = User.objects.all()
 
         context = {
@@ -403,7 +416,10 @@ class UserList(LoginRequiredMixin, TemplateView):
         }
 
         if hosts.exists():
-            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+            host = request.GET.get('host', request.session.get('host'))
+
+            if not hosts.filter(name=host):
+                host = hosts.first().name
 
             # write current host on session
             request.session['host'] = host
@@ -492,27 +508,106 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
     @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        is_admin = request.POST.get('is_admin')
-        permission_id_list = request.POST.getlist('permissions')
+        self.update_permissions()
 
-        if is_admin:
-            user.is_admin = True
-
-        user.permissions.set(permission_id_list)
+        messages.success(self.request, 'Permissions changed successfully.')
 
         permissions = {
             app[0]: CustomPermission.objects.filter(app=app[0])
             for app in CustomPermission.APPS
         }
 
-        user.save()
-
         context = {
-            'user': user,
+            'user': self.user,
             'permissions': permissions
         }
         return self.render_to_response(context)
+
+    def update_permissions(self):
+
+        is_admin = self.request.POST.get('is_admin', False)
+        permission_id_list = self.request.POST.getlist('permissions')
+
+        self.user.is_admin = is_admin
+
+        self.user.permissions.set(permission_id_list)
+
+        self.user.save()
+
+        if is_admin:
+            self.request.user.api.xabber_set_admin(
+                {
+                    "username": self.user.username,
+                    "host": self.user.host
+                }
+            )
+        else:
+            self.request.user.api.xabber_del_admin(
+                {
+                    "username": self.user.username,
+                    "host": self.user.host,
+                }
+            )
+
+            permissions = self.get_permissions_dict()
+
+            self.request.user.api.xabber_set_permissions(
+                {
+                    "username": self.user.username,
+                    "host": self.user.host,
+                    "permissions": permissions,
+                }
+            )
+
+    def get_permissions_dict(self):
+
+        """
+            Create permissions dict depending on selected user permissions
+        """
+
+        permissions = {}
+
+        circles_read = self.user.permissions.filter(app='circles', permission='read').exists()
+        circles_write = self.user.permissions.filter(app='circles', permission='write').exists()
+        if circles_write:
+            permissions['circles'] = 'write'
+        elif circles_read:
+            permissions['circles'] = 'read'
+        else:
+            permissions['circles'] = 'forbidden'
+
+        dashboard_read = self.user.permissions.filter(app='dashboard', permission='read').exists()
+        dashboard_write = self.user.permissions.filter(app='dashboard', permission='write').exists()
+        if dashboard_write:
+            permissions['server'] = 'write'
+        elif dashboard_read:
+            permissions['server'] = 'read'
+        else:
+            permissions['server'] = 'forbidden'
+
+        groups_read = self.user.permissions.filter(app='groups', permission='read').exists()
+        groups_write = self.user.permissions.filter(app='groups', permission='write').exists()
+        if groups_write:
+            permissions['groups'] = 'write'
+        elif groups_read:
+            permissions['groups'] = 'read'
+        else:
+            permissions['groups'] = 'forbidden'
+
+        users_read = self.user.permissions.filter(app='users', permission='read').exists()
+        users_write = self.user.permissions.filter(app='users', permission='write').exists()
+        if users_write:
+            permissions['users'] = 'write'
+            permissions['vcard'] = 'write'
+        elif users_read:
+            permissions['users'] = 'read'
+            permissions['vcard'] = 'read'
+        else:
+            permissions['users'] = 'forbidden'
+            permissions['vcard'] = 'forbidden'
+
+        return permissions

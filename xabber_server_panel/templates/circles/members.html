@@ -123,6 +123,7 @@
                         <th>#</th>
                         <th>Username</th>
                         <th>Nickname</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,6 +141,13 @@
                             </td>
                             <td>
                                 {{ user.nickname|default:'' }}
+                            </td>
+                            <td>
+                                {% if circles_write_permissions %}
+                                    <a href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
+                                        Delete
+                                    </a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

@@ -26,8 +26,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="password" name="password" placeholder="Password" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
+                        <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="password" name="password" placeholder="Password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
                     </div>
+
+                    {% if form.errors %}
+                        <div>
+                            Wrong username or password. Access denied.
+                        </div>
+                    {% endif %}
 
                     <button class="btn btn-primary" type="submit">Login</button>
                 </form>

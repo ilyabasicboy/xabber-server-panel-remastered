@@ -8,8 +8,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from xabber_server_panel.api.api import EjabberdAPI
 from xabber_server_panel.utils import get_modules
-
-import pytz
+from xabber_server_panel.dashboard.models import VirtualHost
 
 
 class UserManager(BaseUserManager):
@@ -112,13 +111,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     nickname = models.CharField(max_length=100, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
-    # photo = models.ImageField(
-    #     verbose_name='Photo',
-    #     upload_to='upload',
-    #     validators=[
-    #         FileExtensionValidator(allowed_extensions=['jpg', 'png', 'jpeg'])],
-    #     null=True
-    # )
     created = models.DateTimeField(
         default=timezone.now,
         blank=True
@@ -167,60 +159,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_expired(self):
         return self.expires and self.expires < timezone.now()
 
-    # @property
-    # def full_name(self):
-    #     if self.first_name and self.last_name:
-    #         formatted_name = u'{} {}'.format(self.first_name, self.last_name).strip()
-    #         if len(formatted_name) > 0:
-    #             return formatted_name
-    #         else:
-    #             return self.full_jid
-    #     else:
-    #         return self.full_jid
-    #
-    # def get_full_name(self):
-    #     full_name = u'{}@{}'.format(self.first_name, self.last_name)
-    #     return full_name.strip()
-    #
-    # def get_short_name(self):
-    #     return self.first_name
-    #
-    # @property
-    # def vhost(self):
-    #     try:
-    #         return VirtualHost.objects.get(name=self.host)
-    #     except VirtualHost.DoesNotExist:
-    #         return None
-    #
-    # @property
-    # def allowed_delete(self):
-    #     return False if self.auth_backend == 'ldap' else True
-    #
-    # @property
-    # def allowed_change_vcard(self):
-    #     return True
-    #
-    # @property
-    # def allowed_change_password(self):
-    #     return False if self.auth_backend == 'ldap' else True
-    #
-    # def __str__(self):
-    #     return self.full_jid
-    #
-    # def has_perm(self, perm, obj=None):
-    #     """
-    #     Return True if the user has the specified permission. Query all
-    #     available auth backends, but return immediately if any backend returns
-    #     True. Thus, a user who has permission from a single auth backend is
-    #     assumed to have permission in general. If an object is provided, check
-    #     permissions for that object.
-    #     """
-    #     # # Active superusers have all permissions.
-    #     if self.is_active and self.is_superuser or self.is_active and self.is_admin:
-    #         return True
-    #
-    #     # Otherwise we need to check the backends.
-    #     return _user_has_perm(self, perm, obj)
+    @property
+    def has_any_permissions(self):
+        return self.permissions.exists()
+
+    def get_allowed_hosts(self):
+        hosts = VirtualHost.objects.all()
+        if not self.is_admin:
+            hosts = hosts.filter(name=self.host)
+        return hosts
 
 
 class CustomPermission(models.Model):

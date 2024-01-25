@@ -34,9 +34,11 @@
                 </select>
             </label>
 
-            <button>
-                Save
-            </button>
+            {% if settings_write_permissions %}
+                <button>
+                    Save
+                </button>
+            {% endif %}
         </form>
     </div>
 {% endblock %}

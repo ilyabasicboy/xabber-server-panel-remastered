@@ -1,4 +1,6 @@
-{% load base_tags %}
+{% load base_tags users_tags %}
+
+{% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
 
 <div class="mb-4 overflow-hidden">
     <form method="post">
@@ -16,11 +18,13 @@
                     <option value="public" {% if settings.status == 'public' %}selected{% endif %}>public</option>
                 </select>
             </div>
-            <div class="me-3 mb-3">
-                <button class="btn btn-primary" type="submit">
-                    Save
-                </button>
-            </div>
+            {% if registration_write_permissions %}
+                <div class="me-3 mb-3">
+                    <button class="btn btn-primary" type="submit">
+                        Save
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </form>
 </div>
@@ -36,9 +40,11 @@
                 {{ settings.url|default:'' }}
             </a>
 
-            <a class="me-3 mb-3" href="{% url 'registration:url' id=settings.id %}">
-                Edit
-            </a>
+            {% if registration_write_permissions %}
+                <a class="me-3 mb-3" href="{% url 'registration:url' id=settings.id %}">
+                    Edit
+                </a>
+            {% endif %}
         </div>
     </div>
 
@@ -79,16 +85,20 @@
                                         </div>
 
                                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item text-wrap" href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
-                                                    Change
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
-                                                     Delete
-                                                </a>
-                                            </li>
+                                            {% if registration_write_permissions %}
+                                                <li>
+                                                    <a class="dropdown-item text-wrap" href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
+                                                        Change
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            {% if registration_write_permissions %}
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
+                                                         Delete
+                                                    </a>
+                                                </li>
+                                            {% endif %}
                                             <li>
                                                 <a class="dropdown-item text-wrap text-info show-url-js" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
                                                      Show link
@@ -129,9 +139,11 @@
         {% endif %}
     {% endif %}
 
-    <div class="mt-4 text-end">
-        <a class="btn btn-primary" href="{% url 'registration:create' vhost_id=settings.host.id %}">
-            Add
-        </a>
-    </div>
+    {% if registration_write_permissions %}
+        <div class="mt-4 text-end">
+            <a class="btn btn-primary" href="{% url 'registration:create' vhost_id=settings.host.id %}">
+                Add
+            </a>
+        </div>
+    {% endif %}
 {% endif %}

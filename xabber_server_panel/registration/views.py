@@ -3,27 +3,34 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import reverse, render, loader
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from datetime import datetime
 
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config
+from xabber_server_panel.users.decorators import permission_read, permission_write
 
 from .models import RegistrationSettings
 
 
 class RegistrationList(LoginRequiredMixin, TemplateView):
     template_name = 'registration/list.html'
+    app = 'registration'
 
+    @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
 
         context = {
             'hosts': hosts,
         }
 
         if hosts.exists():
-            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+            host = request.GET.get('host', request.session.get('host'))
+
+            if not hosts.filter(name=host):
+                host = hosts.first().name
 
             # write current host on session
             request.session['host'] = host
@@ -52,6 +59,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, *args, **kwargs):
         host_name = request.POST.get('host')
         hosts = VirtualHost.objects.all()
@@ -60,10 +68,12 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
         self.context = {
             'hosts': hosts,
+            'curr_host': host_name
         }
 
         if self.host:
             self.update_settings()
+            messages.success(request, 'Registration changed successfully.')
 
         return self.render_to_response(self.context)
 
@@ -85,7 +95,9 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
 class RegistrationCreate(LoginRequiredMixin, TemplateView):
     template_name = 'registration/create.html'
+    app = 'registration'
 
+    @permission_write
     def get(self, request, vhost_id, *args, **kwargs):
 
         try:
@@ -99,6 +111,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, vhost_id, *args, **kwargs):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
@@ -120,6 +133,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
                      "description": description
                 }
             )
+            messages.success(request, 'Registration key created successfully.')
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={host.name}'
             )
@@ -135,7 +149,9 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
 class RegistrationChange(LoginRequiredMixin, TemplateView):
     template_name = 'registration/change.html'
+    app = 'registration'
 
+    @permission_write
     def get(self, request, vhost_id, key, *args, **kwargs):
 
         try:
@@ -164,6 +180,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, vhost_id, key, *args, **kwargs):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
@@ -186,6 +203,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
                 },
                 key
             )
+            messages.success(request, 'Registration key changed successfully.')
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={host.name}'
             )
@@ -200,6 +218,9 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
 
 class RegistrationDelete(LoginRequiredMixin, TemplateView):
+    app = 'registration'
+
+    @permission_write
     def get(self, request, vhost_id, key, *args, **kwargs):
 
         try:
@@ -208,7 +229,7 @@ class RegistrationDelete(LoginRequiredMixin, TemplateView):
             return HttpResponseNotFound
 
         request.user.api.delete_key({"host": host.name}, key=key)
-
+        messages.success(request, 'Registration key deleted successfully.')
         return HttpResponseRedirect(
             reverse('registration:list') + f'?host={host.name}'
         )
@@ -216,7 +237,9 @@ class RegistrationDelete(LoginRequiredMixin, TemplateView):
 
 class RegistrationUrl(LoginRequiredMixin, TemplateView):
     template_name = 'registration/url.html'
+    app = 'registration'
 
+    @permission_write
     def get(self, request, id, *args, **kwargs):
         try:
             settings = RegistrationSettings.objects.get(id=id)
@@ -228,6 +251,7 @@ class RegistrationUrl(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_write
     def post(self, request, id, *args, **kwargs):
         try:
             settings = RegistrationSettings.objects.get(id=id)
@@ -243,6 +267,8 @@ class RegistrationUrl(LoginRequiredMixin, TemplateView):
             else:
                 settings.url = url
                 settings.save()
+
+            messages.success(request, 'Web client url changed successfully.')
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={settings.host.name}'
             )

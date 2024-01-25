@@ -38,7 +38,7 @@
     </div>
 
     <div class="col-12 pb-5 mb-5">
-        <form action="{% url 'users:detail' id=user.id %}" method="POST">
+        <form action="{% url 'users:circles' id=user.id %}" method="POST">
             {% csrf_token %}
 
             <ul class="list-group mb-3">

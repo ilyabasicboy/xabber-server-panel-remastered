@@ -2,6 +2,7 @@ from django.shortcuts import render, reverse, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.circles.models import Circle
@@ -19,12 +20,15 @@ class CircleList(LoginRequiredMixin, TemplateView):
     @permission_read
     def get(self, request, *args, **kwargs):
 
-        hosts = VirtualHost.objects.all()
+        hosts = request.user.get_allowed_hosts()
         self.circles = Circle.objects.all()
         context = {}
 
         if hosts.exists():
-            host = request.GET.get('host', request.session.get('host', hosts.first().name))
+            host = request.GET.get('host', request.session.get('host'))
+
+            if not hosts.filter(name=host):
+                host = hosts.first().name
 
             # write current host on session
             request.session['host'] = host
@@ -103,6 +107,16 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
 
         if form.is_valid():
             circle = form.save()
+            self.request.user.api.create_group(
+                {
+                    'group': form.cleaned_data.get('circle'),
+                    'host': form.cleaned_data.get('host'),
+                    'name': form.cleaned_data.get('name'),
+                    'description': form.cleaned_data.get('description'),
+                    'displayed_groups': None
+                }
+            )
+            messages.success(request, 'Circle created successfully.')
             return HttpResponseRedirect(
                 reverse(
                     'circles:detail',
@@ -146,6 +160,7 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
         self.update_circle()
 
+        messages.success(request, 'Circle changed successfully.')
         context = {
             'circle': self.circle,
         }
@@ -253,13 +268,16 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         try:
             username, host = self.add_member.split('@')
         except:
-            print('jid is incorrect')
+            messages.error(self.request, 'Jid is incorrect.')
+            return
 
         user = User.objects.filter(username=username, host=host).first()
         if user:
             self.circle.members.add(user)
+            messages.success(self.request, 'Member added successfully.')
         else:
-            print('user is undefined')
+            messages.error(self.request, 'User is undefined.')
+            return
 
         self.request.user.api.srg_user_add_api(
             {
@@ -304,6 +322,30 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
             )
 
         self.circle.members.set(members)
+        messages.success(self.request, 'Members changed successfully.')
+
+
+class DeleteMember(LoginRequiredMixin, TemplateView):
+    app = 'circles'
+
+    @permission_write
+    def get(self, request, circle_id, member_id, *args, **kwargs):
+
+        try:
+            circle = Circle.objects.get(id=circle_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        members = circle.members.exclude(id=member_id)
+        circle.members.set(members)
+        self.request.user.api.delete_group(
+            {
+                'circle': circle.circle,
+                'host': circle.host
+            }
+        )
+        messages.success(self.request, 'Member deleted successfully.')
+        return HttpResponseRedirect(reverse('circles:members', kwargs={'id': circle.id}))
 
 
 class CircleShared(LoginRequiredMixin, TemplateView):
@@ -339,6 +381,8 @@ class CircleShared(LoginRequiredMixin, TemplateView):
         circles = Circle.objects.filter(host=self.circle.host)
 
         self.update_circle()
+
+        messages.success(self.request, 'Shared contacts changed successfully.')
 
         context = {
             'circle': self.circle,
