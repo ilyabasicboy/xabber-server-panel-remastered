@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, loader
+from django.shortcuts import reverse, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +11,7 @@ from xabber_server_panel.users.models import User
 from xabber_server_panel.users.decorators import permission_read, permission_write
 
 from .forms import CircleForm
+from .utils import check_circles
 
 
 class CircleList(LoginRequiredMixin, TemplateView):
@@ -21,7 +22,7 @@ class CircleList(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
         hosts = request.user.get_allowed_hosts()
-        self.circles = Circle.objects.all()
+        self.circles = Circle.objects.none()
         context = {}
 
         if hosts.exists():
@@ -36,11 +37,12 @@ class CircleList(LoginRequiredMixin, TemplateView):
             context['curr_host'] = host
 
             # check circles from server
-            self.check_circles(host)
-            self.circles = self.circles.filter(host=host)
+            check_circles(request.user, host)
 
-        context['hosts'] = hosts
-        context['circles'] = self.circles.order_by('circle')
+            self.circles = Circle.objects.filter(host=host)
+
+            context['hosts'] = hosts
+            context['circles'] = self.circles.order_by('circle')
 
         if request.is_ajax():
             html = loader.render_to_string('circles/parts/circle_list.html', context, request)
@@ -50,40 +52,6 @@ class CircleList(LoginRequiredMixin, TemplateView):
             }
             return JsonResponse(response_data)
         return self.render_to_response(context)
-
-    def check_circles(self, host):
-        """
-            Check registered circles and create
-            if it doesn't exist in django db
-        """
-        try:
-            registered_circles = self.request.user.api.get_groups({"host": host}).get('circles')
-        except:
-            registered_circles = []
-
-        if registered_circles:
-            # Get a list of existing circles from the Circle model
-            existing_circles = self.circles.values_list('circle', flat=True)
-
-            # Filter the circle list to exclude existing circles
-            unknown_circles = [circle for circle in registered_circles if circle not in existing_circles]
-
-            if unknown_circles:
-                circles_to_create = [
-                    Circle(
-                        circle=circle,
-                        host=host,
-                    )
-                    for circle in unknown_circles
-                ]
-                Circle.objects.bulk_create(circles_to_create)
-
-            # get unregistered circles in db and delete
-            circles_to_delete = Circle.objects.filter(host=host).exclude(circle__in=registered_circles)
-            if circles_to_delete:
-                circles_to_delete.delete()
-
-            self.circles = Circle.objects.all()
 
 
 class CircleCreate(LoginRequiredMixin, TemplateView):

@@ -3,6 +3,8 @@ $(function () {
     let url, page;
     function ajax_send(url, page='') {
         let ajax_url = url + page;
+
+        // Create the data objec`t with `the host value and query parameters
         let data = {
             'host': $('#host').val(),
         };
@@ -20,9 +22,45 @@ $(function () {
 
     $('.list-js').on('click', '.pagination a', function(e){
         e.preventDefault();
+
         let url = $(this).parents('.list-js').data('url');
         ajax_send(url, $(this).attr('href'));
     });
+
+    // ------ Separate logic for search ------------
+
+    function search_ajax(url, page=''){
+        let ajax_url = url + page;
+
+        let query = $('#search-host').data('querystring');
+
+        // Parse the query string into an object
+        let queryParams = {};
+        query.split('&').forEach(function (param) {
+            var keyValue = param.split('=');
+            queryParams[keyValue[0]] = keyValue[1];
+        });
+
+        // Create the data objec`t with `the host value and query parameters
+        let data = {
+            'host': $('#search-host').val(),
+            ...queryParams
+        };
+
+        $.get(ajax_url, data, function(data){
+            $('.search-list-js').html(data['html']);
+            setCurrentUrl();
+        });
+    }
+    $('#search-host').on('change', function(e){
+        search_ajax($(this).data('url'));
+    });
+
+    $('.search-pagination-js').on('click', 'pagination a', function(e){
+        e.preventDefault();
+        search_ajax($('#search-host').data('url'), $(this).attr('href'));
+    });
+
 
     function setCurrentUrl() {
         //Get the current URL

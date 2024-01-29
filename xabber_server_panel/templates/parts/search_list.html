@@ -1,0 +1,36 @@
+{% load users_tags %}
+
+{% check_user_permissions request.user 'users' as users_read_permissions %}
+{% check_user_permissions request.user 'cricles' as circles_read_permissions %}
+{% check_user_permissions request.user 'groups' as groups_read_permissions %}
+
+{% if users and users_read_permissions %}
+  <div>
+    Users
+
+    <div class="search-pagination-js" data-table="users">
+      {% include 'users/parts/user_list.html' %}
+    </div>
+  </div>
+{% endif %}
+
+{% if circles and circles_read_permissions %}
+  <div>
+    Circles
+
+    <div class="search-pagination-js" data-table="circles">
+      {% include 'circles/parts/circle_list.html' %}
+    </div>
+  </div>
+{% endif %}
+
+{% if groups and groups_read_permissions %}
+  <div>
+    Groups
+
+    <div class="search-pagination-js" data-table="groups">
+      {% include 'groups/parts/groups_list.html' %}
+    </div>
+
+  </div>
+{% endif %}

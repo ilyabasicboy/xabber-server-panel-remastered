@@ -15,6 +15,7 @@ from datetime import datetime
 
 from .models import User, CustomPermission
 from .forms import UserForm
+from .utils import check_users
 
 
 class CreateUser(LoginRequiredMixin, TemplateView):
@@ -409,7 +410,7 @@ class UserList(LoginRequiredMixin, TemplateView):
     @permission_read
     def get(self, request, *args, **kwargs):
         hosts = request.user.get_allowed_hosts()
-        self.users = User.objects.all()
+        self.users = User.objects.none()
 
         context = {
             'hosts': hosts,
@@ -425,11 +426,11 @@ class UserList(LoginRequiredMixin, TemplateView):
             request.session['host'] = host
 
             context['curr_host'] = host
-            self.check_users(host)
+            check_users(request.user, host)
 
-            self.users = self.users.filter(host=host)
+            self.users = User.objects.filter(host=host)
 
-        context['users'] = self.users
+        context['users'] = self.users.order_by('username')
 
         if request.is_ajax():
             html = loader.render_to_string('users/parts/user_list.html', context, request)
@@ -441,46 +442,7 @@ class UserList(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
-    def check_users(self, host):
 
-        """
-            Check registered users and create
-            if it doesn't exist in django db
-        """
-
-        try:
-            registered_users = self.request.user.api.xabber_registered_users({"host": host}).get('users')
-        except:
-            registered_users = []
-
-        if registered_users:
-            # Get a list of existing usernames from the User model
-            existing_usernames = self.users.values_list('username', flat=True)
-
-            # get registered usernames list
-            registered_usernames = [user['username'] for user in registered_users]
-
-            # Filter the user_list to exclude existing usernames
-            unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
-
-            # create in db unknown users
-            if unknown_users:
-                users_to_create = [
-                    User(
-                        username=user['username'],
-                        host=host,
-                        auth_backend=user['backend']
-                    )
-                    for user in unknown_users
-                ]
-                User.objects.bulk_create(users_to_create)
-
-            # get unregistered users in db and delete
-            users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
-            if users_to_delete:
-                users_to_delete.delete()
-
-        self.users = User.objects.all()
 
 
 class UserPermissions(LoginRequiredMixin, TemplateView):

@@ -70,6 +70,11 @@
                     </div>
                 {% endif %}
 
+                <form action="{% url 'search' %}" method="GET">
+
+                    <input type="text" name="text" placeholder="Search for Users, Circles, Groups">
+                </form>
+
                 {% if request.user.is_authenticated %}
                     <div class="dropdown ms-auto">
                         <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6" role="button" data-bs-toggle="dropdown" aria-expanded="false">
