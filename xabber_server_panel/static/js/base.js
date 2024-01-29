@@ -11,7 +11,7 @@ $(function () {
 
         $.get(ajax_url, data, function(data){
             $('.list-js').html(data['html']);
-            $('.items-count-js span').html(data['items_count'])
+            $('.items-count-js span').html(data['items_count']);
             setCurrentUrl();
         });
     };
@@ -39,29 +39,40 @@ $(function () {
         let queryParams = {};
         query.split('&').forEach(function (param) {
             var keyValue = param.split('=');
-            queryParams[keyValue[0]] = keyValue[1];
+            if (keyValue[0] != 'page'){
+                queryParams[keyValue[0]] = keyValue[1];
+            }
         });
 
         // Create the data objec`t with `the host value and query parameters
         let data = {
             'host': $('#search-host').val(),
-            'object': object;
+            'object': object,
             ...queryParams
         };
 
         $.get(ajax_url, data, function(data){
             $target.html(data['html']);
             setCurrentUrl();
+            SearchPagination();
         });
     }
     $('#search-host').on('change', function(e){
         search_ajax($(this).data('url'));
     });
 
-    $('.search-pagination-js').on('click', 'pagination a', function(e){
-        e.preventDefault();
-        search_ajax($('#search-host').data('url'), target=$(this),  $(this).attr('href'));
-    });
+    function SearchPagination(){
+        $('.search-pagination-js').on('click', '.pagination a', function(e){
+            e.preventDefault();
+            search_ajax(
+                $('#search-host').data('url'),
+                target=$(this).parents('.search-pagination-js'),
+                object=$(this).parents('.search-pagination-js').data('object'),
+                $(this).attr('href')
+            );
+        });
+    }
+    SearchPagination()
 
 
     function setCurrentUrl() {

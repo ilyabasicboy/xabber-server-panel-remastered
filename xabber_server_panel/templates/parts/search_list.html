@@ -1,14 +1,14 @@
 {% load users_tags %}
 
 {% check_user_permissions request.user 'users' as users_read_permissions %}
-{% check_user_permissions request.user 'cricles' as circles_read_permissions %}
+{% check_user_permissions request.user 'circles' as circles_read_permissions %}
 {% check_user_permissions request.user 'groups' as groups_read_permissions %}
 
 {% if users and users_read_permissions %}
   <div>
     Users
 
-    <div class="search-pagination-js" data-table="users">
+    <div class="search-pagination-js" data-object="users">
       {% include 'users/parts/user_list.html' %}
     </div>
   </div>
@@ -18,7 +18,7 @@
   <div>
     Circles
 
-    <div class="search-pagination-js" data-table="circles">
+    <div class="search-pagination-js" data-object="circles">
       {% include 'circles/parts/circle_list.html' %}
     </div>
   </div>
@@ -28,7 +28,7 @@
   <div>
     Groups
 
-    <div class="search-pagination-js" data-table="groups">
+    <div class="search-pagination-js" data-object="groups">
       {% include 'groups/parts/groups_list.html' %}
     </div>
 

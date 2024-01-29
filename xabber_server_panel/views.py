@@ -37,6 +37,8 @@ class Search(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         text = request.GET.get('text', '')
+        object = request.GET.get('object')
+
         hosts = request.user.get_allowed_hosts()
 
         context = {
@@ -84,7 +86,15 @@ class Search(LoginRequiredMixin, TemplateView):
             context['groups'] = groups
 
         if request.is_ajax():
-            html = loader.render_to_string('parts/search_list.html', context, request)
+            if object == 'users':
+                template = 'users/parts/user_list.html'
+            elif object == 'circles':
+                template = 'circles/parts/circle_list.html'
+            elif object == 'groups':
+                template = 'groups/parts/groups_list.html'
+            else:
+                template = 'parts/search_list.html'
+            html = loader.render_to_string(template, context, request)
             response_data = {
                 'html': html,
             }
