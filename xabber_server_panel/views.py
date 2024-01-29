@@ -1,6 +1,7 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from xabber_server_panel.utils import get_modules
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.config.models import RootPage
@@ -14,8 +15,9 @@ class HomePage(TemplateView):
 
         # redirect to module root
         rp = RootPage.objects.first()
+        modules = get_modules()
         if rp and rp.module:
-            if rp.module != 'home':
+            if rp.module != 'home' and rp.module in modules:
                 return HttpResponseRedirect(
                     reverse(f'{rp.module}:root')
                 )

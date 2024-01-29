@@ -5,12 +5,14 @@ from django.conf import settings
 from ldap3 import Server, Connection, ALL
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.core import management
+from django.apps import apps
 
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.users.models import User
 from xabber_server_panel.config.utils import update_ejabberd_config, make_xmpp_config
-from xabber_server_panel.utils import host_is_valid, get_system_group_suffix
+from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list
 from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
 
 from .models import LDAPSettings, LDAPServer, RootPage
@@ -338,6 +340,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
+        # print(settings.INSTALLED_APPS)
         return self.render_to_response({})
 
     @permission_admin
@@ -348,31 +351,46 @@ class Modules(LoginRequiredMixin, TemplateView):
             temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
 
             try:
-                # Создание временной папки для распаковки
+                # Create temporary dir for unpack
                 os.makedirs(temp_extract_dir, exist_ok=True)
 
-                # Распаковка архива во временную папку
+                # Unpack archieve in temporary dir
                 with tarfile.open(fileobj=uploaded_file, mode='r:gz') as tar:
                     tar.extractall(temp_extract_dir)
 
-                # Получение вложенной папки внутри 'panel'
+                # Get nested dir inside 'panel'
                 panel_path = os.path.join(temp_extract_dir, 'panel')
                 if os.path.isdir(panel_path):
-                    # Копирование содержимого в modules
+                    # Copy module in modules dir
                     for module_dir in os.listdir(panel_path):
-                        target_path = os.path.join(settings.MODULES_DIR, module_dir)
-                        module_path = os.path.join(panel_path, module_dir)
-                        shutil.copytree(module_path, target_path)
+                        app_name = f'modules.{module_dir}'
 
-                        # Внесение изменений в settings.py
-                        settings.INSTALLED_APPS.append(f'{target_path}')
-                    # Удаление временной папки
+                        if not apps.is_installed(app_name):
+                            target_path = os.path.join(settings.MODULES_DIR, module_dir)
+                            module_path = os.path.join(panel_path, module_dir)
+                            shutil.copytree(module_path, target_path)
+
+                            # Append app in settings.py
+                            settings.INSTALLED_APPS += [app_name]
+
+                            # update app list
+                            update_app_list(settings.INSTALLED_APPS)
+
+                            # migrate db if module has migrations
+                            if os.path.exists(os.path.join(target_path, 'migrations', '__init__.py')):
+                                management.call_command('migrate', module_dir, interactive=False)
+
+                            if not settings.DEBUG:
+                                management.call_command('collectstatic', '--noinput', interactive=False)
+
+                    # Delete temporary dir
                     shutil.rmtree(temp_extract_dir)
 
                     make_xmpp_config()
                     messages.success(request, 'Module added successfully.')
             except Exception as e:
-                # Удаление временной папки в случае ошибки
+                print(e)
+                # Delete temporary dir
                 shutil.rmtree(temp_extract_dir, ignore_errors=True)
                 messages.error(request, 'Archieve reading error.')
 
@@ -386,8 +404,23 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
     def get(self, request, module, *args, **kwargs):
 
         module_path = os.path.join(settings.MODULES_DIR, module)
-        if os.path.isdir(module_path):
+        app_name = f'modules.{module}'
+
+        if os.path.isdir(module_path) and apps.is_installed(app_name):
+
+            # migrate db if module has migrations
+            if os.path.exists(os.path.join(module_path, 'migrations', '__init__.py')):
+                management.call_command('migrate', module, 'zero', interactive=True)
+
+            if not settings.DEBUG:
+                management.call_command('collectstatic', '--noinput', interactive=False)
+
             shutil.rmtree(module_path)
+
+            settings.INSTALLED_APPS.remove(app_name)
+
+            # update app list
+            update_app_list(settings.INSTALLED_APPS)
 
             make_xmpp_config()
             messages.success(request, 'Module deleted successfully.')

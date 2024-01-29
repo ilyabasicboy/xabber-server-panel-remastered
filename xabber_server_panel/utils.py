@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.apps import apps
+from collections import OrderedDict
 
 import subprocess
 import time
@@ -114,3 +116,11 @@ def get_user_data_for_api(user, password=None):
 
 def get_system_group_suffix():
     return ''.join(random.choices(string.ascii_lowercase, k=8))
+
+
+def update_app_list(app_list):
+
+    apps.app_configs = OrderedDict()
+    apps.apps_ready = apps.models_ready = apps.loading = apps.ready = False
+    apps.clear_cache()
+    apps.populate(app_list)

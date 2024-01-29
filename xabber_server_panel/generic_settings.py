@@ -5,9 +5,10 @@ PROJECT_ROOT = os.path.join(BASE_DIR, 'xabber_server_panel')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(PROJECT_ROOT, "static"), os.path.join(BASE_DIR, 'modules', 'xabber_web', "static")]
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, "static"),
+]
 
-print(os.path.join(BASE_DIR, 'modules', 'xabber_web', "static"))
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
 FILE_UPLOAD_PERMISSIONS = 0o644  # права для записи файлов, размером > FILE_UPLOAD_MAX_MEMORY_SIZE
