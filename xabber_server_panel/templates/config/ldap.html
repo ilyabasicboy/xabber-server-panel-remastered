@@ -11,20 +11,20 @@
         {% include 'config/parts/links.html' %}
     </div>
 
-    <div class="col-12">
+    <div class="col-12 pb-5 mb-5">
         {% url 'config:tabs' as ldap %}
         <form method="post">
             {% csrf_token %}
 
             <div class="d-flex flex-column mb-4">
-                <div class="text-secondary mt-0">
+                <h4 class="text-secondary mt-0">
                     LDAP authentication
-                </div>
+                </h4>
 
                 <div class="row mb-3">
-                    <h4 class="col-form-label col-sm-3">
+                    <label class="col-form-label col-sm-3">
                         Host
-                    </h4>
+                    </label>
                     <div class="col-sm-9">
                         <select class="form-select" id="host" name="host" data-url="{{ url }}">
                             {% for host in hosts %}
