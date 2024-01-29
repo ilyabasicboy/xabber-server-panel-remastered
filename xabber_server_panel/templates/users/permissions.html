@@ -41,20 +41,31 @@
         <form action="{% url 'users:permissions' id=user.id %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <div>
-                Server
-                <input type="checkbox" {% if user.is_admin %}checked{% endif %} name="is_admin" id="is_admin">
-                <label for="is_admin">
-                    Administrator
-                </label>
+            <div class="mb-3">
+                <h4 class="mt-0">
+                    Server
+                </h4>
+
+                <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" {% if user.is_admin %}checked{% endif %} name="is_admin" id="is_admin">
+                    <label class="form-check-label" for="is_admin">
+                        Administrator
+                    </label>
+                </div>
             </div>
 
-            <div>
-                {{ user.host }}
+            <hr class="border border-2">
 
-                {% for app, permissions in permissions.items %}
-                    <ul class="list-group mb-3">
+            <h4 class="mt-0">
+                {{ user.host }}
+            </h4>
+
+            {% for app, permissions in permissions.items %}
+                <div class="mb-3">
+                    <label class="form-label">
                         {{ app }}
+                    </label>
+                    <ul class="list-group mb-3">
                         {% for permission in permissions %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="form-check mb-0">
@@ -66,8 +77,8 @@
                             </li>
                         {% endfor %}
                     </ul>
-                {% endfor %}
-            </div>
+                </div>
+            {% endfor %}
 
             {% if users_write_permissions %}
                 <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">

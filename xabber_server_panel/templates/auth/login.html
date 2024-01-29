@@ -30,8 +30,10 @@
                     </div>
 
                     {% if form.errors %}
-                        <div>
-                            Wrong username or password. Access denied.
+                        <div class="mb-3">
+                            <div class="form-text text-danger mt-0">
+                                Wrong username or password. Access denied.
+                            </div>
                         </div>
                     {% endif %}
 

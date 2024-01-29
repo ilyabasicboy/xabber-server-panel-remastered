@@ -32,14 +32,28 @@
                                 {{ host.name }}
                             </td>
                             <td>
-                                <a href="{% url 'config:host_detail' id=host.id %}">
-                                    SRV records info
-                                </a>
-                                {% if settings_write_permissions %}
-                                    <a href="{% url 'config:host_delete' id=host.id %}">
-                                        Delete
-                                    </a>
-                                {% endif %}
+                                <div class="d-flex">
+                                    <div class="dropdown">
+                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical d-flex"></i>
+                                        </div>
+
+                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item text-wrap" href="{% url 'config:host_detail' id=host.id %}">
+                                                    SRV records info
+                                                </a>
+                                            </li>
+                                            {% if settings_write_permissions %}
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'config:host_delete' id=host.id %}">
+                                                         Delete
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

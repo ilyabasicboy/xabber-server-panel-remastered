@@ -25,7 +25,11 @@
                     {% for admin in admins %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ admin.full_jid }}</td>
+                            <td>
+                                <a {% if users_read_permissions %}href="{% url 'users:detail' id=admin.id %}"{% endif %}>
+                                    {{ admin.full_jid }}
+                                </a>
+                            </td>
                             <td>{{ admin.nickname|default:admin.username }}</td>
                         </tr>
                     {% endfor %}
