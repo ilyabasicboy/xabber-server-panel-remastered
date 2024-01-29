@@ -492,11 +492,18 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
     def update_permissions(self):
 
         is_admin = self.request.POST.get('is_admin', False)
-        permission_id_list = self.request.POST.getlist('permissions')
 
-        self.user.is_admin = is_admin
+        permission_id_list = []
 
-        self.user.permissions.set(permission_id_list)
+        for app in CustomPermission.APPS:
+            app_permission_id_list = self.request.POST.getlist(f'permissions_{app[0]}', [])
+            permission_id_list += app_permission_id_list
+
+        permission_list = CustomPermission.objects.filter(id__in=permission_id_list)
+
+        self.user.is_admin = True if is_admin else False
+
+        self.user.permissions.set(permission_list)
 
         self.user.save()
 

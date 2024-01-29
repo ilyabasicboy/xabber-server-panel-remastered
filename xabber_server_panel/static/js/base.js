@@ -29,7 +29,8 @@ $(function () {
 
     // ------ Separate logic for search ------------
 
-    function search_ajax(url, page=''){
+    let target, object;
+    function search_ajax(url, $target=$('.search-list-js'), object='', page=''){
         let ajax_url = url + page;
 
         let query = $('#search-host').data('querystring');
@@ -44,11 +45,12 @@ $(function () {
         // Create the data objec`t with `the host value and query parameters
         let data = {
             'host': $('#search-host').val(),
+            'object': object;
             ...queryParams
         };
 
         $.get(ajax_url, data, function(data){
-            $('.search-list-js').html(data['html']);
+            $target.html(data['html']);
             setCurrentUrl();
         });
     }
@@ -58,7 +60,7 @@ $(function () {
 
     $('.search-pagination-js').on('click', 'pagination a', function(e){
         e.preventDefault();
-        search_ajax($('#search-host').data('url'), $(this).attr('href'));
+        search_ajax($('#search-host').data('url'), target=$(this),  $(this).attr('href'));
     });
 
 

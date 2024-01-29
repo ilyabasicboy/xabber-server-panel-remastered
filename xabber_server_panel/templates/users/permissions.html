@@ -66,10 +66,18 @@
                         {{ app }}
                     </label>
                     <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="radio" name="permissions_{{ app }}" checked value="0" id="permissions_{{ app }}_forbidden">
+                                <label class="form-check-label" for="permissions_{{ app }}_forbidden">
+                                    forbidden
+                                </label>
+                            </div>
+                        </li>
                         {% for permission in permissions %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="form-check mb-0">
-                                    <input class="form-check-input" type="checkbox" name="permissions" {% if permission in user.permissions.all %}checked{% endif %} value="{{ permission.id }}" id="permissions_{{ permission.id }}">
+                                    <input class="form-check-input" type="radio" name="permissions_{{ app }}" {% if permission in user.permissions.all %}checked{% endif %} value="{{ permission.id }}" id="permissions_{{ permission.id }}">
                                     <label class="form-check-label" for="permissions_{{ permission.id }}">
                                         {{ permission.get_permission_display }}
                                     </label>
