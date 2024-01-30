@@ -54,14 +54,14 @@ $(function () {
         $.get(ajax_url, data, function(data){
             $target.html(data['html']);
             setCurrentUrl();
-            SearchPagination();
+            searchPagination();
         });
     }
     $('#search-host').on('change', function(e){
         search_ajax($(this).data('url'));
     });
 
-    function SearchPagination(){
+    function searchPagination(){
         $('.search-pagination-js').on('click', '.pagination a', function(e){
             e.preventDefault();
             search_ajax(
@@ -72,7 +72,7 @@ $(function () {
             );
         });
     }
-    SearchPagination()
+    searchPagination()
 
 
     function setCurrentUrl() {
@@ -137,6 +137,23 @@ $(function () {
     $(document).on('click', '.generate-password-js', function() {
         $(this).prev().val(generatePassword());
         return false;
+    });
+
+    //Init tooltips
+    const tooltipTriggerItem = document.querySelector('[data-bs-toggle="tooltip"]');
+    if ($(tooltipTriggerItem).length > 0) {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    }
+
+    //Show/hide reason with change user status
+    $('#user_status').on('change', function() {
+        let optionVal = $(this).val();
+        if (optionVal == "SUSPENDED") {
+            $(this).parent().next().addClass('show');
+        } else {
+            $(this).parent().next().removeClass('show');
+        }
     });
 
 });

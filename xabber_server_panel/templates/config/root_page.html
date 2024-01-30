@@ -12,32 +12,40 @@
     </div>
 
     {% get_items_by_model_name 'rootpage' num=1 as rp %}
-    <div id="root_page">
-        <div>
-            Root page
-        </div>
-
+    <div class="col-12 pb-5 mb-5">
         <form action="{% url 'config:root_page' %}" method="post">
             {% csrf_token %}
 
-            <label>
-                Module
-                <select name="module">
-                    <option value="home">
-                        Home page
-                    </option>
-                    {% for module in modules %}
-                        <option value="{{ module }}" {% if rp.0.module == module %}selected{% endif %}>
-                            {{ module }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </label>
+            <div class="d-flex flex-column">
+                <h4 class="text-secondary mt-0">
+                    Root page
+                </h4>
+
+                <div class="row mb-3">
+                    <label class="col-form-label col-sm-3">
+                        Module
+                    </label>
+                    <div class="col-sm-9">
+                        <select class="form-select" name="module">
+                            <option value="home">
+                                Home page
+                            </option>
+                            {% for module in modules %}
+                                <option value="{{ module }}" {% if rp.0.module == module %}selected{% endif %}>
+                                    {{ module }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             {% if settings_write_permissions %}
-                <button>
-                    Save
-                </button>
+                <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
+                    <button class="btn btn-primary" type="submit">
+                        Save
+                    </button>
+                </div>
             {% endif %}
         </form>
     </div>

@@ -11,8 +11,8 @@
         {% include 'config/parts/links.html' %}
     </div>
 
-    <div>
-        <table>
+    <div class="table-responsive">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>#</th>
@@ -38,17 +38,23 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
 
-        {% if settings_write_permissions %}
+    {% if settings_write_permissions %}
+        <div class="mt-4">
             <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <div>
-                    You can only upload a module in TAR.GZ or TGZ format.
+                <div class="mb-3">
+                    <label class="form-label h5" for="formFile">
+                        You can only upload a module in TAR.GZ or TGZ format.
+                    </label>
+
+                    <input class="form-control" id="formFile" type="file" name="file" accept=".tar.gz, .tgz">
                 </div>
-                <input type="file" name="file" accept=".tar.gz, .tgz">
-                <button>Save</button>
+
+                <button class="btn btn-primary">Save</button>
             </form>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -73,7 +73,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Change status:</label>
-                        <select class="form-select" name="status">
+                        <select class="form-select" id="user_status" name="status">
                             <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
                                 Active
                             </option>
@@ -82,11 +82,13 @@
                         </select>
                     </div>
 
-                    <hr class="border border-2">
+                    <div class="collapse {% if user.status == 'SUSPENDED' %}show{% endif %}">
+                        <hr class="border border-2">
 
-                    <div class="mb-3">
-                        <label class="form-label">Reason for blocking:</label>
-                        <textarea class="form-control" name="reason" cols="30" rows="10" placeholder="Reason for blocking"></textarea>
+                        <div class="mb-3">
+                            <label class="form-label">Reason for blocking:</label>
+                            <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking"></textarea>
+                        </div>
                     </div>
 
                     <hr class="border border-2">
