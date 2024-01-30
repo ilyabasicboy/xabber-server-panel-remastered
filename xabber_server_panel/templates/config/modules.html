@@ -29,7 +29,7 @@
                         </td>
                         <td>
                             {% if settings_write_permissions %}
-                                <a href="{% url 'config:delete_module' module=module %}">
+                                <a class="text-danger" href="{% url 'config:delete_module' module=module %}">
                                     Delete
                                 </a>
                             {% endif %}

@@ -65,6 +65,12 @@
 {% if modules %}
     <hr>
     <ul class="nav nav-pills flex-column">
+        <li>
+            <a class="nav-link text-secondary">
+                Modules
+            </a>
+        </li>
+
         {% for module in modules %}
             {% with namespace=module|add:':info' %}
                 {% check_user_permissions request.user module as module_read_permissions %}

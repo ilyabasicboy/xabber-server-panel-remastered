@@ -156,4 +156,25 @@ $(function () {
         }
     });
 
+    //Change radio input with admin checkbox
+    $('#is_admin').on('change', function() {
+        if ($(this).prop('checked')) {
+            $(this).parents('form').find('.list-group-item').each(function(index, item) {
+                $(item).find('input[type="radio"]').first().prop('checked', true);
+                $(item).find('input[type="radio"]').attr('disabled', true);
+            });
+        } else {
+            $(this).parents('form').find('input[type="radio"]').attr('disabled', false);
+        }
+    });
+
+    //Show/hide modal messages
+    const messagesItem = document.querySelector('#messages');
+    if ($(messagesItem).length > 0) {
+        let messages = new bootstrap.Modal(document.getElementById('messages'), {})
+        messages.show();
+        setTimeout(function() {
+             messages.hide();
+        }, 4000);
+    }
 });
