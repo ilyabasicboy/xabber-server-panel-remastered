@@ -4,7 +4,7 @@ $(function () {
     function ajax_send(url, page='') {
         let ajax_url = url + page;
 
-        // Create the data objec`t with `the host value and query parameters
+        //Create the data objec`t with `the host value and query parameters
         let data = {
             'host': $('#host').val(),
         };
@@ -20,22 +20,20 @@ $(function () {
         ajax_send($(this).data('url'));
     });
 
-    $('.list-js').on('click', '.pagination a', function(e){
+    $('.list-js').on('click', '.pagination a', function(e) {
         e.preventDefault();
 
         let url = $(this).parents('.list-js').data('url');
         ajax_send(url, $(this).attr('href'));
     });
 
-    // ------ Separate logic for search ------------
-
+    //Separate logic for search
     let target, object;
-    function search_ajax(url, $target=$('.search-list-js'), object='', page=''){
+    function search_ajax(url, $target=$('.search-list-js'), object='', page='') {
         let ajax_url = url + page;
-
         let query = $('#search-host').data('querystring');
 
-        // Parse the query string into an object
+        //Parse the query string into an object
         let queryParams = {};
         query.split('&').forEach(function (param) {
             var keyValue = param.split('=');
@@ -44,7 +42,7 @@ $(function () {
             }
         });
 
-        // Create the data objec`t with `the host value and query parameters
+        //Create the data objec`t with `the host value and query parameters
         let data = {
             'host': $('#search-host').val(),
             'object': object,
@@ -56,12 +54,13 @@ $(function () {
             setCurrentUrl();
             searchPagination();
         });
-    }
-    $('#search-host').on('change', function(e){
+    };
+
+    $('#search-host').on('change', function(e) {
         search_ajax($(this).data('url'));
     });
 
-    function searchPagination(){
+    function searchPagination() {
         $('.search-pagination-js').on('click', '.pagination a', function(e){
             e.preventDefault();
             search_ajax(
@@ -73,7 +72,6 @@ $(function () {
         });
     }
     searchPagination()
-
 
     function setCurrentUrl() {
         //Get the current URL
@@ -177,4 +175,5 @@ $(function () {
              messages.hide();
         }, 4000);
     }
+
 });
