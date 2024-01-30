@@ -94,6 +94,8 @@
                             </li>
                         </ul>
                     </div>
+                {% else %}
+                    <a href="{% url 'custom_auth:login' %}">Login</a>
                 {% endif %}
 
                 <ul class="navbar-nav flex-row d-md-none ms-auto">

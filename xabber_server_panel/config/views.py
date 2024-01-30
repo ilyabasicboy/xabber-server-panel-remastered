@@ -172,7 +172,9 @@ class Admins(LoginRequiredMixin, TemplateView):
     @permission_admin
     def get(self, request, *args, **kwargs):
         admins = User.objects.filter(is_admin=True)
-        users = User.objects.all()
+
+        # exclude authenticated user because he cant change self status
+        users = User.objects.exclude(id=request.user.id)
         context = {
             'admins': admins,
             'users': users
@@ -182,7 +184,9 @@ class Admins(LoginRequiredMixin, TemplateView):
     @permission_admin
     def post(self, request, *args, **kwargs):
         request_data = dict(request.POST)
-        users = User.objects.all()
+
+        # exclude authenticated user because he cant change self status
+        users = User.objects.exclude(id=request.user.id)
         admins = request_data.get('admins', [])
 
         admins_to_add = users.filter(id__in=admins, is_admin=False)
@@ -209,7 +213,7 @@ class Admins(LoginRequiredMixin, TemplateView):
         messages.success(request, 'Admins changed successfully.')
         update_ejabberd_config()
         context = {
-            'admins': users.filter(id__in=admins),
+            'admins': User.objects.filter(is_admin=True),
             'users': users
         }
         return self.render_to_response(context)

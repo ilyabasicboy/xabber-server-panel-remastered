@@ -9,7 +9,7 @@ from django.utils import timezone
 from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
-from xabber_server_panel.users.decorators import permission_read, permission_write
+from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
 
 from datetime import datetime
 
@@ -443,18 +443,21 @@ class UserList(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-
-
 class UserPermissions(LoginRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
     app = 'users'
 
-    @permission_read
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
+
+        # check if user change himself
+        if user == request.user:
+            messages.error(request, 'You cant change self permissions.')
+            return HttpResponseRedirect(reverse('home'))
 
         permissions = {
             app[0]: CustomPermission.objects.filter(app=app[0])
@@ -467,12 +470,17 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
-    @permission_write
+    @permission_admin
     def post(self, request, id, *args, **kwargs):
         try:
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
+
+        # check if user change himself
+        if self.user == request.user:
+            messages.error(request, 'You cant change self permissions.')
+            return HttpResponseRedirect(reverse('home'))
 
         self.update_permissions()
 

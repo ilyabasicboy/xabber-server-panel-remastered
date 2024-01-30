@@ -24,10 +24,12 @@
             Circles
         </a>
     </li>
-    <li class="nav-item">
-        {% url 'users:permissions' id=user.id as permissions %}
-        <a class="nav-link {% if request.path_info == permissions %}active{% endif %}" href="{{ permissions }}">
-            Permissions
-        </a>
-    </li>
+    {% if request.user.is_admin and request.user != user %}
+        <li class="nav-item">
+            {% url 'users:permissions' id=user.id as permissions %}
+            <a class="nav-link {% if request.path_info == permissions %}active{% endif %}" href="{{ permissions }}">
+                Permissions
+            </a>
+        </li>
+    {% endif %}
 </ul>
