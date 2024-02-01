@@ -12,7 +12,7 @@
     </div>
 
     {% if admins %}
-        <div class="table-responsive-md">
+        <div class="table-adaptive">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
@@ -24,13 +24,13 @@
                 <tbody>
                     {% for admin in admins %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
+                            <td data-title="#">{{ forloop.counter }}</td>
+                            <td data-title="JID">
                                 <a {% if users_read_permissions %}href="{% url 'users:detail' id=admin.id %}"{% endif %}>
                                     {{ admin.full_jid }}
                                 </a>
                             </td>
-                            <td>{{ admin.nickname|default:admin.username }}</td>
+                            <td data-title="Username">{{ admin.nickname|default:admin.username }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

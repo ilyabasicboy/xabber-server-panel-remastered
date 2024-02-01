@@ -10,8 +10,8 @@
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3 {% if form.circle.errors %}text-danger{% endif %}">Circle *</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3 {% if form.circle.errors %}text-danger{% endif %}">Circle *</label>
+                <div class="col-12 col-md-9">
                     <div class="input-group">
                         <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>
 
@@ -29,15 +29,15 @@
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Name</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Name</label>
+                <div class="col-12 col-md-9">
                     <input class="form-control" type="text" placeholder="Name" name="name" {% if form.name.data %}value="{{ form.name.data }}"{% endif %}>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Description</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Description</label>
+                <div class="col-12 col-md-9">
                     <textarea class="form-control" name="description" cols="30" rows="6">
                         {% if form.description.data %}{{ form.description.data }}{% endif %}
                     </textarea>

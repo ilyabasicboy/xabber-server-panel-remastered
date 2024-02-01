@@ -116,33 +116,33 @@
     </div>
 
     <div class="mt-4 col-12">
-        <div class="table-responsive-md">
+        <div class="table-adaptive">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Username</th>
                         <th>Nickname</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in circle.members.all %}
                         <tr>
-                            <td>
+                            <td data-title="#">
                                 <div class="d-flex">
                                     <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
                                         {{ user.get_initials }}
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td data-title="Username">
                                 {{ user.full_jid }}
                             </td>
-                            <td>
+                            <td data-title="Nickname">
                                 {{ user.nickname|default:'' }}
                             </td>
-                            <td>
+                            <td data-title="Actions">
                                 {% if circles_write_permissions %}
                                     <div class="d-flex">
                                         <div class="dropdown">

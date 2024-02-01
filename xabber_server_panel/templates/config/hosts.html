@@ -11,26 +11,26 @@
         {% include 'config/parts/links.html' %}
     </div>
 
-    <div class="table-responsive-md">
+    <div class="table-adaptive">
         {% if hosts %}
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Virtual host</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for host in hosts %}
                         <tr>
-                            <td>
+                            <td data-title="#">
                                 {{ forloop.counter }}
                             </td>
-                            <td>
+                            <td data-title="Virtual host">
                                 {{ host.name }}
                             </td>
-                            <td>
+                            <td data-title="Actions">
                                 <div class="d-flex">
                                     <div class="dropdown">
                                         <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">

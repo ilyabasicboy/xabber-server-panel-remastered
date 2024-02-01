@@ -3,7 +3,7 @@
 {% if groups %}
     {% paginate groups 5 as paginated_groups %}
 
-    <div class="table-responsive-md">
+    <div class="table-adaptive">
         <table class="table table-striped mb-0">
             <thead>
                 <tr>
@@ -16,19 +16,19 @@
             <tbody>
                 {% for group in paginated_groups %}
                     <tr>
-                        <td>
+                        <td data-title="#">
                             {{ forloop.counter }}
                         </td>
-                        <td>
+                        <td data-title="Chat identifier">
                             {{ group.name }}
                         </td>
-                        <td>
+                        <td data-title="Owner">
                             {% get_user_by_jid group.owner as user %}
                             <a {% if user %}href="{% url 'users:detail' id=user.id %}"{% endif %}>
                                 {{ group.owner }}
                             </a>
                         </td>
-                        <td>
+                        <td data-title="Members">
                             {{ group.size }}
                         </td>
                     </tr>

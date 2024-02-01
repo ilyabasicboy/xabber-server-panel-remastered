@@ -11,23 +11,23 @@
         {% include 'config/parts/links.html' %}
     </div>
 
-    <div class="table-responsive-md">
+    <div class="table-adaptive">
         <table class="table table-striped mb-0">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Module</th>
-                    <th></th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for module in modules %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>
+                        <td data-title="#">{{ forloop.counter }}</td>
+                        <td data-title="Module">
                             {{ module }}
                         </td>
-                        <td>
+                        <td data-title="Actions">
                             {% if settings_write_permissions %}
                                 <div class="d-flex">
                                     <div class="dropdown">

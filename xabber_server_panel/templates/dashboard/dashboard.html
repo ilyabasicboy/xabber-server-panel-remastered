@@ -49,7 +49,7 @@
         <h5 class="pb-2">
             Virtual hosts and users
         </h5>
-        <div class="table-responsive-md">
+        <div class="table-adaptive">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
@@ -70,16 +70,16 @@
                 <tbody>
                     {% for obj in data.hosts %}
                         <tr>
-                            <td>
+                            <td data-title="#">
                                 {{ forloop.counter }}
                             </td>
-                            <td>
+                            <td data-title="Virtual host">
                                 {{ obj.host }}
                             </td>
-                            <td>
+                            <td data-title="All users">
                                 {{ obj.total|default:'--' }}
                             </td>
-                            <td>
+                            <td data-title="Online users">
                                 {{ obj.online|default:'--' }}
                             </td>
                         </tr>
@@ -87,12 +87,12 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td>
+                        <td class="d-none d-lg-table-cell"></td>
+                        <td class="d-none d-lg-table-cell"></td>
+                        <td data-title="Total users">
                             {{ data.total }}
                         </td>
-                        <td>
+                        <td data-title="Total online users">
                             {{ data.online|default:'--' }}
                         </td>
                     </tr>

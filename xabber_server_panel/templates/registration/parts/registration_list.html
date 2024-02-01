@@ -51,7 +51,7 @@
     {% if keys %}
         {% paginate keys 10 as paginated_keys %}
 
-        <div class="table-responsive-md">
+        <div class="table-adaptive">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
@@ -59,25 +59,25 @@
                         <th>Key</th>
                         <th>Expires</th>
                         <th>Description</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for obj in paginated_keys %}
                         <tr>
-                            <td>
+                            <td data-title="#">
                                 {{ forloop.counter }}
                             </td>
-                            <td>
+                            <td data-title="Key">
                                 {{ obj.key }}
                             </td>
-                            <td>
+                            <td data-title="Expires">
                                 {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
                             </td>
-                            <td>
+                            <td data-title="Description">
                                 {{ obj.description }}
                             </td>
-                            <td>
+                            <td data-title="Actions">
                                 <div class="d-flex">
                                     <div class="dropdown">
                                         <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -5,7 +5,7 @@
 {% if circles %}
     {% paginate circles 5 as paginated_circles %}
 
-    <div class="table-responsive-md">
+    <div class="table-adaptive">
         <table class="table table-striped mb-0">
             <thead>
                 <tr>
@@ -19,25 +19,25 @@
             <tbody>
                 {% for circle in paginated_circles %}
                     <tr>
-                        <td>
+                        <td data-title="#">
                             {{ forloop.counter }}
                         </td>
-                        <td>
+                        <td data-title="Circle identifier">
                             <a href="{% url 'circles:detail' id=circle.id %}">
                                 {{ circle.circle }}
                             </a>
                         </td>
-                        <td>
+                        <td data-title="Circle name">
                             <span class="text-body-secondary">
                                 {{ circle.name|default:'-' }}
                             </span>
                         </td>
-                        <td>
+                        <td data-title="Members count">
                             <span class="text-body-secondary">
                                 {{ circle.members.count }}
                             </span>
                         </td>
-                        <td>
+                        <td data-title="Actions">
                             {% if circles_write_permissions %}
                                 <div class="d-flex">
                                     <div class="dropdown">
