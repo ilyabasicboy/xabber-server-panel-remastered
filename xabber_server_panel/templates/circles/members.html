@@ -3,10 +3,10 @@
 {% block section_title %}{% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
-                <ol class="breadcrumb mb-0">
+                <ol class="breadcrumb flex-nowrap mb-0">
                     <li class="breadcrumb-item">
                         <a class="fs-4" href="{% url 'circles:list' %}">
                             Circles
@@ -39,12 +39,12 @@
 
     <div class="col-12">
         <div class="row" data-bs-theme="light">
-            <div class="col-6 d-flex align-items-center">
+            <div class="d-flex align-items-center col-12 col-md-6">
                 <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.members.count }} members</span>
             </div>
 
             {% if circles_write_permissions %}
-                <div class="col-6 d-flex align-items-start justify-content-end">
+                <div class="d-flex align-items-start justify-content-start justify-content-md-end col-12 col-md-6 mt-3 mt-md-0">
                     <a class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#add_member">
                         Add
                     </a>
@@ -117,7 +117,7 @@
 
     <div class="mt-4 col-12">
         <div class="table-responsive-md">
-            <table class="table table-striped">
+            <table class="table table-striped mb-0">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -144,9 +144,21 @@
                             </td>
                             <td>
                                 {% if circles_write_permissions %}
-                                    <a href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
-                                        Delete
-                                    </a>
+                                    <div class="d-flex">
+                                        <div class="dropdown">
+                                            <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical d-flex"></i>
+                                            </div>
+
+                                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
+                                                        Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 {% endif %}
                             </td>
                         </tr>

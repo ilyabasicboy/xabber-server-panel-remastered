@@ -3,10 +3,10 @@
 {% block section_title %}{% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
-                <ol class="breadcrumb mb-0">
+                <ol class="breadcrumb flex-nowrap mb-0">
                     <li class="breadcrumb-item">
                         <a class="fs-4" href="{% url 'circles:list' %}">
                             Circles
@@ -42,29 +42,31 @@
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Name</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Name</label>
+                <div class="col-12 col-md-9">
                     <input class="form-control" type="text" name="name" placeholder="Name" value="{{ circle.name|default:'' }}">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Description</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Description</label>
+                <div class="col-12 col-md-9">
                     <textarea class="form-control" name="description" cols="30" rows="6">{% if circle.description %}{{ circle.description }}{% endif %}</textarea>
                 </div>
             </div>
 
             {% if circles_write_permissions %}
-                <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
-                    <div class="d-flex flex-wrap mb-n3 me-n3">
-                        <button class="btn btn-primary me-3 mb-3" type="submit" name="save">
-                            Save
-                        </button>
+                <div class="fixed-bottom row col-md-9 col-lg-10 m-0 ms-auto py-4 px-0 px-md-4 bg-white border-top">
+                    <div class="col-12 p-md-0">
+                        <div class="d-flex flex-wrap mb-n3 me-n3">
+                            <button class="btn btn-primary me-3 mb-3" type="submit" name="save">
+                                Save
+                            </button>
 
-                        <a class="btn btn-danger me-3 mb-3" href="{% url 'circles:delete' id=circle.id %}">
-                            Delete Circle
-                        </a>
+                            <a class="btn btn-danger me-3 mb-3" href="{% url 'circles:delete' id=circle.id %}">
+                                Delete Circle
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endif %}

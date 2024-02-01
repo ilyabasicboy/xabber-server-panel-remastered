@@ -15,8 +15,8 @@
                 </h4>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-sm-3 {% if form.username.errors %}text-danger{% endif %}">Username *</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3 {% if form.username.errors %}text-danger{% endif %}">Username *</label>
+                    <div class="col-12 col-md-9">
                         <div class="input-group">
                             <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" placeholder="Username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
 
@@ -34,8 +34,8 @@
                 </div>
 
                 <div class="row">
-                    <label class="col-form-label col-sm-3 {% if form.password.errors %}text-danger{% endif %}">Password *</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3 {% if form.password.errors %}text-danger{% endif %}">Password *</label>
+                    <div class="col-12 col-md-9">
                         <div class="input-group">
                             <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="text" name="password" placeholder="Password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
                             <button class="btn btn-primary generate-password-js" type="button">Generate</button>
@@ -50,41 +50,41 @@
                 </h4>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-sm-3">Nickname</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3">Nickname</label>
+                    <div class="col-12 col-md-9">
                         <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if form.password.data %}value="{{ form.nickname.data }}"{% endif %}>
                         <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-sm-3">First name</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3">First name</label>
+                    <div class="col-12 col-md-9">
                         <input class="form-control" type="text" name="first_name" placeholder="John" {% if form.first_name.data %}value="{{ form.first_name.data }}"{% endif %}>
                         <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-sm-3">Last name</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3">Last name</label>
+                    <div class="col-12 col-md-9">
                         <input class="form-control" type="text" name="last_name" placeholder="Doe" {% if form.last_name.data %}value="{{ form.last_name.data }}"{% endif %}>
                         <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-sm-3">Expires</label>
-                    <div class="col-sm-9">
+                    <label class="col-form-label col-12 col-md-3">Expires</label>
+                    <div class="col-12 col-md-9">
                         <input class="form-control" type="text" name="expires" placeholder="2022-04-15" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
                         <span class="form-text text-secondary">A string of characters of the format YYYY-MM-DD; where YYYY shall contain year, MM shall contain the month, and DD shall contain the day.</span>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-sm-3"></div>
+                    <div class="col-12 col-md-3"></div>
 
-                    <div class="col-sm-9">
+                    <div class="col-12 col-md-9">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="is_admin" value="" id="is_admin">
                             <label class="form-check-label" for="is_admin">

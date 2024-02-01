@@ -4,15 +4,15 @@
 
 {% block content %}
     {% url 'registration:list' as url %}
-    <div class="mb-4 col-12 d-flex">
-        <div class="d-flex align-items-center me-4">
+    <div class="mb-4 col-12 d-flex flex-wrap flex-md-nowrap">
+        <div class="d-flex align-items-center me-0 me-md-4 col-12 col-md-auto">
             <h2 class="mb-0">
                 Registration
             </h2>
         </div>
 
         {% if hosts %}
-            <div class="ms-auto">
+            <div class="ms-auto col-12 col-md-auto mt-3 mt-md-0">
                 {% include 'parts/host_select.html' %}
             </div>
         {% endif %}

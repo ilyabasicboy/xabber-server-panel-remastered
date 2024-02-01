@@ -3,10 +3,10 @@
 {% block section_title %}{% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
-                <ol class="breadcrumb mb-0">
+                <ol class="breadcrumb flex-nowrap mb-0">
                     <li class="breadcrumb-item">
                         <a class="fs-4" href="{% url 'users:list' %}">
                             Users
@@ -42,34 +42,36 @@
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Nickname</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Nickname</label>
+                <div class="col-12 col-md-9">
                     <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if user.nickname %}value="{{ user.nickname }}"{% endif %}>
                     <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">First name</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">First name</label>
+                <div class="col-12 col-md-9">
                     <input class="form-control" type="text" name="first_name" placeholder="John" {% if user.first_name %}value="{{ user.first_name }}"{% endif %}>
                     <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-sm-3">Last name</label>
-                <div class="col-sm-9">
+                <label class="col-form-label col-12 col-md-3">Last name</label>
+                <div class="col-12 col-md-9">
                     <input class="form-control" type="text" name="last_name" placeholder="Doe" {% if user.last_name %}value="{{ user.last_name }}"{% endif %}>
                     <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                 </div>
             </div>
 
             {% if users_write_permissions %}
-                <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
-                    <button class="btn btn-primary" type="submit">
-                        Save
-                    </button>
+                <div class="fixed-bottom row col-md-9 col-lg-10 m-0 ms-auto py-4 px-0 px-md-4 bg-white border-top">
+                    <div class="col-12 p-md-0">
+                        <button class="btn btn-primary" type="submit">
+                            Save
+                        </button>
+                    </div>
                 </div>
             {% endif %}
         </form>

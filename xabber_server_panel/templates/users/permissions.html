@@ -3,10 +3,10 @@
 {% block section_title %}{% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
-                <ol class="breadcrumb mb-0">
+                <ol class="breadcrumb flex-nowrap mb-0">
                     <li class="breadcrumb-item">
                         <a class="fs-4" href="{% url 'users:list' %}">
                             Users
@@ -91,10 +91,12 @@
             {% endfor %}
 
             {% if users_write_permissions %}
-                <div class="fixed-bottom col-md-9 col-lg-10 ms-auto p-4 bg-white border-top">
-                    <button class="btn btn-primary" type="submit">
-                        Save
-                    </button>
+                <div class="fixed-bottom row col-md-9 col-lg-10 m-0 ms-auto py-4 px-0 px-md-4 bg-white border-top">
+                    <div class="col-12 p-md-0">
+                        <button class="btn btn-primary" type="submit">
+                            Save
+                        </button>
+                    </div>
                 </div>
             {% endif %}
         </form>

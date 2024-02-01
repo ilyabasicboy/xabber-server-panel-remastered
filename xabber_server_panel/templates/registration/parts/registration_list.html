@@ -52,7 +52,7 @@
         {% paginate keys 10 as paginated_keys %}
 
         <div class="table-responsive-md">
-            <table class="table table-striped">
+            <table class="table table-striped mb-0">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -100,7 +100,7 @@
                                                 </li>
                                             {% endif %}
                                             <li>
-                                                <a class="dropdown-item text-wrap text-info show-url-js" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
+                                                <a class="dropdown-item text-wrap text-info show-url-js" role="button" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
                                                      Show link
                                                 </a>
                                             </li>

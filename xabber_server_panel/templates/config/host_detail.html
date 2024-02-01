@@ -6,10 +6,10 @@
 {% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
-                <ol class="breadcrumb mb-0">
+                <ol class="breadcrumb flex-nowrap mb-0">
                     <li class="breadcrumb-item">
                         <a class="fs-4" href="{% url 'config:hosts' %}">
                             Settings
@@ -36,69 +36,80 @@
         </div>
     </div>
 
-    <div>
-        <p>
-            To make XMPP work on your server, you need to set up SRV records for domain customdomain.com.
-            It will allow XMPP clients to correctly find the location of your server using Domain Name System (DNS).
-            You need to add several types of DNS records to make things work:
-        </p>
-
-        <div>
-            <h3>A record</h3>
+    <div class="col-12">
+        <div class="mb-4">
+            <p>
+                To make XMPP work on your server, you need to set up SRV records for domain customdomain.com.
+                It will allow XMPP clients to correctly find the location of your server using Domain Name System (DNS).
+                You need to add several types of DNS records to make things work:
+            </p>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Hostname</th>
-                    <th>IP Address</th>
-                    <th>TTL (seconds)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ host }}</td>
-                    <td>Your server IP</td>
-                    <td>Default</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="mb-4">
+            <h5 class="pb-2">
+                A record
+            </h5>
 
-        <div>
-            <h3>SRV records</h3>
+            <div class="table-responsive-md">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Hostname</th>
+                            <th>IP Address</th>
+                            <th>TTL (seconds)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ host }}</td>
+                            <td>Your server IP</td>
+                            <td>Default</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Service</th>
-                    <th>Protocol</th>
-                    <th>Priority</th>
-                    <th>Weight</th>
-                    <th>Port</th>
-                    <th>Target</th>
-                    <th>TTL (seconds)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>_xmpp-client</td>
-                    <td>TCP</td>
-                    <td>10</td>
-                    <td>5</td>
-                    <td>5222</td>
-                    <td>{{ host }}</td>
-                    <td>86400</td>
-                </tr>
-                <tr>
-                    <td>_xmpp-server</td>
-                    <td>TCP</td>
-                    <td>10</td>
-                    <td>5</td>
-                    <td>5269</td>
-                    <td>{{ host }}</td>
-                    <td>86400</td>
-                </tr>
-            </tbody>
-        </table>
+
+        <div class="mb-4">
+            <h5 class="pb-2">
+                SRV records
+            </h5>
+
+            <div class="table-responsive-md">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Protocol</th>
+                            <th>Priority</th>
+                            <th>Weight</th>
+                            <th>Port</th>
+                            <th>Target</th>
+                            <th>TTL (seconds)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>_xmpp-client</td>
+                            <td>TCP</td>
+                            <td>10</td>
+                            <td>5</td>
+                            <td>5222</td>
+                            <td>{{ host }}</td>
+                            <td>86400</td>
+                        </tr>
+                        <tr>
+                            <td>_xmpp-server</td>
+                            <td>TCP</td>
+                            <td>10</td>
+                            <td>5</td>
+                            <td>5269</td>
+                            <td>{{ host }}</td>
+                            <td>86400</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}
