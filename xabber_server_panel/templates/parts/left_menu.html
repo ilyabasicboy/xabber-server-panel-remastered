@@ -2,7 +2,8 @@
 <ul class="nav nav-pills flex-column">
     <li class="nav-item">
         {% url 'home' as home %}
-        <a href="{{ home }}" class="nav-link text-white {% if request.path_info == home %}active{% endif %}" aria-current="page">
+        <a href="{{ home }}" class="nav-link text-white {% if request.path_info == home %}active{% endif %}">
+            <i class="bi bi-house-door me-1 pe-none"></i>
             Home
         </a>
     </li>
@@ -11,6 +12,7 @@
         <li>
             {% url 'dashboard' as dashboard %}
             <a href="{{ dashboard }}" class="nav-link text-white {% if request.path_info == dashboard %}active{% endif %}">
+                <i class="bi bi-speedometer2 me-1 pe-none"></i>
                 Dashboard
             </a>
         </li>
@@ -20,6 +22,7 @@
         <li>
             {% url 'users:list' as users %}
             <a href="{{ users }}" class="nav-link text-white {% if users in request.path_info %}active{% endif %}">
+                <i class="bi bi-people me-1 pe-none"></i>
                 Users
             </a>
         </li>
@@ -29,6 +32,7 @@
         <li>
             {% url 'circles:list' as circles %}
             <a href="{{ circles }}" class="nav-link text-white {% if circles in request.path_info %}active{% endif %}">
+                <i class="bi bi-circle me-1 pe-none"></i>
                 Circles
             </a>
         </li>
@@ -38,6 +42,7 @@
         <li>
             {% url 'groups:list' as groups %}
             <a href="{{ groups }}" class="nav-link text-white {% if groups in request.path_info %}active{% endif %}">
+                <i class="bi bi-grid me-1 pe-none"></i>
                 Groups
             </a>
         </li>
@@ -47,6 +52,7 @@
         <li>
             {% url 'registration:list' as registration %}
             <a href="{{ registration }}" class="nav-link text-white {% if registration in request.path_info %}active{% endif %}">
+                <i class="bi bi-person-plus me-1 pe-none"></i>
                 Registration
             </a>
         </li>
@@ -56,6 +62,7 @@
         <li>
             {% url 'config:root' as config %}
             <a href="{{ config }}" class="nav-link text-white {% if config in request.path_info %}active{% endif %}">
+                <i class="bi bi-sliders me-1 pe-none"></i>
                 Settings
             </a>
         </li>
