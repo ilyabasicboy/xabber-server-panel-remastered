@@ -35,22 +35,17 @@
                         </td>
                         <td data-title="Name">
                             {% if user.nickname %}
-                                {{ user.nickname }}
+                                {{ user.nickname|truncatechars:'15' }}
                             {% else %}
-                                {% if user.first_name %}
-                                    {{ user.first_name }}
-                                {% endif %}
-                                {% if user.last_name %}
-                                    {{ user.last_name }}
-                                {% endif %}
+                                {{ user.full_name|truncatechars:'15' }}
                             {% endif %}
                         </td>
-                        <td data-title="Created">
+                        <td data-title="Created(UTC)">
                             <span class="text-body-secondary">
                                 {{ user.created|date:"m.d.Y H:i" }}
                             </span>
                         </td>
-                        <td data-title="Expires">
+                        <td data-title="Expires(UTC)">
                             <span class="text-body-secondary">
                                 {% if user.expires %}
                                     {{ user.expires|date:"m.d.Y H:i" }}
@@ -91,9 +86,15 @@
                                         {% endif %}
                                         {% if users_write_permissions %}
                                             <li>
-                                                <a class="dropdown-item text-wrap text-info" href="#">
-                                                     Block user
-                                                </a>
+                                                {% if user.status != 'BLOCKED' %}
+                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:block' id=user.id %}">
+                                                         Block user
+                                                    </a>
+                                                {% else %}
+                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:block' id=user.id %}">
+                                                         Unblock user
+                                                    </a>
+                                                {% endif %}
                                             </li>
                                         {% endif %}
                                         {% if users_write_permissions %}

@@ -53,12 +53,7 @@
                         {% if user.nickname %}
                             {{ user.nickname }}
                         {% elif user.first_name or user.last_name %}
-                            {% if user.first_name %}
-                                {{ user.first_name }}
-                            {% endif %}
-                            {% if user.last_name %}
-                                {{ user.last_name }}
-                            {% endif %}
+                            {{ user.full_name }}
                         {% else %}
                             {{ user.full_jid }}
                         {% endif %}

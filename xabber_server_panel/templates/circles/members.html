@@ -109,14 +109,14 @@
                 <tbody>
                     {% if circle.all_users %}
                         <tr>
-                            <td>
+                            <td data-title="#">
                             </td>
-                            <td>
+                            <td data-title="Username">
                                 All ({{ circle.get_members_count }} on {{ circle.host }})
                             </td>
-                            <td>
+                            <td data-title="Nickname">
                             </td>
-                            <td>
+                            <td data-title="Actions">
                             </td>
                         </tr>
                     {% endif %}
