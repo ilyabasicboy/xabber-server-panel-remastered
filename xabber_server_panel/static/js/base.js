@@ -176,14 +176,6 @@ $(function () {
         }, 4000);
     }
 
-    //Get Cookie
-    function getCookie(name) {
-        let matches = document.cookie.match(new RegExp(
-            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-    };
-
     //Set Cookie
     function setCookie(name, value, options = {}) {
         options = {
@@ -209,7 +201,6 @@ $(function () {
 
     //Switch theme
     const themeSwitch = document.getElementById('theme_switch');
-    const currentTheme = getCookie('theme');
     themeSwitch.addEventListener('change', function () {
         if (themeSwitch.checked) {
             document.documentElement.setAttribute('data-bs-theme', 'dark');

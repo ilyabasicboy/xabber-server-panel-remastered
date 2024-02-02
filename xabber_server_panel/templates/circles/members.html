@@ -65,8 +65,8 @@
                             </div>
 
                             <div class="modal-body">
-                                <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                    <div class="form-check">
+                                <div class="mb-3">
+                                    <div class="form-check mb-0">
                                         <input class="form-check-input" type="checkbox" {% if circle.all_users %}checked{% endif %} name="members" value="@all@" id="all">
                                         <label class="form-check-label" for="all">
                                             All ({{ circle.host }})
@@ -75,7 +75,7 @@
                                 </div>
                                 {% for user in users %}
                                     <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                        <div class="form-check">
+                                        <div class="form-check mb-0">
                                             <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
                                             <label class="form-check-label" for="user_{{ user.id }}">
                                                 {{ user.full_jid }}
@@ -95,6 +95,7 @@
             </div>
         {% endif %}
     </div>
+
     <div class="mt-4 col-12">
         <div class="table-adaptive">
             <table class="table table-striped mb-0">
@@ -109,14 +110,14 @@
                 <tbody>
                     {% if circle.all_users %}
                         <tr>
-                            <td data-title="#">
+                            <td class="d-none d-lg-table-cell">
                             </td>
-                            <td data-title="Username">
+                            <td data-title="All users">
                                 All ({{ circle.get_members_count }} on {{ circle.host }})
                             </td>
-                            <td data-title="Nickname">
+                            <td class="d-none d-lg-table-cell">
                             </td>
-                            <td data-title="Actions">
+                            <td class="d-none d-lg-table-cell">
                             </td>
                         </tr>
                     {% endif %}
