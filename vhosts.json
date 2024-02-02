@@ -1,0 +1,23 @@
+[
+  {
+    "model": "config.virtualhost",
+    "pk": 1,
+    "fields": {
+      "name": "example.com"
+    }
+  },
+  {
+    "model": "config.virtualhost",
+    "pk": 2,
+    "fields": {
+      "name": "domain.com"
+    }
+  },
+  {
+    "model": "config.virtualhost",
+    "pk": 10,
+    "fields": {
+      "name": "test.com"
+    }
+  }
+]

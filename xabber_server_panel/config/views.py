@@ -8,10 +8,10 @@ from django.contrib import messages
 from django.core import management
 from django.apps import apps
 
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.users.models import User
-from xabber_server_panel.config.utils import update_ejabberd_config, make_xmpp_config
+from xabber_server_panel.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list
 from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
 
@@ -42,6 +42,8 @@ class Hosts(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
+        check_hosts(request.user)
+
         hosts = VirtualHost.objects.all()
 
         context = {
@@ -74,7 +76,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
 
         circles = Circle.objects.filter(host=host.name)
         for circle in circles:
-            request.user.api.delete_group(
+            request.user.api.delete_circle(
                 {
                     'circle': circle.circle,
                     'host': host.name
@@ -127,8 +129,12 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             VirtualHost.objects.create(
                 name=host
             )
-            self.create_everybody_group(request, host)
+
+            # update config after creating new host
             update_ejabberd_config()
+
+            # create groups after update config
+            self.create_everybody_group(request, host)
 
             messages.success(request, 'Vhost created successfully.')
             return HttpResponseRedirect(
@@ -139,29 +145,23 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
-        request.user.api.srg_create_api(
+        request.user.api.create_circle(
             {
-                'group': host,
+                'circle': host,
                 'host': host,
                 'name': settings.EJABBERD_DEFAULT_GROUP_NAME,
                 'description': settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
-                'display': []
-            }
-        )
-        request.user.api.srg_user_add_api(
-            {
-                'members': ['@all@'],
-                'host': host,
-                'circle': host
+                'all_users': True
             }
         )
 
-        circle = Circle.objects.create(
+        Circle.objects.create(
             circle=host,
             host=host,
             name=settings.EJABBERD_DEFAULT_GROUP_NAME,
             description=settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
-            prefix=get_system_group_suffix()
+            prefix=get_system_group_suffix(),
+            all_users=True
         )
 
 
@@ -191,7 +191,7 @@ class Admins(LoginRequiredMixin, TemplateView):
 
         admins_to_add = users.filter(id__in=admins, is_admin=False)
         for user in admins_to_add:
-            request.user.api.xabber_set_admin(
+            request.user.api.set_admin(
                 {
                     "username": user.username,
                     "host": user.host
@@ -202,7 +202,7 @@ class Admins(LoginRequiredMixin, TemplateView):
 
         admins_to_delete = users.exclude(id__in=admins, is_admin=True)
         for user in admins_to_delete:
-            request.user.api.xabber_del_admin(
+            request.user.api.del_admin(
                 {
                     "username": user.username,
                     "host": user.host,

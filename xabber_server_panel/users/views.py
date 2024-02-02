@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils import timezone
 
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
 from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
@@ -62,7 +62,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
             get_user_data_for_api(user, cleaned_data.get('password'))
         )
         if user.is_admin:
-            user.api.xabber_set_admin(
+            user.api.set_admin(
                 {
                     "username": cleaned_data['username'],
                     "host": cleaned_data['host']
@@ -112,13 +112,14 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
     def update_user(self):
 
+        # set expires if its provided
+        # BEFORE CHANGE STATUS!!!
+        if 'expires' in self.request.POST:
+            self.change_expires()
+
         status = self.request.POST.get('status')
         if status and self.user.status != status:
             self.change_status(status)
-
-        # set expires if its provided
-        if 'expires' in self.request.POST:
-            self.change_expires()
 
         self.user.save()
 
@@ -143,10 +144,12 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         }
         if self.user.status == 'EXPIRED':
             if not self.user.is_expired:
+                self.user.reason = None
                 self.user.api.unblock_user(data)
                 self.user.status = 'ACTIVE'
         elif self.user.is_active:
             if self.user.is_expired:
+                self.user.reason = "Your account has expired"
                 data['reason'] = "Your account has expired"
                 self.user.api.block_user(data)
                 self.user.status = 'EXPIRED'
@@ -159,13 +162,9 @@ class UserDetail(LoginRequiredMixin, TemplateView):
             "username": self.user.username,
              "host": self.user.host,
         }
-        if status == 'SUSPENDED':
+        if status == 'BLOCKED':
+            self.user.reason = self.request.POST.get('reason')
             data['reason'] = self.request.POST.get('reason')
-            self.user.api.block_user(data)
-            self.user.status = status
-
-        elif status == 'EXPIRED':
-            data['reason'] = "Your account has expired"
             self.user.api.block_user(data)
             self.user.status = status
 
@@ -178,8 +177,9 @@ class UserDetail(LoginRequiredMixin, TemplateView):
             self.user.status = status
 
         elif status == 'ACTIVE':
-            if self.user.status == 'SUSPENDED':
+            if self.user.status == 'BLOCKED':
                 self.user.api.unblock_user(data)
+                self.user.reason = None
                 if self.user.is_expired:
                     self.user.expires = None
 
@@ -189,11 +189,61 @@ class UserDetail(LoginRequiredMixin, TemplateView):
                 self.user.api.unban_user(data)
 
                 if self.user.is_expired:
+                    self.user.reason = "Your account has expired"
                     data['reason'] = "Your account has expired"
                     self.user.api.block_user(data)
                     self.user.status = 'EXPIRED'
                 else:
+                    self.user.reason = None
                     self.user.status = status
+
+
+class UserBlock(LoginRequiredMixin, TemplateView):
+    app = 'users'
+
+    @permission_write
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        reason = self.request.GET.get('reason')
+        user.reason = reason
+        user.api.block_user(
+            {
+                "username": user.username,
+                "host": user.host,
+                'reason': reason
+            }
+        )
+        user.status = 'BLOCKED'
+        user.save()
+        return HttpResponseRedirect(reverse('users:list'))
+
+
+class UserUnBlock(LoginRequiredMixin, TemplateView):
+    app = 'users'
+
+    @permission_write
+    def get(self, request, id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
+        reason = self.request.GET.get('reason')
+        user.reason = reason
+        user.api.block_user(
+            {
+                "username": user.username,
+                "host": user.host,
+                'reason': reason
+            }
+        )
+        user.status = 'BLOCKED'
+        user.save()
+        return HttpResponseRedirect(reverse('users:list'))
 
 
 class UserDelete(LoginRequiredMixin, TemplateView):
@@ -262,7 +312,7 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 
         self.user.last_name = self.request.POST.get('last_name')
 
-        self.request.user.api.edit_user_vcard(
+        self.request.user.api.set_vcard(
             get_user_data_for_api(self.user)
         )
 
@@ -379,7 +429,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # add circles
         circles_to_add = self.circles.filter(id__in=ids_to_add)
         for circle in circles_to_add:
-            self.user.api.srg_user_add_api(
+            self.user.api.add_circle_members(
                 {
                     'circle': circle.circle,
                     'host': circle.host,
@@ -390,7 +440,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # delete circles
         circles_to_delete = self.circles.filter(id__in=ids_to_delete)
         for circle in circles_to_delete:
-            self.user.api.srg_user_del_api(
+            self.user.api.del_circle_members(
                 {
                     'circle': circle.circle,
                     'host': circle.host,
@@ -479,7 +529,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
         # check if user change himself
         if self.user == request.user:
-            messages.error(request, 'You cant change self permissions.')
+            messages.error(request, 'You cant change self permissions.',)
             return HttpResponseRedirect(reverse('home'))
 
         self.update_permissions()
@@ -516,14 +566,14 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
         self.user.save()
 
         if is_admin:
-            self.request.user.api.xabber_set_admin(
+            self.request.user.api.set_admin(
                 {
                     "username": self.user.username,
                     "host": self.user.host
                 }
             )
         else:
-            self.request.user.api.xabber_del_admin(
+            self.request.user.api.del_admin(
                 {
                     "username": self.user.username,
                     "host": self.user.host,
@@ -532,7 +582,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
             permissions = self.get_permissions_dict()
 
-            self.request.user.api.xabber_set_permissions(
+            self.request.user.api.set_permissions(
                 {
                     "username": self.user.username,
                     "host": self.user.host,

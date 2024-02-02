@@ -28,7 +28,7 @@ def check_users(user, host):
     """
 
     try:
-        registered_users = user.api.xabber_registered_users({"host": host}).get('users')
+        registered_users = user.api.get_users({"host": host}).get('users')
     except:
         registered_users = []
 

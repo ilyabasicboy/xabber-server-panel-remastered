@@ -1,6 +1,11 @@
 from django.db import models
 
-from xabber_server_panel.dashboard.models import VirtualHost
+
+class VirtualHost(models.Model):
+    name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.name
 
 
 class LDAPSettings(models.Model):

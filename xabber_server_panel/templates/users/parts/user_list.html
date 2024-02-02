@@ -11,8 +11,8 @@
                     <th>#</th>
                     <th>Username</th>
                     <th>Name</th>
-                    <th>Created</th>
-                    <th>Expires</th>
+                    <th>Created(UTC)</th>
+                    <th>Expires(UTC)</th>
                     <th>Auth</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -34,22 +34,26 @@
                             </a>
                         </td>
                         <td data-title="Name">
-                            {% if user.first_name %}
-                                {{ user.first_name }}
-                            {% endif %}
-                            {% if user.last_name %}
-                                {{ user.last_name }}
+                            {% if user.nickname %}
+                                {{ user.nickname }}
+                            {% else %}
+                                {% if user.first_name %}
+                                    {{ user.first_name }}
+                                {% endif %}
+                                {% if user.last_name %}
+                                    {{ user.last_name }}
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td data-title="Created">
                             <span class="text-body-secondary">
-                                {{ user.created|date:"M d, Y H:i" }}, UTC
+                                {{ user.created|date:"m.d.Y H:i" }}
                             </span>
                         </td>
                         <td data-title="Expires">
                             <span class="text-body-secondary">
                                 {% if user.expires %}
-                                    {{ user.expires|date:"M d, Y H:i" }}, UTC
+                                    {{ user.expires|date:"m.d.Y H:i" }}
                                 {% else %}
                                     Never
                                 {% endif %}
@@ -89,6 +93,13 @@
                                             <li>
                                                 <a class="dropdown-item text-wrap text-info" href="#">
                                                      Block user
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        {% if users_write_permissions %}
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-info" href="#">
+                                                     Set expire
                                                 </a>
                                             </li>
                                         {% endif %}

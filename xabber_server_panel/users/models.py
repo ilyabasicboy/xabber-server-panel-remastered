@@ -8,7 +8,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from xabber_server_panel.api.api import EjabberdAPI
 from xabber_server_panel.utils import get_modules
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 
 
 class UserManager(BaseUserManager):
@@ -81,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('ACTIVE', 'ACTIVE'),
         ('BANNED', 'BANNED'),
         ('EXPIRED', 'EXPIRED'),
-        ('SUSPENDED', 'SUSPENDED'),
+        ('BLOCKED', 'BLOCKED'),
     ]
     USERNAME_FIELD = 'username'
     username_validator = UnicodeUsernameValidator()
@@ -128,6 +128,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     permissions = models.ManyToManyField(
         'CustomPermission',
         blank=True
+    )
+    reason = models.TextField(
+        verbose_name='reason for blocking',
+        blank=True,
+        null=True
     )
 
     class Meta:

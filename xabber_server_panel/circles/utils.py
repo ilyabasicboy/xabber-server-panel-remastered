@@ -8,7 +8,7 @@ def check_circles(user: User, host: str) -> None:
         if it doesn't exist in django db
     """
     try:
-        registered_circles = user.api.get_groups({"host": host}).get('circles')
+        registered_circles = user.api.get_circles({"host": host}).get('circles')
     except:
         registered_circles = []
 
@@ -20,13 +20,28 @@ def check_circles(user: User, host: str) -> None:
         unknown_circles = [circle for circle in registered_circles if circle not in existing_circles]
 
         if unknown_circles:
-            circles_to_create = [
-                Circle(
-                    circle=circle,
-                    host=host,
+            circles_to_create = []
+            for circle in unknown_circles:
+                circle_info = user.api.get_circles_info(
+                    {
+                        'host': host,
+                        'circle': circle
+                    }
                 )
-                for circle in unknown_circles
-            ]
+
+                # parse displayed groups
+                contacts = circle_info.get('displayed_groups')
+                str_contacts = ','.join(contacts)
+                circles_to_create += [
+                    Circle(
+                        circle=circle,
+                        name=circle_info.get('name', ''),
+                        description=circle_info.get('description', ''),
+                        all_users=circle_info.get('all_users', False),
+                        host=host,
+                        subscribes=str_contacts
+                    )
+                ]
             Circle.objects.bulk_create(circles_to_create)
 
         # get unregistered circles in db and delete

@@ -97,7 +97,6 @@ def get_user_data_for_api(user, password=None):
         'nickname': user.nickname,
         'first_name': user.first_name,
         'last_name': user.last_name,
-        'photo': None,
         'is_admin': user.is_admin,
         'expires': user.expires,
         'vcard': {

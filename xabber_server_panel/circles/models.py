@@ -26,12 +26,13 @@ class Circle(models.Model):
     host = models.CharField(max_length=256)
     name = models.CharField(
         max_length=100,
-        null=True, blank=True
+        blank=True,
+        default=''
     )
     description = models.CharField(
         max_length=256,
-        null=True,
-        blank=True
+        blank=True,
+        default=''
     )
     subscribes = models.TextField(
         null=True,
@@ -50,6 +51,9 @@ class Circle(models.Model):
         User,
         blank=True,
         related_name='circles'
+    )
+    all_users = models.BooleanField(
+        default=False
     )
 
     class Meta:
@@ -79,3 +83,10 @@ class Circle(models.Model):
 
     def __str__(self):
         return self.full_jid
+
+    @property
+    def get_members_count(self):
+        if self.all_users:
+            return User.objects.filter(status='ACTIVE', host=self.host).count()
+        else:
+            return self.members.count()

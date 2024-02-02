@@ -69,7 +69,7 @@
     {% endif %}
 </ul>
 
-{% if modules %}
+{% if modules and user.is_authenticated %}
     <hr>
     <ul class="nav nav-pills flex-column">
         <li class="nav-item">

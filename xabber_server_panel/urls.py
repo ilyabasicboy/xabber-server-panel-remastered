@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from xabber_server_panel.views import HomePage, Search
+from xabber_server_panel.views import HomePage, Search, Root
 from xabber_server_panel.utils import get_modules
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomePage.as_view(), name='home'),
+    path('', Root.as_view(), name='root'),
+    path('home/', HomePage.as_view(), name='home'),
     path('search/', Search.as_view(), name='search'),
     path('dashboard/', include('xabber_server_panel.dashboard.urls')),
     path('auth/', include(('xabber_server_panel.custom_auth.urls', 'custom_auth'), namespace='custom_auth')),

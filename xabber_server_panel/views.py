@@ -12,9 +12,7 @@ from xabber_server_panel.users.utils import check_users
 from xabber_server_panel.utils import get_modules
 
 
-class HomePage(TemplateView):
-
-    template_name = 'home.html'
+class Root(TemplateView):
 
     def get(self, request, *args, **kwargs):
 
@@ -27,6 +25,16 @@ class HomePage(TemplateView):
                     reverse(f'{rp.module}:root')
                 )
 
+        return HttpResponseRedirect(
+            reverse('home')
+        )
+
+
+class HomePage(LoginRequiredMixin, TemplateView):
+
+    template_name = 'home.html'
+
+    def get(self, request, *args, **kwargs):
         context = {}
         return self.render_to_response(context, **kwargs)
 
@@ -75,7 +83,7 @@ class Search(LoginRequiredMixin, TemplateView):
             context['users'] = users
 
             # get group list
-            groups = request.user.api.xabber_registered_chats(
+            groups = request.user.api.get_groups(
                 {
                     "host": host
                 }

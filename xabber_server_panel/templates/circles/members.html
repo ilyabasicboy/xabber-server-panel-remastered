@@ -40,14 +40,11 @@
     <div class="col-12">
         <div class="row">
             <div class="d-flex align-items-center col-12 col-md-6">
-                <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.members.count }} members</span>
+                <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.get_members_count }} members</span>
             </div>
 
             {% if circles_write_permissions %}
                 <div class="d-flex align-items-start justify-content-start justify-content-md-end col-12 col-md-6 mt-3 mt-md-0">
-                    <a class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#add_member">
-                        Add
-                    </a>
                     <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage">
                         Manage
                     </a>
@@ -56,30 +53,6 @@
         </div>
 
         {% if circles_write_permissions %}
-            <div class="modal fade" id="add_member" tabindex="-1" aria-labelledby="add_member_label" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="{% url 'circles:members' id=circle.id %}" method="POST">
-                            {% csrf_token %}
-
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="add_member_label">Add new member</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <input class="form-control" type="text" placeholder="username@example.com" name="add_member">
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Add member</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
             <div class="modal fade" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -92,6 +65,14 @@
                             </div>
 
                             <div class="modal-body">
+                                <div class="{% if not forloop.last %}mb-3{% endif %}">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if circle.all_users %}checked{% endif %} name="members" value="@all@" id="all">
+                                        <label class="form-check-label" for="all">
+                                            All ({{ circle.host }})
+                                        </label>
+                                    </div>
+                                </div>
                                 {% for user in users %}
                                     <div class="{% if not forloop.last %}mb-3{% endif %}">
                                         <div class="form-check">
@@ -114,7 +95,6 @@
             </div>
         {% endif %}
     </div>
-
     <div class="mt-4 col-12">
         <div class="table-adaptive">
             <table class="table table-striped mb-0">
@@ -127,6 +107,19 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if circle.all_users %}
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                All ({{ circle.get_members_count }} on {{ circle.host }})
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    {% endif %}
                     {% for user in circle.members.all %}
                         <tr>
                             <td data-title="#">

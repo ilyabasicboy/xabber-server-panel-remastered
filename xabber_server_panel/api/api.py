@@ -115,137 +115,266 @@ class EjabberdAPI(object):
             "scopes": settings.EJABBERD_API_SCOPES,
             "ttl": settings.EJABBERD_API_TOKEN_TTL
         }
-        return self._call_method('post', '/issue_token', 201, data=data,
-                                 login_method=True, auth_required=False, **kwargs)
+        return self._call_method('post', '/issue_token', 201, data=data, login_method=True, auth_required=False, **kwargs)
 
-    def registered_vhosts(self, data, **kwargs):
-        return self._call_method('get', '/vhosts', 200, data=data,
-                                 **kwargs)
+    def get_vhosts(self, data={}, **kwargs):
 
-    def xabber_set_admin(self, data, **kwargs):
-        return self._call_method('post', '/admins', 201,
-                                 data=data, **kwargs)
+        """ Get Virtual host list """
 
-    def xabber_del_admin(self, data, **kwargs):
-        return self._call_method('delete', '/admins', 201,
-                                 data=data, **kwargs)
+        return self._call_method('get', '/vhosts', 200, data=data, **kwargs)
 
-    def xabber_set_permissions(self, data, **kwargs):
-        return self._call_method('post', '/permissions', 201,
-                                 data=data, **kwargs)
+    def set_admin(self, data, **kwargs):
 
-    def xabber_registered_users(self, data, **kwargs):
-        return self._call_method('get', '/users', 200,
-                                 data=data, **kwargs)
+        """
+            Args: username, host
+        """
 
-    def xabber_registered_users_count(self, data, **kwargs):
-        return self._call_method('get', '/users/count', 200,
-                                 data=data, **kwargs)
+        return self._call_method('post', '/admins', 201, data=data, **kwargs)
 
-    def xabber_registered_chats(self, data, **kwargs):
+    def del_admin(self, data, **kwargs):
+
+        """
+            Args: username, host
+        """
+
+        return self._call_method('delete', '/admins', 201, data=data, **kwargs)
+
+    def set_permissions(self, data, **kwargs):
+        """
+            Example:
+                {
+                    "username": "username",
+                    "host": "example.com",
+                    "permissions": {
+                        "circles": "write",
+                        "users": "read"
+                    },
+                }
+        """
+
+        return self._call_method('post', '/permissions', 201, data=data, **kwargs)
+
+    def get_users(self, data, **kwargs):
+        """
+            Args: host
+        """
+
+        return self._call_method('get', '/users', 200, data=data, **kwargs)
+
+    def get_users_count(self, data, **kwargs):
+        """
+            Args: host
+        """
+
+        return self._call_method('get', '/users/count', 200, data=data, **kwargs)
+
+    def get_groups(self, data, **kwargs):
+        """
+            Args: host
+        """
+
         return self._call_method('get', '/groups', 200, data=data, **kwargs)
 
-    def xabber_registered_chats_count(self, data, **kwargs):
-        return self._call_method('get', '/groups/count', 200,
-                                 data=data, **kwargs)
+    def get_groups_count(self, data, **kwargs):
+        """
+            Args: host
+        """
+
+        return self._call_method('get', '/groups/count', 200, data=data, **kwargs)
+
+    def create_user(self, data, **kwargs):
+        """
+            Example:
+                data = {
+                    'username': "username",
+                    'host': "host",
+                    'nickname': "nickname",
+                    'first_name': "first_name",
+                    'last_name': "last_name",
+                    'is_admin': True,
+                    'expires': date,
+                    'vcard': {
+                        'nickname': "nickname",
+                        'n': {
+                            'given': "first_name",
+                            'family': "last_name"
+                        },
+                        'photo': {'type': '', 'binval': ''}
+                    }
+                }
+        """
+
+        self.register_user(data)
+        self.set_vcard(data)
+
+        return self.success
 
     def register_user(self, data, **kwargs):
-        self._call_method('post', '/users', 201, data=data, **kwargs)
-        if self.status_code == 409:
-            self.response = {'error': "This user already exists."}
+
+        user_data = {
+            "username": data.get("username", ''),
+            "host": data.get("host", ''),
+            "password": data.get("password", '')
+        }
+
+        self._call_method('post', '/users', 201, data=user_data, **kwargs)
         return self.response
 
     def unregister_user(self, data, **kwargs):
-        data_copy = data.copy()
-        data_copy['username'] = data_copy.pop('username')
-        self._call_method('delete', '/users', 200, data=data_copy, **kwargs)
-        if not self.success:
-            self.response = {'error': 'This user has not been deleted.'}
+        """
+            Args: username, host
+        """
+
+        self._call_method('delete', '/users', 200, data=data, **kwargs)
         return self.response
 
     def set_vcard(self, data, **kwargs):
-        return self._call_method('post', '/vcard', 200, data=data,
-                                 **kwargs)
+
+        vcard_data = {
+            "username": data.get("username"),
+            "host": data.get("host"),
+            "vcard": data.get('vcard', {})
+        }
+        return self._call_method('post', '/vcard', 200, data=vcard_data, **kwargs)
 
     def get_vcard(self, data, **kwargs):
+        """
+            Args: username, host
+        """
         return self._call_method('get', '/vcard', 200, data=data, **kwargs)
-
-    def create_user(self, data, **kwargs):
-        new_user_data = {"username": data.get("username"),
-                         "host": data.get("host"),
-                         "password": data.get("password")}
-        self.register_user(new_user_data)
-        if not self.success:
-            return self.success
-
-        self.edit_user_vcard(data)
-        return self.success
-
-    def edit_user_vcard(self, data, **kwargs):
-        username, host = data.get("username"), data.get("host")
-        vcard = data.get('vcard', dict())
-        vcard_data = {"username": username,
-                      "host": host,
-                      "vcard": vcard}
-        self.set_vcard(vcard_data)
-        if not self.success:
-            self.unregister_user({"username": username, "host": host})
-            self.success = False
-            self.response = {'error': 'Error with creating user.'}
-        return self.success
 
     def change_password_api(self, data, **kwargs):
         return self._call_method('put', '/users/set_password', 200, data=data, **kwargs)
 
-    def get_groups(self, data, **kwargs):
+    def get_circles(self, data, **kwargs):
+        """
+            Args: host
+        """
         return self._call_method('get', '/circles', 200, data=data, **kwargs)
 
-    def srg_create_api(self, data, **kwargs):
+    def get_circles_info(self, data, **kwargs):
+        """
+            Args: circle, host
+        """
+        return self._call_method('get', '/circles/info', 200, data=data, **kwargs)
+
+    def create_circle(self, data, **kwargs):
+
+        """
+            Create/update circle
+            Example:
+                {
+                    'circle': 'circle.circle',
+                    'host': 'circle.host',
+                    'name': 'circle.name',
+                    'description': 'circle.description',
+                    'displayed_groups': [],
+                    'all_users': False
+                }
+
+        """
         return self._call_method('post', '/circles', 200, data=data, **kwargs)
 
-    def delete_group(self, data, **kwargs):
+    def delete_circle(self, data, **kwargs):
         return self._call_method('delete', '/circles', 200, data=data, **kwargs)
 
-    def srg_user_add_api(self, data, **kwargs):
+    def create_group(self, data, **kwargs):
+        """
+            Example:
+                {
+                    "localpart": "name",
+                    "host": "example.com",
+                    "owner": "name@example.com",
+                    "name": "group name",
+                    "privacy": "public/incognito",
+                    "index": "none/local/global",
+                    "membership": "open/member-only"
+                }
+        """
+        return self._call_method('post', '/groups', 200, data=data, **kwargs)
+
+    def add_circle_members(self, data, **kwargs):
+
+        """
+            Example:
+                {
+                    'circle': circle.circle,
+                    'host': circle.host,
+                    'grouphost': circle.host, [optional]
+                    'members': ['@all@']
+                }
+        """
         return self._call_method('post', '/circles/members', 200, data=data, **kwargs)
 
-    def srg_user_del_api(self, data, **kwargs):
+    def get_circle_members(self, data, **kwargs):
+        """
+            Args: circle, host
+        """
+        return self._call_method('get', '/circles/members', 200, data=data, **kwargs)
+
+    def del_circle_members(self, data, **kwargs):
+
+        """
+            Example:
+                {
+                    'circle': circle.circle,
+                    'host': circle.host,
+                    'grouphost': circle.host, [optional]
+                    'members': ['@all@']
+                }
+        """
         return self._call_method('delete', '/circles/members', 200, data=data, **kwargs)
 
-    def create_group(self, data, **kwargs):
-        group_data = {
-            "circle": data["group"],
-            "host": data["host"],
-            "name": data["name"],
-            "description": data["description"],
-            "display": data["displayed_groups"]
-        }
-        self.srg_create_api(group_data)
-        return self.success
-
     def stats_host(self, data, **kwargs):
+        """
+            Args: host
+        """
         return self._call_method('get', '/users/online', 200, data=data, **kwargs)
 
     def get_keys(self, data, **kwargs):
+        """
+            Args: host
+        """
         return self._call_method('get', '/registration/keys', 200, data=data, **kwargs)
 
     def create_key(self, data, **kwargs):
+        """
+            Args: host, expire[, description]
+        """
         return self._call_method('post', '/registration/keys', 201, data=data, **kwargs)
 
     def change_key(self, data, key, **kwargs):
+        """
+            Args: host, expire[, description]
+        """
         return self._call_method('put', '/registration/keys/{}'.format(key), 200, data=data, **kwargs)
 
     def delete_key(self, data, key, **kwargs):
+        """
+            Args: host
+        """
         return self._call_method('delete', '/registration/keys/{}'.format(key), 200, data=data, **kwargs)
 
     def block_user(self, data, **kwargs):
+        """
+            Args: host, username, reason
+        """
         return self._call_method('post', '/users/block', 200, data=data, **kwargs)
 
     def unblock_user(self, data, **kwargs):
+        """
+            Args: host, username
+        """
         return self._call_method('delete', '/users/block', 200, data=data, **kwargs)
 
     def ban_user(self, data, **kwargs):
+        """
+            Args: host, username
+        """
         return self._call_method('post', '/users/ban', 200, data=data, **kwargs)
 
     def unban_user(self, data, **kwargs):
+        """
+            Args: host, username
+        """
         return self._call_method('delete', '/users/ban', 200, data=data, **kwargs)

@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
 
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.utils import reload_ejabberd_config
 from xabber_server_panel.config.models import BaseXmppModule, BaseXmppOption
 
@@ -153,3 +153,39 @@ def update_ejabberd_config():
     update_vhosts_config()
     make_xmpp_config()
     reload_ejabberd_config()
+
+
+def check_hosts(user):
+
+    """
+        Check registered users and create
+        if it doesn't exist in django db
+    """
+
+    try:
+        registered_hosts = user.api.get_vhosts().get('vhosts')
+    except:
+        registered_hosts = []
+
+    if registered_hosts:
+
+        # Get a list of existing usernames from the User model
+        existing_hosts = VirtualHost.objects.values_list('name', flat=True)
+
+        # Filter the user_list to exclude existing usernames
+        unknown_hosts = [host for host in registered_hosts if host not in existing_hosts]
+
+        # create in db unknown users
+        if unknown_hosts:
+            hosts_to_create = [
+                VirtualHost(
+                    name=host,
+                )
+                for host in unknown_hosts
+            ]
+            VirtualHost.objects.bulk_create(hosts_to_create)
+
+        # get unregistered users in db and delete
+        hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
+        if hosts_to_delete:
+            hosts_to_delete.delete()

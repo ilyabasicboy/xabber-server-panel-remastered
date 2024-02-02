@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import reverse, render, loader
+from django.shortcuts import reverse, loader
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from datetime import datetime
 
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config
 from xabber_server_panel.users.decorators import permission_read, permission_write

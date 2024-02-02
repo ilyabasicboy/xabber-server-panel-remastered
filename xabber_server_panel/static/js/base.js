@@ -147,7 +147,7 @@ $(function () {
     //Show/hide reason with change user status
     $('#user_status').on('change', function() {
         let optionVal = $(this).val();
-        if (optionVal == "SUSPENDED") {
+        if (optionVal == "BLOCKED") {
             $(this).parent().next().addClass('show');
         } else {
             $(this).parent().next().removeClass('show');

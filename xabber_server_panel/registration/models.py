@@ -1,5 +1,5 @@
 from django.db import models
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 
 
 class RegistrationSettings(models.Model):

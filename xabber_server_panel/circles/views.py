@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.circles.models import Circle
-from xabber_server_panel.dashboard.models import VirtualHost
+from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.users.models import User
 from xabber_server_panel.users.decorators import permission_read, permission_write
 
@@ -72,16 +72,20 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
 
         form = CircleForm(request.POST)
-
         if form.is_valid():
+
             circle = form.save()
-            self.request.user.api.create_group(
+
+            name = form.cleaned_data.get('name')
+            if not name:
+                name = form.cleaned_data.get('circle')
+
+            self.request.user.api.create_circle(
                 {
-                    'group': form.cleaned_data.get('circle'),
+                    'circle': form.cleaned_data.get('circle'),
                     'host': form.cleaned_data.get('host'),
-                    'name': form.cleaned_data.get('name'),
+                    'name': name,
                     'description': form.cleaned_data.get('description'),
-                    'displayed_groups': None
                 }
             )
             messages.success(request, 'Circle created successfully.')
@@ -91,6 +95,9 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
                     kwargs={'id': circle.id}
                 )
             )
+
+        for error in form.errors.values():
+            messages.error(request, error)
 
         context = {
             'form': form,
@@ -142,13 +149,15 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
         description = self.request.POST.get('description')
         self.circle.description = description
-        self.request.user.api.create_group(
+
+        self.request.user.api.create_circle(
             {
-                'group': self.circle.circle,
+                'circle': self.circle.circle,
                 'host': self.circle.host,
                 'name': name,
                 'description': description,
-                'displayed_groups': self.circle.get_subscribes
+                'displayed_groups': self.circle.get_subscribes,
+                'all_users': self.circle.all_users
             }
         )
 
@@ -168,7 +177,7 @@ class CirclesDelete(LoginRequiredMixin, TemplateView):
             return HttpResponseNotFound
 
         circle.delete()
-        self.request.user.api.delete_group(
+        self.request.user.api.delete_circle(
             {
                 'circle': circle.circle,
                 'host': circle.host
@@ -185,14 +194,16 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
     def get(self, request, id, *args, **kwargs):
 
         try:
-            circle = Circle.objects.get(id=id)
+            self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        users = User.objects.filter(status='ACTIVE')
+        self.check_members()
+
+        users = User.objects.filter(status='ACTIVE', host=self.circle.host)
 
         context = {
-            'circle': circle,
+            'circle': self.circle,
             'users': users,
         }
 
@@ -206,7 +217,9 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        self.users = User.objects.filter(status='ACTIVE')
+        self.check_members()
+
+        self.users = User.objects.filter(status='ACTIVE', host=self.circle.host)
 
         self.update_circle()
 
@@ -219,45 +232,40 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
     def update_circle(self):
 
-        # add member by jid
-        self.add_member = self.request.POST.get('add_member')
         self.members = self.request.POST.getlist('members')
 
-        if self.add_member:
-            self.add_member_api()
-        # select multiple members
-        else:
-            self.members_api()
+        self.members_api()
 
         # send data to server if members was changed
         self.circle.save()
 
-    def add_member_api(self):
-        try:
-            username, host = self.add_member.split('@')
-        except:
-            messages.error(self.request, 'Jid is incorrect.')
-            return
-
-        user = User.objects.filter(username=username, host=host).first()
-        if user:
-            self.circle.members.add(user)
-            messages.success(self.request, 'Member added successfully.')
-        else:
-            messages.error(self.request, 'User is undefined.')
-            return
-
-        self.request.user.api.srg_user_add_api(
-            {
-                'circle': self.circle.circle,
-                'host': self.circle.host,
-                'members': [self.add_member]
-            }
-        )
-
     def members_api(self):
-        members = User.objects.filter(id__in=self.members)
 
+        # set all members and clear id members list
+        if "@all@" in self.members:
+            self.request.user.api.add_circle_members(
+                {
+                    'circle': self.circle.circle,
+                    'host': self.circle.host,
+                    'grouphost': self.circle.host,
+                    'members': ['@all@']
+                }
+            )
+            self.members = []
+            self.circle.all_users = True
+        else:
+            if self.circle.all_users:
+                self.request.user.api.del_circle_members(
+                    {
+                        'circle': self.circle.circle,
+                        'host': self.circle.host,
+                        'grouphost': self.circle.host,
+                        'members': ['@all@']
+                    }
+                )
+            self.circle.all_users = False
+
+        members = User.objects.filter(id__in=self.members)
         new_members = set(map(int, self.members))
         existing_members = set(self.circle.members.values_list('id', flat=True))
 
@@ -270,7 +278,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         # add circles
         members_to_add = self.users.filter(id__in=ids_to_add)
         for member in members_to_add:
-            self.request.user.api.srg_user_add_api(
+            self.request.user.api.add_circle_members(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
@@ -281,7 +289,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         # delete circles
         members_to_delete = self.users.filter(id__in=ids_to_delete)
         for member in members_to_delete:
-            self.request.user.api.srg_user_del_api(
+            self.request.user.api.del_circle_members(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
@@ -290,7 +298,38 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
             )
 
         self.circle.members.set(members)
+        self.circle.save()
         messages.success(self.request, 'Members changed successfully.')
+
+    def check_members(self):
+
+        """ Sync member list from server """
+
+        server_members_list = self.request.user.api.get_circle_members(
+            {
+                'circle': self.circle.circle,
+                'host': self.circle.host
+            }
+        ).get('members', [])
+
+        # get server members list
+        server_members = []
+        for member_jid in server_members_list:
+            username, host = member_jid.split('@')
+            member = User.objects.filter(username=username, host=host).first()
+            if member:
+                server_members += [member.id]
+            else:
+                self.request.user.api.del_circle_members(
+                    {
+                        'circle': self.circle.circle,
+                        'host': self.circle.host,
+                        'members': [member_jid]
+                    }
+                )
+
+        # set members from server
+        self.circle.members.set(server_members)
 
 
 class DeleteMember(LoginRequiredMixin, TemplateView):
@@ -306,7 +345,7 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
 
         members = circle.members.exclude(id=member_id)
         circle.members.set(members)
-        self.request.user.api.delete_group(
+        self.request.user.api.delete_circle(
             {
                 'circle': circle.circle,
                 'host': circle.host
@@ -333,7 +372,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
 
         context = {
             'circle': circle,
-            'circles': circles
+            'circles': circles,
         }
 
         return self.render_to_response(context)
@@ -362,16 +401,17 @@ class CircleShared(LoginRequiredMixin, TemplateView):
     def update_circle(self):
 
         # shared contacts logic
-        contacts = self.request.POST.getlist('contacts')
-        if isinstance(contacts, list):
-            str_contacts = ','.join(contacts)
-        self.request.user.api.create_group(
+        contacts = self.request.POST.getlist('contacts', [])
+        str_contacts = ','.join(contacts)
+
+        self.request.user.api.create_circle(
             {
-                'group': self.circle.circle,
+                'circle': self.circle.circle,
                 'host': self.circle.host,
                 'name': self.circle.name,
                 'description': self.circle.description,
-                'displayed_groups': contacts
+                'displayed_groups': contacts,
+                'all_users': self.circle.all_users
             }
         )
         self.circle.subscribes = str_contacts

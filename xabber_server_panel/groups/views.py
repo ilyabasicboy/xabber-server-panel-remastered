@@ -3,7 +3,6 @@ from django.shortcuts import loader
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from xabber_server_panel.dashboard.models import VirtualHost
 from xabber_server_panel.users.decorators import permission_read
 
 
@@ -27,7 +26,7 @@ class GroupList(LoginRequiredMixin, TemplateView):
         else:
             host = ''
 
-        chats = request.user.api.xabber_registered_chats(
+        chats = request.user.api.get_groups(
             {
                 "host": host
             }
