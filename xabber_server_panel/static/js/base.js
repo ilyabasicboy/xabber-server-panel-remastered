@@ -176,4 +176,48 @@ $(function () {
         }, 4000);
     }
 
+    //Get Cookie
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    };
+
+    //Set Cookie
+    function setCookie(name, value, options = {}) {
+        options = {
+            path: '/',
+        };
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    };
+
+    //Switch theme
+    const themeSwitch = document.getElementById('theme_switch');
+    const currentTheme = getCookie('theme');
+    themeSwitch.addEventListener('change', function () {
+        if (themeSwitch.checked) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            setCookie('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            setCookie('theme', 'light');
+        }
+    });
+
 });

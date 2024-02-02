@@ -1,5 +1,4 @@
 <ul class="nav nav-pills">
-
     <li class="nav-item">
         {% url 'users:detail' id=user.id as detail %}
         <a class="nav-link {% if request.path_info == detail %}active{% endif %}" aria-current="page" href="{{ detail }}">

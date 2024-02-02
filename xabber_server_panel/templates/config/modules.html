@@ -7,7 +7,7 @@
 
 {% block content %}
     {% url 'config:tabs' as url %}
-    <div class="mb-4 col-12" data-bs-theme="light">
+    <div class="mb-4 col-12">
         {% include 'config/parts/links.html' %}
     </div>
 
@@ -31,11 +31,11 @@
                             {% if settings_write_permissions %}
                                 <div class="d-flex">
                                     <div class="dropdown">
-                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical d-flex"></i>
                                         </div>
 
-                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
                                                 <a class="dropdown-item text-wrap text-danger" href="{% url 'config:delete_module' module=module %}">
                                                      Delete

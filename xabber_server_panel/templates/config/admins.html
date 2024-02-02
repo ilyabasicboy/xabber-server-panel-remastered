@@ -7,7 +7,7 @@
 
 {% block content %}
     {% url 'config:tabs' as url %}
-    <div class="mb-4 col-12" data-bs-theme="light">
+    <div class="mb-4 col-12">
         {% include 'config/parts/links.html' %}
     </div>
 
@@ -52,14 +52,14 @@
                         {% csrf_token %}
 
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5 text-white" id="manage_label">Manage administrators</h1>
+                            <h1 class="modal-title fs-5" id="manage_label">Manage administrators</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div class="modal-body">
                             {% for user in users %}
                                 <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                    <div class="form-check text-white">
+                                    <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="admins" {% if user.is_admin %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
                                         <label class="form-check-label" for="user_{{ user.id }}">
                                             {{ user.full_jid }}

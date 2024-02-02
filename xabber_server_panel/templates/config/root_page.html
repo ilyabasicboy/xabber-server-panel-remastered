@@ -7,7 +7,7 @@
 
 {% block content %}
     {% url 'config:tabs' as url %}
-    <div class="mb-4 col-12" data-bs-theme="light">
+    <div class="mb-4 col-12">
         {% include 'config/parts/links.html' %}
     </div>
 
@@ -41,7 +41,7 @@
             </div>
 
             {% if settings_write_permissions %}
-                <div class="fixed-bottom row col-md-9 col-lg-10 m-0 ms-auto py-4 px-0 px-md-4 bg-white border-top">
+                <div class="fixed-bottom row col-md-9 col-xl-10 m-0 ms-auto py-4 px-0 px-md-4 bg-body border-top shadow">
                     <div class="col-12 p-md-0">
                         <button class="btn btn-primary" type="submit">
                             Save

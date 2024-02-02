@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load static base_tags config_tags users_tags %}
 {% smart_spaceless %}
-<html lang="en">
+<html lang="en" data-bs-theme="{% if request.COOKIES.theme == 'dark' %}dark{% else %}light{% endif %}">
     <head>
         <meta name="theme-color" class="theme-color" content="#fff">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -36,9 +36,9 @@
         {% check_user_permissions request.user 'settings' 'write' as settings_write_permissions %}
         {% check_user_permissions request.user 'settings' as settings_read_permissions %}
 
-        <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
+        <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-body bg-opacity-75">
             <header class="navbar d-flex justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
-                <a class="navbar-brand d-flex align-items-center col-md-3 col-lg-2 fs-4 text-white p-0 me-2 me-md-4" href="/">
+                <a class="navbar-brand d-flex align-items-center col-md-3 col-xl-2 fs-4 text-white p-0 me-2 me-md-4" href="/">
                     <img src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
                     <span class="d-none d-md-block ms-2 fs-4">Xabber</span>
                 </a>
@@ -49,7 +49,7 @@
                             Create
                         </button>
 
-                        <ul class="dropdown-menu dropdown-menu-dark">
+                        <ul class="dropdown-menu">
                             {% if users_write_permissions %}
                                 <li>
                                     <a class="dropdown-item text-wrap" href="{% url 'users:create' %}">
@@ -83,7 +83,7 @@
                                 {{ request.user.username|slice:'2' }}
                             </div>
 
-                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <a class="dropdown-item text-wrap" href="{% url 'users:detail' id=request.user.id %}">
                                         {{ request.user.full_jid }}
@@ -115,27 +115,35 @@
                 </ul>
             </header>
 
-            <div class="container-fluid flex-md-grow-1 overflow-auto" data-bs-theme="dark">
+            <div class="container-fluid flex-md-grow-1 overflow-auto">
                 <div class="row h-100">
-                    <div class="sidebar col-md-3 col-lg-2 p-md-3 text-bg-dark">
-                        <div class="offcanvas-md offcanvas-end" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-                            <div class="offcanvas-header">
-                                <a class="navbar-brand d-flex align-items-center fs-4 p-0" href="/" id="sidebarMenuLabel">
-                                    <img class="me-2" src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
-                                    <span class="fs-4">Xabber</span>
-                                </a>
-                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+                    <div class="offcanvas-md offcanvas-end col-md-3 col-xl-2 p-0 p-md-3 text-bg-dark bg-dark shadow" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                        <div class="offcanvas-header" data-bs-theme="dark">
+                            <a class="navbar-brand d-flex align-items-center fs-4 p-0" href="/" id="sidebarMenuLabel">
+                                <img class="me-2" src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
+                                <span class="fs-4">Xabber</span>
+                            </a>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+                        </div>
+
+                        <div class="offcanvas-body d-flex flex-column h-100 pt-md-3 overflow-y-auto" data-bs-theme="dark">
+                            <div class="flex-column mb-auto">
+                                {% include 'parts/left_menu.html' %}
                             </div>
 
-                            <div class="offcanvas-body d-md-flex flex-column p-3 p-md-0 pt-lg-3 overflow-y-auto">
-                                <div class="flex-column mb-auto">
-                                    {% include 'parts/left_menu.html' %}
+                            <hr>
+                            <div class="d-flex align-items-center">
+                                <div class="form-switch mb-0 fs-4">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="theme_switch" {% if request.COOKIES.theme == 'dark' %}checked{% endif %}>
                                 </div>
+                                <label class="form-check-label" for="theme_switch">
+                                    <i class="bi bi-moon-stars"></i> Dark mode
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <main class="col-md-9 col-lg-10 overflow-hidden ms-sm-auto px-md-4 py-4">
+                    <main class="col-md-9 col-xl-10 overflow-hidden ms-sm-auto px-md-4 py-4">
                         {% block section_title %}
                             <h2 class="mb-4 col-12">
                                 {% block title %}{% endblock %}
@@ -150,7 +158,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h1 class="modal-title fs-5 text-white" id="manage_label">Messages</h1>
+                                                <h1 class="modal-title fs-5" id="manage_label">Messages</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
 

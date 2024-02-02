@@ -41,11 +41,11 @@
                             {% if circles_write_permissions %}
                                 <div class="d-flex">
                                     <div class="dropdown">
-                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical d-flex"></i>
                                         </div>
 
-                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
                                                 <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete' id=circle.id %}">
                                                      Delete circle

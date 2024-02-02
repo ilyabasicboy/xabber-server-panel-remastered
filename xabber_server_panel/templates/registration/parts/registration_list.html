@@ -30,7 +30,7 @@
 </div>
 
 {% if settings.status == 'link' %}
-    <div class="mb-4 overflow-hidden" data-bs-theme="light">
+    <div class="mb-4 overflow-hidden">
         <div class="d-flex flex-wrap align-items-center mb-n3 me-n3">
             <span class="me-3 mb-3">
                 Web client url:
@@ -80,11 +80,11 @@
                             <td data-title="Actions">
                                 <div class="d-flex">
                                     <div class="dropdown">
-                                        <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical d-flex"></i>
                                         </div>
 
-                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             {% if registration_write_permissions %}
                                                 <li>
                                                     <a class="dropdown-item text-wrap" href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
@@ -118,7 +118,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5 text-white" id="show_link_label">Registration link</h1>
+                        <h1 class="modal-title fs-5" id="show_link_label">Registration link</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 

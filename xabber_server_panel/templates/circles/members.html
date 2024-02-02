@@ -3,7 +3,7 @@
 {% block section_title %}{% endblock %}
 
 {% block content %}
-    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap" data-bs-theme="light">
+    <div class="mb-4 col-12 d-flex overflow-hidden overflow-x-auto text-nowrap">
         <div class="d-flex align-items-center me-4">
             <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '';">
                 <ol class="breadcrumb flex-nowrap mb-0">
@@ -33,12 +33,12 @@
         </div>
     </div>
 
-    <div class="mb-4 col-12" data-bs-theme="light">
+    <div class="mb-4 col-12">
         {% include 'circles/parts/links.html' %}
     </div>
 
     <div class="col-12">
-        <div class="row" data-bs-theme="light">
+        <div class="row">
             <div class="d-flex align-items-center col-12 col-md-6">
                 <div class="fs-5">Members</div> <div class="vr mx-3"></div> <span class="text-body-tertiary">{{ circle.members.count }} members</span>
             </div>
@@ -63,7 +63,7 @@
                             {% csrf_token %}
 
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5 text-white" id="add_member_label">Add new member</h1>
+                                <h1 class="modal-title fs-5" id="add_member_label">Add new member</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
@@ -87,14 +87,14 @@
                             {% csrf_token %}
 
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5 text-white" id="manage_label">Manage members</h1>
+                                <h1 class="modal-title fs-5" id="manage_label">Manage members</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
                             <div class="modal-body">
                                 {% for user in users %}
                                     <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                        <div class="form-check text-white">
+                                        <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
                                             <label class="form-check-label" for="user_{{ user.id }}">
                                                 {{ user.full_jid }}
@@ -146,11 +146,11 @@
                                 {% if circles_write_permissions %}
                                     <div class="d-flex">
                                         <div class="dropdown">
-                                            <div class="text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="bi bi-three-dots-vertical d-flex"></i>
                                             </div>
 
-                                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                            <ul class="dropdown-menu dropdown-menu-end">
                                                 <li>
                                                     <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
                                                         Delete
