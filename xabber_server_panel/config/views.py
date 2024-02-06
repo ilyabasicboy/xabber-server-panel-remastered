@@ -387,6 +387,9 @@ class Modules(LoginRequiredMixin, TemplateView):
                             if not settings.DEBUG:
                                 management.call_command('collectstatic', '--noinput', interactive=False)
 
+                    # create permissions for new modules
+                    management.call_command('update_permissions')
+
                     # Delete temporary dir
                     shutil.rmtree(temp_extract_dir)
 
@@ -406,7 +409,6 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, module, *args, **kwargs):
-
         module_path = os.path.join(settings.MODULES_DIR, module)
         app_name = f'modules.{module}'
 
@@ -426,6 +428,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
             # update app list
             update_app_list(settings.INSTALLED_APPS)
 
+            management.call_command('update_permissions')
             make_xmpp_config()
             messages.success(request, 'Module deleted successfully.')
             return HttpResponseRedirect(reverse('config:modules'))

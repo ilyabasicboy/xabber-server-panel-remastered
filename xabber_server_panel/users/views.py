@@ -4,18 +4,15 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.utils import timezone
 
 from xabber_server_panel.config.models import VirtualHost
 from xabber_server_panel.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
 from xabber_server_panel.users.decorators import permission_read, permission_write, permission_admin
 
-from datetime import datetime
-
-from .models import User, CustomPermission
+from .models import User, CustomPermission, get_apps_choices
 from .forms import UserForm
-from .utils import check_users
+from .utils import check_users, block_user, ban_user, unblock_user, set_expires
 
 
 class CreateUser(LoginRequiredMixin, TemplateView):
@@ -102,8 +99,6 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         # update user params
         self.update_user()
 
-        messages.success(request, 'User changed successfully.')
-
         context = {
             'user': self.user,
             'circles': self.circles
@@ -112,90 +107,58 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
     def update_user(self):
 
+        password = self.request.POST.get('password')
+        confirm_password = self.request.POST.get('confirm_password')
+        if password and confirm_password:
+
+            # Check user auth backend
+            if self.user.auth_backend_is_ldap:
+                messages.error(self.request, 'User auth backend is "ldap". Password cant be changed.')
+
+            elif password == confirm_password:
+
+                self.request.user.api.change_password_api(
+                    {
+                        'password': password,
+                        'username': self.user.username,
+                        'host': self.user.host
+                    }
+                )
+
+                # Change the user's password
+                self.user.set_password(password)
+
+                messages.success(self.request, 'Password changed successfully.')
+            else:
+                messages.error(self.request, 'Password is incorrect.')
+
         # set expires if its provided
         # BEFORE CHANGE STATUS!!!
         if 'expires' in self.request.POST:
-            self.change_expires()
+            expires = self.request.POST.get('expires')
+            set_expires(self.request.user.api, self.user, expires)
+            messages.success(self.request, 'Expires changed successfully.')
 
         status = self.request.POST.get('status')
         if status and self.user.status != status:
             self.change_status(status)
+            messages.success(self.request, 'Status changed successfully.')
 
         self.user.save()
-
-    def change_expires(self):
-        """ Change user expires and send data to server """
-
-        expires = self.request.POST.get('expires')
-        if expires:
-            try:
-                expires_datetime = datetime.strptime(expires, '%Y-%m-%d')
-                self.user.expires = expires_datetime.replace(tzinfo=timezone.utc)
-            except Exception as e:
-                messages.error(self.request, e)
-                self.user.expires = None
-        else:
-            self.user.expires = None
-
-        # send data to server
-        data = {
-            "host": self.user.host,
-            "username": self.user.username
-        }
-        if self.user.status == 'EXPIRED':
-            if not self.user.is_expired:
-                self.user.reason = None
-                self.user.api.unblock_user(data)
-                self.user.status = 'ACTIVE'
-        elif self.user.is_active:
-            if self.user.is_expired:
-                self.user.reason = "Your account has expired"
-                data['reason'] = "Your account has expired"
-                self.user.api.block_user(data)
-                self.user.status = 'EXPIRED'
 
     def change_status(self, status):
 
         """ Change status and send data to server """
 
-        data = {
-            "username": self.user.username,
-             "host": self.user.host,
-        }
         if status == 'BLOCKED':
-            self.user.reason = self.request.POST.get('reason')
-            data['reason'] = self.request.POST.get('reason')
-            self.user.api.block_user(data)
-            self.user.status = status
+            reason = self.request.POST.get('reason')
+            block_user(self.request.user.api, self.user, reason)
 
-        elif status == 'BANNED':
-            if not self.user.is_active:
-                self.user.api.unblock_user(data)
-
-            self.user.api.ban_user(data)
-
-            self.user.status = status
+        elif status == 'BANNED' and not self.user.auth_backend_is_ldap:
+            ban_user(self.request.user.api, self.user)
 
         elif status == 'ACTIVE':
-            if self.user.status == 'BLOCKED':
-                self.user.api.unblock_user(data)
-                self.user.reason = None
-                if self.user.is_expired:
-                    self.user.expires = None
-
-                self.user.status = status
-
-            if self.user.status == 'BANNED':
-                self.user.api.unban_user(data)
-
-                if self.user.is_expired:
-                    self.user.reason = "Your account has expired"
-                    data['reason'] = "Your account has expired"
-                    self.user.api.block_user(data)
-                    self.user.status = 'EXPIRED'
-                else:
-                    self.user.reason = None
-                    self.user.status = status
+            unblock_user(self.request.user.api, self.user)
 
 
 class UserBlock(LoginRequiredMixin, TemplateView):
@@ -209,16 +172,7 @@ class UserBlock(LoginRequiredMixin, TemplateView):
             return HttpResponseNotFound
 
         reason = self.request.GET.get('reason')
-        user.reason = reason
-        user.api.block_user(
-            {
-                "username": user.username,
-                "host": user.host,
-                'reason': reason
-            }
-        )
-        user.status = 'BLOCKED'
-        user.save()
+        block_user(request.user.api, user, reason)
         return HttpResponseRedirect(reverse('users:list'))
 
 
@@ -232,17 +186,7 @@ class UserUnBlock(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        reason = self.request.GET.get('reason')
-        user.reason = reason
-        user.api.block_user(
-            {
-                "username": user.username,
-                "host": user.host,
-                'reason': reason
-            }
-        )
-        user.status = 'BLOCKED'
-        user.save()
+        unblock_user(request.user.api, user)
         return HttpResponseRedirect(reverse('users:list'))
 
 
@@ -257,7 +201,9 @@ class UserDelete(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        if user.full_jid != request.user.full_jid:
+        if user.auth_backend_is_ldap:
+            messages.error(request, 'User auth backend is "ldap". User cant be deleted.')
+        elif user.full_jid != request.user.full_jid:
             user.delete()
             request.user.api.unregister_user(
                 {
@@ -317,60 +263,6 @@ class UserVcard(LoginRequiredMixin, TemplateView):
         )
 
         self.user.save()
-
-
-class UserSecurity(LoginRequiredMixin, TemplateView):
-
-    template_name = 'users/security.html'
-    app = 'users'
-
-    @permission_read
-    def get(self, request, id, *args, **kwargs):
-        try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound
-
-        context = {
-            'user': user,
-        }
-        return self.render_to_response(context)
-
-    @permission_write
-    def post(self, request, id, *args, **kwargs):
-        try:
-            self.user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound
-
-        # update user params
-        self.update_user()
-
-        context = {
-            'user': self.user,
-        }
-        return self.render_to_response(context)
-
-    def update_user(self):
-        password = self.request.POST.get('password')
-        confirm_password = self.request.POST.get('confirm_password')
-        if password and confirm_password:
-            if password == confirm_password:
-                # Change the user's password
-                self.user.set_password(password)
-                messages.success(self.request, 'Password changed successfully.')
-            else:
-                messages.error(self.request, 'Password is incorrect.')
-
-        self.user.save()
-
-        self.request.user.api.change_password_api(
-            {
-                'password': password,
-                'username': self.user.username,
-                'host': self.user.host
-            }
-        )
 
 
 class UserCircles(LoginRequiredMixin, TemplateView):
@@ -476,7 +368,7 @@ class UserList(LoginRequiredMixin, TemplateView):
             request.session['host'] = host
 
             context['curr_host'] = host
-            check_users(request.user, host)
+            check_users(request.user.api, host)
 
             self.users = User.objects.filter(host=host)
 
@@ -511,7 +403,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
         permissions = {
             app[0]: CustomPermission.objects.filter(app=app[0])
-            for app in CustomPermission.APPS
+            for app in get_apps_choices()
         }
 
         context = {
@@ -538,7 +430,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
         permissions = {
             app[0]: CustomPermission.objects.filter(app=app[0])
-            for app in CustomPermission.APPS
+            for app in get_apps_choices()
         }
 
         context = {
@@ -553,7 +445,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
         permission_id_list = []
 
-        for app in CustomPermission.APPS:
+        for app in get_apps_choices():
             app_permission_id_list = self.request.POST.getlist(f'permissions_{app[0]}', [])
             permission_id_list += app_permission_id_list
 

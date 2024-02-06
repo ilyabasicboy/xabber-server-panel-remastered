@@ -143,6 +143,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.status == 'ACTIVE'
 
     @property
+    def auth_backend_is_ldap(self):
+        return self.auth_backend == 'ldap'
+
+    @property
     def full_jid(self):
         return u'{}@{}'.format(self.username, self.host)
 
@@ -185,14 +189,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return hosts
 
 
-class CustomPermission(models.Model):
-
-    PERMISSIONS = [
-        ('read', 'read'),
-        ('write', 'write')
-    ]
-
-    APPS = [
+def get_apps_choices():
+    apps = [
         ('dashboard', 'Dashboard'),
         ('users', 'Users'),
         ('circles', 'Circles'),
@@ -201,6 +199,15 @@ class CustomPermission(models.Model):
         ('settings', 'Settings'),
         *[(module, module) for module in get_modules()]
     ]
+    return apps
+
+
+class CustomPermission(models.Model):
+
+    PERMISSIONS = [
+        ('read', 'read'),
+        ('write', 'write')
+    ]
 
     permission = models.CharField(
         choices=PERMISSIONS,
@@ -208,7 +215,7 @@ class CustomPermission(models.Model):
     )
 
     app = models.CharField(
-        choices=APPS,
+        choices=get_apps_choices(),
         max_length=100
     )
 

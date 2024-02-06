@@ -1,3 +1,6 @@
+from django.utils import timezone
+from datetime import datetime
+
 from .models import CustomPermission, User
 
 
@@ -20,7 +23,7 @@ def check_permissions(user: User, app: str, permission: str = None) -> bool:
         return permissions.exists()
 
 
-def check_users(user, host):
+def check_users(api, host):
 
     """
         Check registered users and create
@@ -28,7 +31,7 @@ def check_users(user, host):
     """
 
     try:
-        registered_users = user.api.get_users({"host": host}).get('users')
+        registered_users = api.get_users({"host": host}).get('users')
     except:
         registered_users = []
 
@@ -59,3 +62,90 @@ def check_users(user, host):
         users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
         if users_to_delete:
             users_to_delete.delete()
+
+
+def block_user(api, user, reason):
+    user.reason = reason
+    api.block_user(
+        {
+            "username": user.username,
+            "host": user.host,
+            'reason': reason
+        }
+    )
+    user.status = 'BLOCKED'
+    user.save()
+
+
+def unblock_user(api, user):
+    data = {
+        "username": user.username,
+        "host": user.host
+    }
+
+    if user.status == 'BLOCKED':
+        api.unblock_user(data)
+        user.reason = None
+        if user.is_expired:
+            user.expires = None
+
+        user.status = 'ACTIVE'
+
+    if user.status == 'BANNED':
+        api.unban_user(data)
+
+        if user.is_expired:
+            user.reason = "Your account has expired"
+            data['reason'] = "Your account has expired"
+            api.block_user(data)
+            user.status = 'EXPIRED'
+        else:
+            user.reason = None
+            user.status = 'ACTIVE'
+
+    user.save()
+
+
+def ban_user(api, user):
+    data = {
+        "username": user.username,
+        "host": user.host
+    }
+
+    if not user.is_active:
+        user.api.unblock_user(data)
+
+    api.ban_user(data)
+    user.status = 'BANNED'
+    user.save()
+
+
+def set_expires(api, user, expires):
+    if expires:
+        try:
+            expires_datetime = datetime.strptime(expires, '%Y-%m-%d')
+            user.expires = expires_datetime.replace(tzinfo=timezone.utc)
+        except Exception as e:
+            user.expires = None
+    else:
+        user.expires = None
+
+    # send data to server
+    data = {
+        "host": user.host,
+        "username": user.username
+    }
+
+    if user.status == 'EXPIRED':
+        if not user.is_expired:
+            user.reason = None
+            api.unblock_user(data)
+            user.status = 'ACTIVE'
+    elif user.is_active:
+        if user.is_expired:
+            user.reason = "Your account has expired"
+            data['reason'] = "Your account has expired"
+            api.block_user(data)
+            user.status = 'EXPIRED'
+
+    user.save()

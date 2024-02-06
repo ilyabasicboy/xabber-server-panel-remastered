@@ -91,7 +91,7 @@ class ApiAuthenticationForm(forms.Form):
         super(ApiAuthenticationForm, self).clean()
         if not self.errors:
             self.api.login(self.cleaned_data)
-            if not self.api.success:
+            if self.api.errors:
                 for field, error in self.api.response.items():
                     try:
                         self.add_error(field, error)

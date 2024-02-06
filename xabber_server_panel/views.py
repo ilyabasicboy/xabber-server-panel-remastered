@@ -73,7 +73,7 @@ class Search(LoginRequiredMixin, TemplateView):
             context['circles'] = circles
 
             # check users from server
-            check_users(request.user, host)
+            check_users(request.user.api, host)
 
             users = User.objects.filter(
                 Q(username__contains=text, host=host)

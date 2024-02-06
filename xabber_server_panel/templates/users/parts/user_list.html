@@ -77,7 +77,7 @@
                                                 Edit vcard
                                             </a>
                                         </li>
-                                        {% if users_write_permissions %}
+                                        {% if users_write_permissions and not user.auth_backend_is_ldap %}
                                             <li>
                                                 <a class="dropdown-item text-wrap text-danger" href="{% url 'users:delete' id=user.id %}">
                                                      Delete user
@@ -91,17 +91,10 @@
                                                          Block user
                                                     </a>
                                                 {% else %}
-                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:block' id=user.id %}">
+                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:unblock' id=user.id %}">
                                                          Unblock user
                                                     </a>
                                                 {% endif %}
-                                            </li>
-                                        {% endif %}
-                                        {% if users_write_permissions %}
-                                            <li>
-                                                <a class="dropdown-item text-wrap text-info" href="#">
-                                                     Set expire
-                                                </a>
                                             </li>
                                         {% endif %}
                                     </ul>

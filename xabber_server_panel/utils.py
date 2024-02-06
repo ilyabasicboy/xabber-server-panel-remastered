@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.apps import apps
 from collections import OrderedDict
+from django.urls import clear_url_caches
+from django import setup
 
 import subprocess
 import time
@@ -123,3 +125,5 @@ def update_app_list(app_list):
     apps.apps_ready = apps.models_ready = apps.loading = apps.ready = False
     apps.clear_cache()
     apps.populate(app_list)
+    # clear_url_caches()
+    # setup()

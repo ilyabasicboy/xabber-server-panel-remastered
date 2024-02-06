@@ -17,7 +17,7 @@ urlpatterns = [
     path('groups/', include(('xabber_server_panel.groups.urls', 'groups'), namespace='groups')),
     path('registration/', include(('xabber_server_panel.registration.urls', 'registration'), namespace='registration')),
     path('config/', include(('xabber_server_panel.config.urls', 'config'), namespace='config')),
-
+    path('webhooks/', include(('xabber_server_panel.webhooks.urls', 'webhooks'), namespace='webhooks')),
 ]
 
 for module in get_modules():

@@ -12,12 +12,6 @@
         </a>
     </li>
     <li class="nav-item">
-        {% url 'users:security' id=user.id as security %}
-        <a class="nav-link {% if request.path_info == security %}active{% endif %}" href="{{ security }}">
-            Security
-        </a>
-    </li>
-    <li class="nav-item">
         {% url 'users:circles' id=user.id as circles %}
         <a class="nav-link {% if request.path_info == circles %}active{% endif %}" href="{{ circles }}">
             Circles
