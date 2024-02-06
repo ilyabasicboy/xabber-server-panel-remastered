@@ -43,73 +43,72 @@
 
             <div class="row">
                 <div class="col-lg-6 col-md-12">
-                    <div class="fs-3 mb-3">
-                        {% if user.nickname %}
-                            {{ user.nickname|truncatechars:'30' }}
-                        {% elif user.first_name or user.last_name %}
-                            {{ user.full_name|truncatechars:'30' }}
-                        {% else %}
-                            {{ user.full_jid }}
-                        {% endif %}
-                    </div>
-
-                    <hr class="border border-2">
-
-                    <div class="mb-3">
-                        Status:
-                        <span class="text-success {% if not user.is_active %}text-danger{% endif %}">
-                            {{ user.status }}
-                        </span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Change status:</label>
-                        <select class="form-select" id="user_status" name="status">
-                            <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
-                                Active
-                            </option>
-                            <option value="BLOCKED" {% if user.status == 'BLOCKED' %}selected{% endif %}>Blocked</option>
-                            {% if not user.auth_backend_is_ldap %}
-                                <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
+                    <div class="d-flex flex-column mb-4">
+                        <div class="fs-3">
+                            {% if user.nickname %}
+                                {{ user.nickname|truncatechars:'30' }}
+                            {% elif user.first_name or user.last_name %}
+                                {{ user.full_name|truncatechars:'30' }}
+                            {% else %}
+                                {{ user.full_jid }}
                             {% endif %}
-                        </select>
-                    </div>
+                        </div>
 
-                    <div class="collapse {% if user.status == 'BLOCKED' %}show{% endif %}">
                         <hr class="border border-2">
 
                         <div class="mb-3">
-                            <label class="form-label">Reason for blocking:</label>
-                            <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
+                            Status:
+                            <span class="text-success {% if not user.is_active %}text-danger{% endif %}">
+                                {{ user.status }}
+                            </span>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Change status:</label>
+                            <select class="form-select" id="user_status" name="status">
+                                <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
+                                    Active
+                                </option>
+                                <option value="BLOCKED" {% if user.status == 'BLOCKED' %}selected{% endif %}>Blocked</option>
+                                {% if not user.auth_backend_is_ldap %}
+                                    <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="collapse {% if user.status == 'BLOCKED' %}show{% endif %}">
+                            <hr class="border border-2">
+
+                            <div>
+                                <label class="form-label">Reason for blocking:</label>
+                                <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <hr class="border border-2">
+
+                        <div>
+                            <label class="form-label">Expires:</label>
+                            <input class="form-control" type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
                         </div>
                     </div>
 
-                    <hr class="border border-2">
+                    <div class="d-flex flex-column mb-4">
+                        <h4 class="text-secondary mt-0">
+                            Change password
+                        </h4>
 
-                    <div class="mb-3">
-                        <label class="form-label">Expires:</label>
-                        <input class="form-control" type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
-                    </div>
-
-                    <div>
-                        Change password
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="col-form-label col-12 col-md-3">Password *</label>
-                        <div class="col-12 col-md-9">
+                        <div class="mb-3">
+                            <label class="form-label">Password *</label>
                             <input class="form-control" type="text" name="password" placeholder="Password">
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="col-form-label col-12 col-md-3">Confirm password *</label>
-                        <div class="col-12 col-md-9">
+                        <div>
+                            <label class="form-label">Confirm password *</label>
                             <input class="form-control" type="text" name="confirm_password" placeholder="Confirm password">
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {% if users_write_permissions %}
