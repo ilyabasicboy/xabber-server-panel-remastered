@@ -1,4 +1,4 @@
-from xabber_server_panel.users.models import User
+from xabber_server_panel.base_modules.users.models import User
 
 
 class CustomAuthBackend(object):

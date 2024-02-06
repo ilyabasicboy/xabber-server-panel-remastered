@@ -4,11 +4,11 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from xabber_server_panel.config.models import RootPage
-from xabber_server_panel.users.models import User
-from xabber_server_panel.circles.models import Circle
-from xabber_server_panel.circles.utils import check_circles
-from xabber_server_panel.users.utils import check_users
+from xabber_server_panel.base_modules.config.models import RootPage
+from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.circles.models import Circle
+from xabber_server_panel.base_modules.circles.utils import check_circles
+from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.utils import get_modules
 
 

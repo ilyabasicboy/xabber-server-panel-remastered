@@ -34,7 +34,7 @@ class EjabberdAPI(object):
         except requests.exceptions.RequestException as e:
             self.errors += [f'Request error: {e}']
         except Exception as e:
-            self.errors += [str(e)]
+            self.errors += [e]
 
     def _call_method(self, http_method, relative_url, data):
 
@@ -45,7 +45,6 @@ class EjabberdAPI(object):
 
         method = getattr(self.session, http_method)
         url = self.base_url + relative_url
-        print(http_method, url, data)
 
         # request data from api
         self._wrapped_call(method, url, data, http_method)
@@ -54,9 +53,14 @@ class EjabberdAPI(object):
         if self.raw_response:
             self._parse_response()
 
+        if settings.DEBUG:
+            print('request:', http_method, url, data)
+            print('raw response:', self.raw_response)
+            print('response', self.response)
+            print('errors:', self.errors)
+
         self.response['errors'] = self.errors
-        print(self.response)
-        print(self.errors)
+
 
     def _parse_response(self):
 
@@ -64,7 +68,9 @@ class EjabberdAPI(object):
 
         if self.raw_response.ok:
             try:
-                self.response = self.raw_response.json()
+                json_raw_response = self.raw_response.json()
+                if isinstance(json_raw_response, dict):
+                    self.response = json_raw_response
             except Exception:
                 self.errors += ['invalid_json_response']
         else:

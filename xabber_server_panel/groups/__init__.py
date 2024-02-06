@@ -1,1 +1,0 @@
-default_app_config = 'xabber_server_panel.groups.apps.GroupsConfig'

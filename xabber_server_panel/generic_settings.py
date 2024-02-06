@@ -130,27 +130,28 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # =========== USERS =============== #
-INSTALLED_APPS += ['xabber_server_panel.users']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.users']
 
 AUTH_USER_MODEL = 'users.User'
 
 # ============ API ============#
 INSTALLED_APPS += ['xabber_server_panel.api']
+CRON_JOB_TOKEN = None
 
 # ============ DASHBOARD ============#
-INSTALLED_APPS += ['xabber_server_panel.dashboard']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.dashboard']
 
 # ============ CIRCLES ===============#
-INSTALLED_APPS += ['xabber_server_panel.circles']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.circles']
 
 # ============ GROUPS ===============#
-INSTALLED_APPS += ['xabber_server_panel.groups']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.groups']
 
 # ============ REGISTRATION ===============#
-INSTALLED_APPS += ['xabber_server_panel.registration']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 
 # ============ CONFIG ===============#
-INSTALLED_APPS += ['xabber_server_panel.config']
+INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
 
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']

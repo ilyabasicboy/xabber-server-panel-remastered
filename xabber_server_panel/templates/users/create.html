@@ -76,7 +76,7 @@
                 <div class="row mb-3">
                     <label class="col-form-label col-12 col-md-3">Expires</label>
                     <div class="col-12 col-md-9">
-                        <input class="form-control" type="text" name="expires" placeholder="2022-04-15" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
+                        <input class="form-control" type="date" name="expires" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
                         <span class="form-text text-secondary">A string of characters of the format YYYY-MM-DD; where YYYY shall contain year, MM shall contain the month, and DD shall contain the day.</span>
                     </div>
                 </div>
