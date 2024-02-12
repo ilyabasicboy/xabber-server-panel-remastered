@@ -132,11 +132,13 @@ def make_xmpp_config():
                 f.write('  "{}":\n'.format(key) + "    modules: []\n")
 
 
-def update_vhosts_config():
+def update_vhosts_config(hosts=None):
     template = 'config/hosts_template.yml'
-    hosts = VirtualHost.objects.all()
 
-    if not hosts.exists():
+    if not hosts:
+        hosts = VirtualHost.objects.all()
+
+    if not hosts:
         return
 
     file = open(

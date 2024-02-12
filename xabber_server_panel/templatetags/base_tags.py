@@ -35,7 +35,7 @@ def fromtimestamp(timestamp):
 
 class SmartSpacelessNode(template.Node):
 
-    """ Удалить пробелы из шаблона если отключен режим отладки """
+    """ Remove spaces from template if debug mode is disabled """
 
     def __init__(self, nodelist):
         self.nodelist = nodelist
@@ -56,7 +56,7 @@ def smart_spaceless(parser, token):
 @register.simple_tag
 def get_items_by_model_name(model_name, ordering=None, num=None, **kwargs):
     """
-    return queryset of every items by model name with filtering
+    return queryset of every item by model name with filtering
     example:
         {% get_items_by_model_name 'door' ordering='-id' num=20 show=True price__gt=6000 as doors %}
     """

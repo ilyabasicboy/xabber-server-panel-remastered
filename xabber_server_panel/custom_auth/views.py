@@ -29,10 +29,6 @@ class CustomLoginView(TemplateView):
         else:
             form = CustomAuthenticationForm(request.POST)
 
-        context = {
-            'form': form
-        }
-
         if form.is_valid():
             login(request, form.user)
             if next:
@@ -42,6 +38,10 @@ class CustomLoginView(TemplateView):
         else:
             for error in form.errors.values():
                 messages.error(request, error)
+
+        context = {
+            'form': form
+        }
 
         return self.render_to_response(context)
 

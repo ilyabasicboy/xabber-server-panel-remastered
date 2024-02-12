@@ -4,7 +4,7 @@ hosts: {% for host in hosts %}
 oauth_default_server: "{{ hosts|first }}"
 
 host_config: {% for host in hosts %}
-  "{{ host.name }}":
+  "{{ host }}":
     auth_method:
       - sql
       {% if host.ldapsettings and host.ldapsettings.is_enabled %}- ldap

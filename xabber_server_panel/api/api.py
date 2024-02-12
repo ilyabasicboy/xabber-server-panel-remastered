@@ -50,7 +50,7 @@ class EjabberdAPI(object):
         self._wrapped_call(method, url, data, http_method)
 
         # check errors and convert response to json
-        if self.raw_response:
+        if self.raw_response is not None:
             self._parse_response()
 
         if settings.DEBUG:
@@ -83,18 +83,11 @@ class EjabberdAPI(object):
 
         username = credentials.get('username')
         password = credentials.get('password')
-        data = {
-            "jid": username,
-            "ip": credentials.get("source_ip", ""),
-            "browser": credentials.get("source_browser", ""),
-            "scopes": settings.EJABBERD_API_SCOPES,
-            "ttl": settings.EJABBERD_API_TOKEN_TTL
-        }
 
         # set auth header
         self.session.auth = requests.auth.HTTPBasicAuth(username, password)
 
-        self._call_method('post', '/issue_token', data=data)
+        self._call_method('post', '/issue_token', data={})
 
         # fetch token if success
         if not self.errors:

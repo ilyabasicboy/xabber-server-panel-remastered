@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <body>
+        <div>
+            Xabber server installation
+        </div>
+        <div>
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                <div>
+                    <a href="#host_tab">
+                        <span>1</span>
+                        XMPP host
+                    </a>
+                    <a href="#admin_settings">
+                        <span>2</span>
+                        Admin settings
+                    </a>
+                    <a href="#database_settings">
+                        <span>3</span>
+                        Database settings
+                    </a>
+                    <a href="#installation">
+                        <span>4</span>
+                        Installation
+                    </a>
+                </div>
+
+                <div id="host_tab" class="{% if form.step_1_errors %}error{% endif %}">
+                    <div>
+                        Configure main domain name for the XMPP server.
+                        It will be used to access server from the internet.
+                        All users will receive accounts in this domain.
+                        You must have access to DNS settings for this domain to make it work.
+                    </div>
+
+                    <div>
+                        <label class="{% if form.host.errors %}error{% endif %}">
+                            {{ form.host.label }}
+                            {{ form.host }}
+                        </label>
+                    </div>
+
+                    <a href="#admin_settings">Next</a>
+                </div>
+
+                <div id="admin_settings" class="{% if form.step_2_errors %}error{% endif %}">
+                    <div>
+                        Configure admin account for the server.
+                        It will be used to perform all administration and maintenance operations with the server.
+                        You will be able to chat using this account, you will also receive security alerts from the server.
+                        You will be able to configure additional admin accounts later.
+                    </div>
+
+                    <div>
+                        <label class="{% if form.username.errors %}error{% endif %}">
+                            {{ form.username.label }}
+                            {{ form.username }}
+                        </label>
+
+                        <label class="{% if form.password.errors %}error{% endif %}">
+                            {{ form.password.label }}
+                            {{ form.password }}
+                        </label>
+                    </div>
+
+                    <a href="#host_tab">Previous</a>
+                    <a href="#database_settings">Next</a>
+                </div>
+
+                <div id="database_settings" class="{% if form.step_3_errors %}error{% endif %}">
+                    <div>
+                        Connect server to a database.
+                        You must have it preconfigured before proceeding with installation.
+                        Database installation instruction can be found
+                        <a href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
+                    </div>
+
+                    <div>
+                        <label class="{% if form.server_name.errors %}error{% endif %}">
+                            {{ form.db_host.label }}
+                            {{ form.db_host }}
+                        </label>
+
+                        <label class="{% if form.db_name.errors %}error{% endif %}">
+                            {{ form.db_name.label }}
+                            {{ form.db_name }}
+                        </label>
+
+                        <label class="{% if form.db_user.errors %}error{% endif %}">
+                            {{ form.db_user.label }}
+                            {{ form.db_user }}
+                        </label>
+
+                        <label class="{% if form.db_user_password.errors %}error{% endif %}">
+                            {{ form.db_user_pass.label }}
+                            {{ form.db_user_pass }}
+                        </label>
+                    </div>
+
+                    <a href="#admin_settings">Previous</a>
+                    <button type="submit">Next</button>
+                </div>
+
+                <div id="installation" class="{% if installation_error %}active{% endif %}">
+                    {% if installation_error %}
+                        {{ installation_error }}
+                        <a href="#database_settings">
+                          Back
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </body>
+{% endblock %}

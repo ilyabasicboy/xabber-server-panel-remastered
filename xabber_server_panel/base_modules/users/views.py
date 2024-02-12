@@ -94,10 +94,17 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        self.errors = []
         self.circles = Circle.objects.filter(host=self.user.host)
 
         # update user params
         self.update_user()
+
+        if self.errors:
+            for error in self.errors:
+                messages.error(request, error)
+        else:
+            messages.success(request, 'User changed successfully.')
 
         context = {
             'user': self.user,
@@ -113,7 +120,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
             # Check user auth backend
             if self.user.auth_backend_is_ldap:
-                messages.error(self.request, 'User auth backend is "ldap". Password cant be changed.')
+                self.errors += ['User auth backend is "ldap". Password cant be changed.']
 
             elif password == confirm_password:
 
@@ -128,21 +135,18 @@ class UserDetail(LoginRequiredMixin, TemplateView):
                 # Change the user's password
                 self.user.set_password(password)
 
-                messages.success(self.request, 'Password changed successfully.')
             else:
-                messages.error(self.request, 'Password is incorrect.')
+                self.errors += ['Password is incorrect.']
 
         # set expires if its provided
         # BEFORE CHANGE STATUS!!!
         if 'expires' in self.request.POST:
             expires = self.request.POST.get('expires')
             set_expires(self.request.user.api, self.user, expires)
-            messages.success(self.request, 'Expires changed successfully.')
 
         status = self.request.POST.get('status')
         if status and self.user.status != status:
             self.change_status(status)
-            messages.success(self.request, 'Status changed successfully.')
 
         self.user.save()
 
@@ -152,10 +156,16 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
         if status == 'BLOCKED':
             reason = self.request.POST.get('reason')
-            block_user(self.request.user.api, self.user, reason)
+            if self.request.user != self.user:
+                block_user(self.request.user.api, self.user, reason)
+            else:
+                self.errors += ['You can not block yourself.']
 
         elif status == 'BANNED' and not self.user.auth_backend_is_ldap:
-            ban_user(self.request.user.api, self.user)
+            if self.request.user != self.user:
+                ban_user(self.request.user.api, self.user)
+            else:
+                self.errors += ['You can not ban yourself.']
 
         elif status == 'ACTIVE':
             unblock_user(self.request.user.api, self.user)

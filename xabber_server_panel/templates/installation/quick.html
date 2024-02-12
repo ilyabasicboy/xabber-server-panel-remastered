@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <body>
+        <div>
+            Xabber server installation
+        </div>
+        <div>
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <div id="" class="{% if form.step_2_errors %}error{% endif %}">
+                    <div>
+                        Configure admin account for the server.
+                        It will be used to perform all administration and maintenance operations with the server.
+                        You will be able to chat using this account, you will also receive security alerts from the server.
+                        You will be able to configure additional admin accounts later.
+                    </div>
+
+                    <div>
+                        <label class="{% if form.username.errors %}error{% endif %}">
+                            {{ form.username.label }}
+                            {{ form.username }}@{{ form.data.host }}
+                        </label>
+
+                        <label class="{% if form.password.errors %}error{% endif %}">
+                            {{ form.password.label }}
+                            {{ form.password }}
+                        </label>
+                    </div>
+
+                    <button>Next</button>
+                </div>
+
+                <div id="installation" class="{% if installation_error %}active{% endif %}">
+                    {% if installation_error %}
+                        {{ installation_error }}
+                        <a href="#database_settings">
+                          Back
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </body>
+{% endblock %}

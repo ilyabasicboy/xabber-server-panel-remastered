@@ -11,46 +11,48 @@
         {% include 'config/parts/links.html' %}
     </div>
 
-    <div class="table-adaptive">
-        <table class="table table-striped mb-0">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Module</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for module in modules %}
+    {% if modules %}
+        <div class="table-adaptive">
+            <table class="table table-striped mb-0">
+                <thead>
                     <tr>
-                        <td data-title="#">{{ forloop.counter }}</td>
-                        <td data-title="Module">
-                            {{ module }}
-                        </td>
-                        <td data-title="Actions">
-                            {% if settings_write_permissions %}
-                                <div class="d-flex">
-                                    <div class="dropdown">
-                                        <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical d-flex"></i>
-                                        </div>
-
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'config:delete_module' module=module %}">
-                                                     Delete
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </td>
+                        <th>#</th>
+                        <th>Module</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for module in modules %}
+                        <tr>
+                            <td data-title="#">{{ forloop.counter }}</td>
+                            <td data-title="Module">
+                                {{ module }}
+                            </td>
+                            <td data-title="Actions">
+                                {% if settings_write_permissions %}
+                                    <div class="d-flex">
+                                        <div class="dropdown">
+                                            <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical d-flex"></i>
+                                            </div>
+
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'config:delete_module' module=module %}">
+                                                         Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
     {% if settings_write_permissions %}
         <div class="mt-4">

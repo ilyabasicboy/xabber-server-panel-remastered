@@ -35,8 +35,11 @@ def server_installed():
     return os.path.isfile(settings.INSTALLATION_LOCK)
 
 
-def start_ejabberd():
-    if is_ejabberd_started() or not server_installed():
+def start_ejabberd(first_start=False):
+    if is_ejabberd_started():
+        return
+
+    if not first_start and not server_installed():
         return
 
     response = execute_ejabberd_cmd('start')

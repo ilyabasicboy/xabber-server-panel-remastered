@@ -1,6 +1,7 @@
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+PROJECT_DIR = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
 PROJECT_ROOT = os.path.join(BASE_DIR, 'xabber_server_panel')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -36,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'xabber_server_panel.installation.middleware.InstallationMiddleware'
 ]
 
 ROOT_URLCONF = 'xabber_server_panel.urls'
@@ -61,7 +63,7 @@ WSGI_APPLICATION = 'xabber_server_panel.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.abspath(os.path.join(BASE_DIR, os.pardir)), 'xmppserver.sqlite3'),
+        'NAME': os.path.join(os.path.abspath(BASE_DIR), 'xmppserver.sqlite3'),
     }
 }
 
@@ -98,10 +100,10 @@ MODULES_DIR = os.path.join(BASE_DIR, 'modules')
 # ======== Ejabberd settings ============= #
 
 INSTALLATION_LOCK = os.path.join(PROJECT_ROOT, '.installation_lock')
-PSQL_SCRIPT = os.path.join(PROJECT_ROOT, 'utils/psql/psql')
 EJABBERD_DUMP = os.path.join(PROJECT_ROOT, 'utils/psql/pg.sql')
 EJABBERD_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'xmppserver/etc/ejabberd/')
 EJABBERD_MODULES_CONFIG_FILE = 'modules_config.yml'
+EJABBERD_ADD_CONFIG_FILE = 'additional_config.yml'
 EJABBERDCTL = os.path.join(PROJECT_ROOT, 'xmppserver/bin/ejabberdctl')
 EJABBERD_SHOULD_RELOAD = False
 EJABBERD_STATE = os.path.join(PROJECT_ROOT, 'server_state')
@@ -109,6 +111,8 @@ EJABBERD_STATE_ON = 1
 EJABBERD_STATE_OFF = 0
 EJABBERD_DEFAULT_GROUP_NAME = "All"
 EJABBERD_DEFAULT_GROUP_DESCRIPTION = "Contains all users on this virtual host"
+
+PREDEFINED_CONFIG_FILE_PATH = "predefined_config.json"
 
 EJABBERD_VHOSTS_CONFIG_FILE = 'virtual_hosts.yml'
 
