@@ -1,25 +1,34 @@
-hosts: {% for host in hosts %}
-  - "{{ host }}"{% endfor %}
+hosts:
+{% for host in hosts %}
+  - "{{ host }}"
+{% endfor %}
 
 oauth_default_server: "{{ hosts|first }}"
 
-host_config: {% for host in hosts %}
+host_config:
+{% for host in hosts %}
   "{{ host }}":
     auth_method:
       - sql
-      {% if host.ldapsettings and host.ldapsettings.is_enabled %}- ldap
-    ldap_servers: {% for s in host.ldapsettings.servers %}
-      - "{{ s.server }}"{% endfor %}
-    ldap_port: {{ host.ldapsettings.ldap_port }}
-    ldap_base: "{{ host.ldapsettings.ldap_base }}"
-    {% if ldap_uids %}ldap_uids: "{{ host.ldapsettings.ldap_uids }}"{% endif %}
-    {% if ldap_filter %}ldap_filter: "{{ host.ldapsettings.ldap_filter }}"{% endif %}
-    {% if ldap_dn_filter %}ldap_dn_filter: "{{ host.ldapsettings.ldap_dn_filter }}"{% endif %}
-    {% if ldap_encrypt %}ldap_encrypt: {{ host.ldapsettings.ldap_encrypt }}{% endif %}
-    {% if ldap_tls_verify %}ldap_tls_verify: {{ host.ldapsettings.ldap_tls_verify }}{% endif %}
-    {% if ldap_tls_cacertfile %}ldap_tls_cacertfile: "{{ host.ldapsettings.ldap_tls_cacertfile }}"{% endif %}
-    {% if ldap_tls_depth %}ldap_tls_depth: {{ host.ldapsettings.ldap_tls_depth }}{% endif %}
-    {% if ldap_rootdn %}ldap_rootdn: "{{ host.ldapsettings.ldap_rootdn }}"{% endif %}
-    {% if ldap_password %}ldap_password: "{{ host.ldapsettings.ldap_password }}"{% endif %}
-    {% if ldap_deref_aliases %}ldap_deref_aliases: {{ host.ldapsettings.ldap_deref_aliases }}{% endif %}{% endif %}
+    {% if host.ldap_settings.exists and host.ldap_settings.first.enabled %}
+      - ldap
+    {% with ldap=host.ldap_settings.first %}
+    ldap_servers:
+    {% for s in ldap.servers.all %}
+      - "{{ s.server }}"
+    {% endfor %}
+    ldap_port: {{ ldap.port }}
+    ldap_base: "{{ ldap.base }}"
+    {% if ldap.uids %}ldap_uids: "{{ ldap.uids }}"{% endif %}
+    {% if ldap.filter %}ldap_filter: "{{ ldap.filter }}"{% endif %}
+    {% if ldap.dn_filter %}ldap_dn_filter: "{{ ldap.dn_filter }}"{% endif %}
+    {% if ldap.encrypt %}ldap_encrypt: {{ ldap.encrypt }}{% endif %}
+    {% if ldap.tls_verify %}ldap_tls_verify: {{ ldap.tls_verify }}{% endif %}
+    {% if ldap.tls_cacertfile %}ldap_tls_cacertfile: "{{ ldap.tls_cacertfile }}"{% endif %}
+    {% if ldap.tls_depth %}ldap_tls_depth: {{ ldap.tls_depth }}{% endif %}
+    {% if ldap.rootdn %}ldap_rootdn: "{{ ldap.rootdn }}"{% endif %}
+    {% if ldap.password %}ldap_password: "{{ ldap.password }}"{% endif %}
+    {% if ldap.deref_aliases %}ldap_deref_aliases: {{ ldap.deref_aliases }}{% endif %}
+    {% endwith %}
+    {% endif %}
 {% endfor %}

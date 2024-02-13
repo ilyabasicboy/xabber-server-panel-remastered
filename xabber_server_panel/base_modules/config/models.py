@@ -55,7 +55,7 @@ class LDAPSettings(models.Model):
         max_length=50,
         null=True, blank=True
     )
-    defer_aliases = models.CharField(
+    deref_aliases = models.CharField(
         max_length=100,
         choices=DEFER_ALIASES_CHOICES,
         null=True, blank=True
@@ -77,7 +77,8 @@ class LDAPSettings(models.Model):
     )
     host = models.ForeignKey(
         VirtualHost,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ldap_settings'
     )
     enabled = models.BooleanField(
         default=False

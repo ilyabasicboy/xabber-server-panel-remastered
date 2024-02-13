@@ -61,7 +61,6 @@ class EjabberdAPI(object):
 
         self.response['errors'] = self.errors
 
-
     def _parse_response(self):
 
         """ Jsonify response or add errors if response is not ok """

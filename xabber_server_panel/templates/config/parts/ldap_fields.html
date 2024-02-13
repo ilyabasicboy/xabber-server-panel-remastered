@@ -186,27 +186,27 @@
         </div>
 
         <div class="row mb-3">
-            <label class="col-form-label col-10 col-md-3 {% if form.defer_aliases.errors %}text-danger{% endif %}">
-                Defer aliases
+            <label class="col-form-label col-10 col-md-3 {% if form.deref_aliases.errors %}text-danger{% endif %}">
+                Deref aliases
             </label>
             <div class="col-10 col-md-8">
-                <select class="form-select" name="defer_aliases">
+                <select class="form-select" name="deref_aliases">
                     <option value="never"
                         {% if form.data %}
-                            {% if form.data.defer_aliases == 'never' %}selected{% endif %}
-                        {% elif ldap_settings.defer_aliases == 'never' %}selected{% endif %}>never</option>
+                            {% if form.data.deref_aliases == 'never' %}selected{% endif %}
+                        {% elif ldap_settings.deref_aliases == 'never' %}selected{% endif %}>never</option>
                     <option value="always"
                         {% if form.data %}
-                            {% if form.data.defer_aliases == 'always' %}selected{% endif %}
-                        {% elif ldap_settings.defer_aliases == 'always' %}selected{% endif %}>always</option>
+                            {% if form.data.deref_aliases == 'always' %}selected{% endif %}
+                        {% elif ldap_settings.deref_aliases == 'always' %}selected{% endif %}>always</option>
                     <option value="finding"
                         {% if form.data %}
-                            {% if form.data.defer_aliases == 'finding' %}selected{% endif %}
-                        {% elif ldap_settings.defer_aliases == 'finding' %}selected{% endif %}>finding</option>
+                            {% if form.data.deref_aliases == 'finding' %}selected{% endif %}
+                        {% elif ldap_settings.deref_aliases == 'finding' %}selected{% endif %}>finding</option>
                     <option value="searching"
                         {% if form.data %}
-                            {% if form.data.defer_aliases == 'searching' %}selected{% endif %}
-                        {% elif ldap_settings.defer_aliases == 'searching' %}selected{% endif %}>searching</option>
+                            {% if form.data.deref_aliases == 'searching' %}selected{% endif %}
+                        {% elif ldap_settings.deref_aliases == 'searching' %}selected{% endif %}>searching</option>
                 </select>
             </div>
             <div class="col-2 col-md-1">
