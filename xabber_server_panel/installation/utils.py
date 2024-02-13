@@ -12,6 +12,7 @@ from xabber_server_panel.base_modules.config.utils import get_modules_config, up
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
 
 from .signals import success_installation
@@ -270,8 +271,13 @@ def start_installation_process(data):
         msg = "Can`t create default roster group"
         print(msg)
         return False, msg
-
     print("Successfully created admin in ejabberd.")
+
+    try:
+        update_permissions()
+        print('Permissions created successfuly')
+    except:
+        print('Permissions was not created')
 
     return True, None
 

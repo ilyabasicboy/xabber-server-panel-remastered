@@ -1,7 +1,21 @@
 from django.utils import timezone
 from datetime import datetime
 
-from .models import CustomPermission, User
+from .models import CustomPermission, User, get_apps_choices
+
+
+def update_permissions():
+    app_list = [app[0] for app in get_apps_choices()]
+
+    for app in app_list:
+        for permission in CustomPermission.PERMISSIONS:
+            permission, created = CustomPermission.objects.get_or_create(
+                permission=permission[0],
+                app=app
+            )
+
+    # delete old permissions
+    CustomPermission.objects.exclude(app__in=app_list).delete()
 
 
 def check_permissions(user: User, app: str, permission: str = None) -> bool:

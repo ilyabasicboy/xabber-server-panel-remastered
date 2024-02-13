@@ -34,7 +34,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
 
         form = UserForm(request.POST)
-
+        print(request.POST)
         if form.is_valid():
             user = form.save()
             self.create_user_api(user, form.cleaned_data)
