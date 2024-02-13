@@ -15,8 +15,6 @@ from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
 
-from .signals import success_installation
-
 
 def database_exists(data):
     try:
@@ -289,14 +287,10 @@ def install_cmd(request, data):
             stop_ejabberd()
         return success, error_message
 
-
     # block installation mode
     open(settings.INSTALLATION_LOCK, 'a').close()
     os.chmod(settings.INSTALLATION_LOCK, 0o444)
 
-    success_installation.send(sender=None,
-                              request=request,
-                              **data)
     return success, error_message
 
 
