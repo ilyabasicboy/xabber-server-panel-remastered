@@ -89,9 +89,9 @@ class Search(LoginRequiredMixin, TemplateView):
                 }
             ).get('groups')
 
-            # filter groups by text
-            groups = [group for group in groups if text in group.get('name', '') or text in group.get('owner', '')]
-            context['groups'] = groups
+            if groups:
+                group_list = [group for group in groups if text in group.get('name', '') or text in group.get('owner', '')]
+                context['groups'] = group_list
 
         if request.is_ajax():
             if object == 'users':
