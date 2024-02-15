@@ -201,14 +201,16 @@ $(function () {
 
     //Switch theme
     const themeSwitch = document.getElementById('theme_switch');
-    themeSwitch.addEventListener('change', function () {
-        if (themeSwitch.checked) {
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-            setCookie('theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-bs-theme', 'light');
-            setCookie('theme', 'light');
-        }
-    });
+    if ($(themeSwitch).length > 0) {
+        themeSwitch.addEventListener('change', function () {
+            if (themeSwitch.checked) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                setCookie('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                setCookie('theme', 'light');
+            }
+        });
+    };
 
 });
