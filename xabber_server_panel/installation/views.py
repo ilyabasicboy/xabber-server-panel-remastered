@@ -21,7 +21,8 @@ class Steps(TemplateView):
         #     return HttpResponseRedirect(reverse('root'))
 
         context = {
-            'form': InstallationForm()
+            'form': InstallationForm(),
+            'step': '1'
         }
 
         return self.render_to_response(context)
@@ -29,6 +30,15 @@ class Steps(TemplateView):
     def post(self, request, *args, **kwargs):
 
         self.form = InstallationForm(request.POST)
+
+        previous = request.POST.get('previous')
+        if previous:
+            return self.render_to_response({
+                "form": self.form,
+                'step': previous
+            })
+
+        context = {}
 
         if self.form.is_valid():
             try:
@@ -40,16 +50,25 @@ class Steps(TemplateView):
             if not success:
                 return self.render_to_response({
                     "form": self.form,
-                    "installation_error": message
+                    "installation_error": message,
+                    'step': '4'
                 })
 
             create_circles(self.form.cleaned_data)
             self.login_admin()
             return HttpResponseRedirect(reverse('installation:success'))
 
-        context = {
-            "form": self.form
-        }
+        else:
+            if self.form.step_1_errors():
+                context['step'] = '1'
+            elif self.form.step_2_errors():
+                context['step'] = '2'
+            elif self.form.step_3_errors():
+                context['step'] = '3'
+
+        context['form'] = self.form
+
+
         return self.render_to_response(context)
 
     def login_admin(self):

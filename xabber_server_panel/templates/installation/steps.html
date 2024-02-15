@@ -17,29 +17,29 @@
 
                             <ul class="nav nav-tabs" id="installationTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#host_tab-pane" type="button" role="tab" aria-controls="host_tab-pane" aria-selected="true">
+                                    <button class="nav-link {% if step == '1' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#host_tab-pane" type="button" role="tab" aria-controls="host_tab-pane" aria-selected="true">
                                         XMPP host
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#admin_settings-pane" type="button" role="tab" aria-controls="admin_settings-pane" aria-selected="true">
+                                    <button class="nav-link {% if step == '2' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#admin_settings-pane" type="button" role="tab" aria-controls="admin_settings-pane" aria-selected="true">
                                         Admin settings
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#database_settings-pane" type="button" role="tab" aria-controls="database_settings-pane" aria-selected="true">
+                                    <button class="nav-link {% if step == '3' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#database_settings-pane" type="button" role="tab" aria-controls="database_settings-pane" aria-selected="true">
                                         Database settings
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#installation-pane" type="button" role="tab" aria-controls="installation-pane" aria-selected="true">
+                                    <button class="nav-link {% if step == '4' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#installation-pane" type="button" role="tab" aria-controls="installation-pane" aria-selected="true">
                                         Installation
                                     </button>
                                 </li>
                             </ul>
 
                             <div class="tab-content" id="installationTabContent">
-                                <div class="tab-pane fade show active {% if form.step_1_errors %}error{% endif %}" id="host_tab-pane" role="tabpanel" tabindex="0">
+                                <div class="tab-pane fade {% if step == '1' %}active show{% endif %}" id="host_tab-pane" role="tabpanel" tabindex="0">
                                     <div>
                                         Configure main domain name for the XMPP server.
                                         It will be used to access server from the internet.
@@ -54,12 +54,12 @@
                                         </label>
                                     </div>
 
-                                    <button class="btn btn-primary" data-bs-toggle="tab" data-bs-target="#admin_settings-pane" type="button" role="tab" aria-controls="admin_settings-pane" aria-selected="true">
+                                    <button class="btn btn-primary" type="submit">
                                         Next
                                     </button>
                                 </div>
 
-                                <div class="tab-pane fade {% if form.step_2_errors %}error{% endif %}" id="admin_settings-pane" role="tabpanel" tabindex="0">
+                                <div class="tab-pane fade {% if step == '2' %}active show{% endif %}" id="admin_settings-pane" role="tabpanel" tabindex="0">
                                     <div>
                                         Configure admin account for the server.
                                         It will be used to perform all administration and maintenance operations with the server.
@@ -79,11 +79,13 @@
                                         </label>
                                     </div>
 
-                                    <a href="#host_tab">Previous</a>
-                                    <a href="#database_settings">Next</a>
+                                    <button type="submit" name="previous" value="1">Previous</button>
+                                    <button class="btn btn-primary" type="submit">
+                                        Next
+                                    </button>
                                 </div>
 
-                                <div class="tab-pane fade {% if form.step_3_errors %}error{% endif %}" id="database_settings-pane" role="tabpanel" tabindex="0">
+                                <div class="tab-pane fade {% if step == '3' %}active show{% endif %}" id="database_settings-pane" role="tabpanel" tabindex="0">
                                     <div>
                                         Connect server to a database.
                                         You must have it preconfigured before proceeding with installation.
@@ -113,16 +115,18 @@
                                         </label>
                                     </div>
 
-                                    <a href="#admin_settings">Previous</a>
-                                    <button type="submit">Next</button>
+                                    <button type="submit" name="previous" value="2">Previous</button>
+                                    <button class="btn btn-primary" type="submit">
+                                        Next
+                                    </button>
                                 </div>
 
-                                <div class="tab-pane fade {% if form.installation_error %}error{% endif %}" id="installation-pane" role="tabpanel" tabindex="0">
+                                <div class="tab-pane fade {% if step == '4' %}active show{% endif %}" id="installation-pane" role="tabpanel" tabindex="0">
                                     {% if installation_error %}
                                         {{ installation_error }}
-                                        <a href="#database_settings">
-                                          Back
-                                        </a>
+                                        <button type="submit" name="previous" value="3">
+                                            Previous
+                                        </button>
                                     {% endif %}
                                 </div>
                             </div>

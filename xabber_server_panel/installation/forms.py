@@ -43,7 +43,6 @@ class InstallationForm(forms.Form):
         max_length=100,
         label='Database user',
         widget=forms.TextInput(attrs={'placeholder': 'admin'}),
-        required=False
     )
     db_user_pass = forms.CharField(
         max_length=100,

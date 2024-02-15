@@ -22,10 +22,7 @@ class Command(BaseCommand):
         call_command('migrate', 'users', 'zero', interactive=False)
 
         # migrate
-        call_command('migrate', 'circles', interactive=False)
-        call_command('migrate', 'config', interactive=False)
-        call_command('migrate', 'registration', interactive=False)
-        call_command('migrate', 'users', interactive=False)
+        call_command('migrate', interactive=False)
 
         if is_ejabberd_started():
             stop_ejabberd()
