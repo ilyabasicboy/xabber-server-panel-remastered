@@ -1,0 +1,9 @@
+.header-create .dropdown-menu {
+    width: 400px;
+}
+
+@media (max-width: 575.98px) {
+    .header-create .dropdown-menu {
+        width: 230px;
+    }
+}

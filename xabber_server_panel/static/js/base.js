@@ -214,6 +214,6 @@ $(function () {
     };
 
     //Init stepper
-    let stepper = new Stepper($('.bs-stepper')[0]);
+//    let stepper = new Stepper($('.bs-stepper')[0]);
 
 });

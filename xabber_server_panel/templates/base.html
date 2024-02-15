@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="{% static 'css/vendor/bootstrap-custom-width.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/vendor/bootstrap-stepper.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/vendor/table-adaptive.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/vendor/custom-style.css' %}">
         {% block css %}{% endblock %}
     </head>
 
@@ -45,7 +46,7 @@
                 </a>
 
                 {% if users_write_permissions or circles_write_permissions %}
-                    <div class="dropdown me-2 me-md-4">
+                    <div class="dropdown me-2 me-md-4 header-create">
                         <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Create
                         </button>

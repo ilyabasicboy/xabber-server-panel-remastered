@@ -16,35 +16,32 @@
                             {% csrf_token %}
 
                             <div class="bs-stepper">
-                                <div class="bs-stepper-header" role="tablist">
-                                    <div class="step {% if step == '1' %}active{% endif %}" data-target="#host_tab">
+                                <div class="bs-stepper-header flex-wrap flex-lg-nowrap mb-4" role="tablist">
+                                    <div class="step col-6 col-lg-auto {% if step == '1' %}active{% endif %}" data-target="#host_tab">
                                         <button type="button" class="step-trigger" role="tab" aria-controls="host_tab" id="host_tab-trigger">
                                             <span class="bs-stepper-circle">1</span>
                                             <span class="bs-stepper-label">XMPP host</span>
                                         </button>
                                     </div>
+                                    <div class="line d-none d-lg-block"></div>
 
-                                    <div class="line"></div>
-
-                                    <div class="step {% if step == '2' %}active{% endif %}" data-target="#admin_settings">
+                                    <div class="step col-6 col-lg-auto {% if step == '2' %}active{% endif %}" data-target="#admin_settings">
                                         <button type="button" class="step-trigger" role="tab" aria-controls="admin_settings" id="admin_settings-trigger">
                                             <span class="bs-stepper-circle">2</span>
                                             <span class="bs-stepper-label">Admin settings</span>
                                         </button>
                                     </div>
+                                    <div class="line d-none d-lg-block"></div>
 
-                                    <div class="line"></div>
-
-                                    <div class="step {% if step == '3' %}active{% endif %}" data-target="#database_settings">
+                                    <div class="step col-6 col-lg-auto {% if step == '3' %}active{% endif %}" data-target="#database_settings">
                                         <button type="button" class="step-trigger" role="tab" aria-controls="database_settings" id="database_settings-trigger">
                                             <span class="bs-stepper-circle">3</span>
                                             <span class="bs-stepper-label">Database settings</span>
                                         </button>
                                     </div>
+                                    <div class="line d-none d-lg-block"></div>
 
-                                    <div class="line"></div>
-
-                                    <div class="step {% if step == '4' %}active{% endif %}" data-target="#installation">
+                                    <div class="step col-6 col-lg-auto {% if step == '4' %}active{% endif %}" data-target="#installation">
                                         <button type="button" class="step-trigger" role="tab" aria-controls="installation" id="installation-trigger">
                                             <span class="bs-stepper-circle">4</span>
                                             <span class="bs-stepper-label">Installation</span>
@@ -54,94 +51,99 @@
 
                                 <div class="bs-stepper-content">
                                     <div id="host_tab" class="content {% if step == '1' %}active{% endif %}" role="tabpanel" aria-labelledby="host_tab-trigger">
-                                        <div>
-                                        Configure main domain name for the XMPP server.
-                                        It will be used to access server from the internet.
-                                        All users will receive accounts in this domain.
-                                        You must have access to DNS settings for this domain to make it work.
+                                        <div class="mb-4">
+                                            <p>
+                                                Configure main domain name for the XMPP server. It will be used to access server from the internet. All users will receive accounts in this domain. You must have access to DNS settings for this domain to make it work.
+                                            </p>
                                         </div>
 
-                                        <div>
-                                        <label class="{% if form.host.errors %}error{% endif %}">
-                                        {{ form.host.label }}
-                                        {{ form.host }}
-                                        </label>
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.host.errors %}text-danger{% endif %}">{{ form.host.label }}</label>
+                                            {{ form.host }}
                                         </div>
 
-                                        <button class="btn btn-primary" type="submit">
-                                            Next
-                                        </button>
+                                        <div class="d-flex justify-content-between align-items-center mt-4">
+                                            <button class="btn btn-primary ms-auto" type="submit" name="next" value="2">
+                                                Next
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <div id="admin_settings" class="content {% if step == '2' %}active{% endif %}" role="tabpanel" aria-labelledby="admin_settings-trigger">
-                                        <div>
-                                            Configure admin account for the server.
-                                            It will be used to perform all administration and maintenance operations with the server.
-                                            You will be able to chat using this account, you will also receive security alerts from the server.
-                                            You will be able to configure additional admin accounts later.
+                                        <div class="mb-4">
+                                            <p>
+                                                Configure admin account for the server. It will be used to perform all administration and maintenance operations with the server. You will be able to chat using this account, you will also receive security alerts from the server. You will be able to configure additional admin accounts later.
+                                            </p>
                                         </div>
 
-                                        <div>
-                                            <label class="{% if form.username.errors %}error{% endif %}">
-                                                {{ form.username.label }}
-                                                {{ form.username }}
-                                            </label>
-
-                                            <label class="{% if form.password.errors %}error{% endif %}">
-                                                {{ form.password.label }}
-                                                {{ form.password }}
-                                            </label>
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.username.errors %}text-danger{% endif %}">{{ form.username.label }}</label>
+                                            {{ form.username }}
                                         </div>
 
-                                        <button class="btn btn-primary" type="submit" name="previous" value="1">
-                                            Previous
-                                        </button>
-                                        <button class="btn btn-primary" type="submit">
-                                            Next
-                                        </button>
-                                    </div>
-                                    <div id="database_settings" class="content {% if step == '3' %}active{% endif %}" role="tabpanel" aria-labelledby="database_settings-trigger">
-                                        <div>
-                                            Connect server to a database.
-                                            You must have it preconfigured before proceeding with installation.
-                                            Database installation instruction can be found
-                                            <a href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.password.errors %}text-danger{% endif %}">{{ form.password.label }}</label>
+                                            {{ form.password }}
                                         </div>
 
-                                        <div>
-                                            <label class="{% if form.server_name.errors %}error{% endif %}">
-                                                {{ form.db_host.label }}
-                                                {{ form.db_host }}
-                                            </label>
-
-                                            <label class="{% if form.db_name.errors %}error{% endif %}">
-                                                {{ form.db_name.label }}
-                                                {{ form.db_name }}
-                                            </label>
-
-                                            <label class="{% if form.db_user.errors %}error{% endif %}">
-                                                {{ form.db_user.label }}
-                                                {{ form.db_user }}
-                                            </label>
-
-                                            <label class="{% if form.db_user_password.errors %}error{% endif %}">
-                                                {{ form.db_user_pass.label }}
-                                                {{ form.db_user_pass }}
-                                            </label>
-                                        </div>
-
-                                        <button class="btn btn-primary" type="submit" name="previous" value="2">
-                                            Previous
-                                        </button>
-                                        <button class="btn btn-primary" type="submit">
-                                            Next
-                                        </button>
-                                    </div>
-                                    <div id="installation" class="content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
-                                        {% if installation_error %}
-                                            {{ installation_error }}
-                                            <button type="submit" name="previous" value="3">
+                                        <div class="d-flex justify-content-between align-items-center mt-4">
+                                            <button class="btn btn-secondary" type="submit" name="previous" value="1">
                                                 Previous
                                             </button>
+                                            <button class="btn btn-primary ms-auto" type="submit" name="next" value="3">
+                                                Next
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="database_settings" class="content {% if step == '3' %}active{% endif %}" role="tabpanel" aria-labelledby="database_settings-trigger">
+                                        <div class="mb-4">
+                                            <p>
+                                                Connect server to a database. You must have it preconfigured before proceeding with installation. Database installation instruction can be found <a target="_blank" href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
+                                            </p>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.db_host.errors %}text-danger{% endif %}">{{ form.db_host.label }}</label>
+                                            {{ form.db_host }}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.db_name.errors %}text-danger{% endif %}">{{ form.db_name.label }}</label>
+                                            {{ form.db_name }}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.db_user.errors %}text-danger{% endif %}">{{ form.db_user.label }}</label>
+                                            {{ form.db_user }}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label {% if form.db_user_pass.errors %}text-danger{% endif %}">{{ form.db_user_pass.label }}</label>
+                                            {{ form.db_user_pass }}
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center mt-4">
+                                            <button class="btn btn-secondary" type="submit" name="previous" value="3">
+                                                Previous
+                                            </button>
+                                            <button class="btn btn-success ms-auto" type="submit" name="next" value="4">
+                                                Next
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="installation" class="content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
+                                        {% if installation_error %}
+                                            <div class="mb-4 text-danger">
+                                                {{ installation_error }}
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                                <button class="btn btn-secondary mx-auto" type="submit" name="previous" value="3">
+                                                    Back
+                                                </button>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </div>
