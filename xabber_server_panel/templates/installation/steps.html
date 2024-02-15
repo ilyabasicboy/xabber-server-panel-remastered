@@ -15,119 +15,135 @@
                         <form method="POST" novalidate>
                             {% csrf_token %}
 
-                            <ul class="nav nav-tabs" id="installationTab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link {% if step == '1' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#host_tab-pane" type="button" role="tab" aria-controls="host_tab-pane" aria-selected="true">
-                                        XMPP host
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link {% if step == '2' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#admin_settings-pane" type="button" role="tab" aria-controls="admin_settings-pane" aria-selected="true">
-                                        Admin settings
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link {% if step == '3' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#database_settings-pane" type="button" role="tab" aria-controls="database_settings-pane" aria-selected="true">
-                                        Database settings
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link {% if step == '4' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#installation-pane" type="button" role="tab" aria-controls="installation-pane" aria-selected="true">
-                                        Installation
-                                    </button>
-                                </li>
-                            </ul>
+                            <div class="bs-stepper">
+                                <div class="bs-stepper-header" role="tablist">
+                                    <div class="step {% if step == '1' %}active{% endif %}" data-target="#host_tab">
+                                        <button type="button" class="step-trigger" role="tab" aria-controls="host_tab" id="host_tab-trigger">
+                                            <span class="bs-stepper-circle">1</span>
+                                            <span class="bs-stepper-label">XMPP host</span>
+                                        </button>
+                                    </div>
 
-                            <div class="tab-content" id="installationTabContent">
-                                <div class="tab-pane fade {% if step == '1' %}active show{% endif %}" id="host_tab-pane" role="tabpanel" tabindex="0">
-                                    <div>
+                                    <div class="line"></div>
+
+                                    <div class="step {% if step == '2' %}active{% endif %}" data-target="#admin_settings">
+                                        <button type="button" class="step-trigger" role="tab" aria-controls="admin_settings" id="admin_settings-trigger">
+                                            <span class="bs-stepper-circle">2</span>
+                                            <span class="bs-stepper-label">Admin settings</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="line"></div>
+
+                                    <div class="step {% if step == '3' %}active{% endif %}" data-target="#database_settings">
+                                        <button type="button" class="step-trigger" role="tab" aria-controls="database_settings" id="database_settings-trigger">
+                                            <span class="bs-stepper-circle">3</span>
+                                            <span class="bs-stepper-label">Database settings</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="line"></div>
+
+                                    <div class="step {% if step == '4' %}active{% endif %}" data-target="#installation">
+                                        <button type="button" class="step-trigger" role="tab" aria-controls="installation" id="installation-trigger">
+                                            <span class="bs-stepper-circle">4</span>
+                                            <span class="bs-stepper-label">Installation</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="bs-stepper-content">
+                                    <div id="host_tab" class="content {% if step == '1' %}active{% endif %}" role="tabpanel" aria-labelledby="host_tab-trigger">
+                                        <div>
                                         Configure main domain name for the XMPP server.
                                         It will be used to access server from the internet.
                                         All users will receive accounts in this domain.
                                         You must have access to DNS settings for this domain to make it work.
-                                    </div>
+                                        </div>
 
-                                    <div>
+                                        <div>
                                         <label class="{% if form.host.errors %}error{% endif %}">
-                                            {{ form.host.label }}
-                                            {{ form.host }}
+                                        {{ form.host.label }}
+                                        {{ form.host }}
                                         </label>
+                                        </div>
+
+                                        <button class="btn btn-primary" type="submit">
+                                            Next
+                                        </button>
                                     </div>
+                                    <div id="admin_settings" class="content {% if step == '2' %}active{% endif %}" role="tabpanel" aria-labelledby="admin_settings-trigger">
+                                        <div>
+                                            Configure admin account for the server.
+                                            It will be used to perform all administration and maintenance operations with the server.
+                                            You will be able to chat using this account, you will also receive security alerts from the server.
+                                            You will be able to configure additional admin accounts later.
+                                        </div>
 
-                                    <button class="btn btn-primary" type="submit">
-                                        Next
-                                    </button>
-                                </div>
+                                        <div>
+                                            <label class="{% if form.username.errors %}error{% endif %}">
+                                                {{ form.username.label }}
+                                                {{ form.username }}
+                                            </label>
 
-                                <div class="tab-pane fade {% if step == '2' %}active show{% endif %}" id="admin_settings-pane" role="tabpanel" tabindex="0">
-                                    <div>
-                                        Configure admin account for the server.
-                                        It will be used to perform all administration and maintenance operations with the server.
-                                        You will be able to chat using this account, you will also receive security alerts from the server.
-                                        You will be able to configure additional admin accounts later.
-                                    </div>
+                                            <label class="{% if form.password.errors %}error{% endif %}">
+                                                {{ form.password.label }}
+                                                {{ form.password }}
+                                            </label>
+                                        </div>
 
-                                    <div>
-                                        <label class="{% if form.username.errors %}error{% endif %}">
-                                            {{ form.username.label }}
-                                            {{ form.username }}
-                                        </label>
-
-                                        <label class="{% if form.password.errors %}error{% endif %}">
-                                            {{ form.password.label }}
-                                            {{ form.password }}
-                                        </label>
-                                    </div>
-
-                                    <button type="submit" name="previous" value="1">Previous</button>
-                                    <button class="btn btn-primary" type="submit">
-                                        Next
-                                    </button>
-                                </div>
-
-                                <div class="tab-pane fade {% if step == '3' %}active show{% endif %}" id="database_settings-pane" role="tabpanel" tabindex="0">
-                                    <div>
-                                        Connect server to a database.
-                                        You must have it preconfigured before proceeding with installation.
-                                        Database installation instruction can be found
-                                        <a href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
-                                    </div>
-
-                                    <div>
-                                        <label class="{% if form.server_name.errors %}error{% endif %}">
-                                            {{ form.db_host.label }}
-                                            {{ form.db_host }}
-                                        </label>
-
-                                        <label class="{% if form.db_name.errors %}error{% endif %}">
-                                            {{ form.db_name.label }}
-                                            {{ form.db_name }}
-                                        </label>
-
-                                        <label class="{% if form.db_user.errors %}error{% endif %}">
-                                            {{ form.db_user.label }}
-                                            {{ form.db_user }}
-                                        </label>
-
-                                        <label class="{% if form.db_user_password.errors %}error{% endif %}">
-                                            {{ form.db_user_pass.label }}
-                                            {{ form.db_user_pass }}
-                                        </label>
-                                    </div>
-
-                                    <button type="submit" name="previous" value="2">Previous</button>
-                                    <button class="btn btn-primary" type="submit">
-                                        Next
-                                    </button>
-                                </div>
-
-                                <div class="tab-pane fade {% if step == '4' %}active show{% endif %}" id="installation-pane" role="tabpanel" tabindex="0">
-                                    {% if installation_error %}
-                                        {{ installation_error }}
-                                        <button type="submit" name="previous" value="3">
+                                        <button class="btn btn-primary" type="submit" name="previous" value="1">
                                             Previous
                                         </button>
-                                    {% endif %}
+                                        <button class="btn btn-primary" type="submit">
+                                            Next
+                                        </button>
+                                    </div>
+                                    <div id="database_settings" class="content {% if step == '3' %}active{% endif %}" role="tabpanel" aria-labelledby="database_settings-trigger">
+                                        <div>
+                                            Connect server to a database.
+                                            You must have it preconfigured before proceeding with installation.
+                                            Database installation instruction can be found
+                                            <a href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
+                                        </div>
+
+                                        <div>
+                                            <label class="{% if form.server_name.errors %}error{% endif %}">
+                                                {{ form.db_host.label }}
+                                                {{ form.db_host }}
+                                            </label>
+
+                                            <label class="{% if form.db_name.errors %}error{% endif %}">
+                                                {{ form.db_name.label }}
+                                                {{ form.db_name }}
+                                            </label>
+
+                                            <label class="{% if form.db_user.errors %}error{% endif %}">
+                                                {{ form.db_user.label }}
+                                                {{ form.db_user }}
+                                            </label>
+
+                                            <label class="{% if form.db_user_password.errors %}error{% endif %}">
+                                                {{ form.db_user_pass.label }}
+                                                {{ form.db_user_pass }}
+                                            </label>
+                                        </div>
+
+                                        <button class="btn btn-primary" type="submit" name="previous" value="2">
+                                            Previous
+                                        </button>
+                                        <button class="btn btn-primary" type="submit">
+                                            Next
+                                        </button>
+                                    </div>
+                                    <div id="installation" class="content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
+                                        {% if installation_error %}
+                                            {{ installation_error }}
+                                            <button type="submit" name="previous" value="3">
+                                                Previous
+                                            </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </form>
