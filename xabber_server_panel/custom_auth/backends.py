@@ -3,6 +3,11 @@ from xabber_server_panel.base_modules.users.models import User
 
 class CustomAuthBackend(object):
 
+    """
+        Customized to allow authorization for administrators and users with any permissions.
+         Also backend writes api token in user.token field if ejabberd server is started.
+    """
+
     def authenticate(self, request, username, password, api=None, **kwargs):
         username, host = username.split('@')
         try:
@@ -13,10 +18,13 @@ class CustomAuthBackend(object):
         except User.DoesNotExist:
             return None
 
+        # check permissions
         if (user.is_admin or user.has_any_permissions) and user.check_password(password):
-            if api and api.token:
-                user.token = api.token
-                user.save()
+
+            # set token in session
+            if api and api.token and request:
+                request.session['api_token'] = api.token
+
             return user
         return None
 

@@ -1,5 +1,4 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from xabber_server_panel.base_modules.circles.views import CircleList, CircleCreate, CircleDetail, CircleMembers, CircleShared, CirclesDelete, DeleteMember
 
 

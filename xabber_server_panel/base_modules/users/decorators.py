@@ -1,5 +1,4 @@
 from functools import wraps
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.contrib import messages

@@ -10,6 +10,7 @@ from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.utils import get_modules
+from xabber_server_panel.api.utils import get_api
 
 
 class Root(TemplateView):
@@ -48,6 +49,7 @@ class Search(LoginRequiredMixin, TemplateView):
         object = request.GET.get('object')
 
         hosts = request.user.get_allowed_hosts()
+        api = get_api(request)
 
         context = {
             'hosts': hosts
@@ -64,7 +66,7 @@ class Search(LoginRequiredMixin, TemplateView):
             context['curr_host'] = host
 
             # check circles from server
-            check_circles(request.user, host)
+            check_circles(api, host)
 
             circles = Circle.objects.filter(
                 Q(circle__contains=text, host=host)
@@ -73,7 +75,7 @@ class Search(LoginRequiredMixin, TemplateView):
             context['circles'] = circles
 
             # check users from server
-            check_users(request.user.api, host)
+            check_users(api, host)
 
             users = User.objects.filter(
                 Q(username__contains=text, host=host)
@@ -83,7 +85,7 @@ class Search(LoginRequiredMixin, TemplateView):
             context['users'] = users
 
             # get group list
-            groups = request.user.api.get_groups(
+            groups = api.get_groups(
                 {
                     "host": host
                 }

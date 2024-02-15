@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.urls import reverse
@@ -25,9 +25,9 @@ class CustomLoginView(TemplateView):
         next = request.POST.get('next')
 
         if is_ejabberd_started():
-            form = ApiAuthenticationForm(request.POST)
+            form = ApiAuthenticationForm(request.POST, request=request)
         else:
-            form = CustomAuthenticationForm(request.POST)
+            form = CustomAuthenticationForm(request.POST, request=request)
 
         if form.is_valid():
             login(request, form.user)

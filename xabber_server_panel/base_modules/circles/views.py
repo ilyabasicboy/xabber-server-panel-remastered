@@ -9,6 +9,7 @@ from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
+from xabber_server_panel.api.utils import get_api
 
 from .forms import CircleForm
 from .utils import check_circles
@@ -37,7 +38,10 @@ class CircleList(LoginRequiredMixin, TemplateView):
             context['curr_host'] = host
 
             # check circles from server
-            check_circles(request.user, host)
+            check_circles(
+                get_api(request),
+                host
+            )
 
             self.circles = Circle.objects.filter(host=host)
 
@@ -72,6 +76,8 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
 
         form = CircleForm(request.POST)
+        api = get_api(request)
+
         if form.is_valid():
 
             circle = form.save()
@@ -80,7 +86,7 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
             if not name:
                 name = form.cleaned_data.get('circle')
 
-            self.request.user.api.create_circle(
+            api.create_circle(
                 {
                     'circle': form.cleaned_data.get('circle'),
                     'host': form.cleaned_data.get('host'),
@@ -143,14 +149,14 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
     def update_circle(self):
-
+        api = get_api(self.request)
         name = self.request.POST.get('name')
         self.circle.name = name
 
         description = self.request.POST.get('description')
         self.circle.description = description
 
-        self.request.user.api.create_circle(
+        api.create_circle(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host,
@@ -176,8 +182,10 @@ class CirclesDelete(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         circle.delete()
-        self.request.user.api.delete_circle(
+        api.delete_circle(
             {
                 'circle': circle.circle,
                 'host': circle.host
@@ -198,6 +206,8 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        self.api = get_api(request)
+
         self.check_members()
 
         users = User.objects.filter(status='ACTIVE', host=self.circle.host)
@@ -216,6 +226,8 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
             self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
+
+        self.api = get_api(request)
 
         self.check_members()
 
@@ -243,7 +255,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         # set all members and clear id members list
         if "@all@" in self.members:
-            self.request.user.api.add_circle_members(
+            self.api.add_circle_members(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
@@ -255,7 +267,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
             self.circle.all_users = True
         else:
             if self.circle.all_users:
-                self.request.user.api.del_circle_members(
+                self.api.del_circle_members(
                     {
                         'circle': self.circle.circle,
                         'host': self.circle.host,
@@ -278,7 +290,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         # add circles
         members_to_add = self.users.filter(id__in=ids_to_add)
         for member in members_to_add:
-            self.request.user.api.add_circle_members(
+            self.api.add_circle_members(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
@@ -289,7 +301,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         # delete circles
         members_to_delete = self.users.filter(id__in=ids_to_delete)
         for member in members_to_delete:
-            self.request.user.api.del_circle_members(
+            self.api.del_circle_members(
                 {
                     'circle': self.circle.circle,
                     'host': self.circle.host,
@@ -305,7 +317,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         """ Sync member list from server """
 
-        server_members_list = self.request.user.api.get_circle_members(
+        server_members_list = self.api.get_circle_members(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host
@@ -320,7 +332,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
             if member:
                 server_members += [member.id]
             else:
-                self.request.user.api.del_circle_members(
+                self.api.del_circle_members(
                     {
                         'circle': self.circle.circle,
                         'host': self.circle.host,
@@ -343,9 +355,11 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         members = circle.members.exclude(id=member_id)
         circle.members.set(members)
-        self.request.user.api.delete_circle(
+        api.delete_circle(
             {
                 'circle': circle.circle,
                 'host': circle.host
@@ -386,6 +400,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
             return HttpResponseNotFound
 
         circles = Circle.objects.filter(host=self.circle.host)
+        self.api = get_api(request)
 
         self.update_circle()
 
@@ -404,7 +419,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
         contacts = self.request.POST.getlist('contacts', [])
         str_contacts = ','.join(contacts)
 
-        self.request.user.api.create_circle(
+        self.api.create_circle(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host,

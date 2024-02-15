@@ -157,7 +157,7 @@ def update_ejabberd_config():
     reload_ejabberd_config()
 
 
-def check_hosts(user):
+def check_hosts(api):
 
     """
         Check registered users and create
@@ -165,7 +165,7 @@ def check_hosts(user):
     """
 
     try:
-        registered_hosts = user.api.get_vhosts().get('vhosts')
+        registered_hosts = api.get_vhosts().get('vhosts')
     except:
         registered_hosts = []
 

@@ -6,6 +6,7 @@ from django.shortcuts import HttpResponseRedirect, reverse
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.base_modules.config.utils import check_hosts
+from xabber_server_panel.api.utils import get_api
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -14,7 +15,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-        check_hosts(request.user)
+        self.api = get_api(request)
+
+        check_hosts(self.api)
 
         context = {
             'data': self.get_users_data(),
@@ -24,7 +27,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, *args, **kwargs):
-        check_hosts(request.user)
+        self.api = get_api(request)
+
+        check_hosts(self.api)
 
         if request.user.is_admin:
             start = request.POST.get('start')
@@ -58,8 +63,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'hosts': [
                 {
                     'host': host.name,
-                    'total': self.request.user.api.get_users_count({"host": host.name}).get('count'),
-                    'online': self.request.user.api.stats_host({"host": host.name}).get('count')
+                    'total': self.api.get_users_count({"host": host.name}).get('count'),
+                    'online': self.api.stats_host({"host": host.name}).get('count')
                 }
                  for host in hosts
             ],

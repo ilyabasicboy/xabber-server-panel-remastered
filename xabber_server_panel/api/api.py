@@ -1,17 +1,19 @@
 import requests
 
 from django.conf import settings
+from django.contrib.auth import logout
 
 
 class EjabberdAPI(object):
 
-    def __init__(self):
+    def __init__(self, request=None):
         self.token = None
         self.session = requests.Session()
         self.base_url = settings.EJABBERD_API_URL
         self.raw_response = None
         self.response = {}
         self.errors = []
+        self.request = request
 
     def fetch_token(self, token):
         self.token = token
@@ -30,9 +32,13 @@ class EjabberdAPI(object):
 
         # resolve exceptions
         except requests.exceptions.ConnectionError:
-            self.errors += ['Connection error.']
+            error = 'Connection error.'
+            if error not in self.errors:
+                self.errors += [error]
         except requests.exceptions.RequestException as e:
-            self.errors += [f'Request error: {e}']
+            error = f'Request error: {e}'
+            if error not in self.errors:
+                self.errors += [error]
         except Exception as e:
             self.errors += [e]
 
@@ -73,6 +79,9 @@ class EjabberdAPI(object):
             except Exception:
                 self.errors += ['invalid_json_response']
         else:
+            # logout if user unauthorized
+            # if self.raw_response.status_code == 401 and self.request:
+            #     logout(self.request)
             self.errors += [self.raw_response.reason]
 
     def login(self, credentials):

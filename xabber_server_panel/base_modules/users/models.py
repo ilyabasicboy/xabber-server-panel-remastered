@@ -6,7 +6,6 @@ from django.contrib.auth import _get_backends, load_backend
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
-from xabber_server_panel.api.api import EjabberdAPI
 from xabber_server_panel.utils import get_modules
 from xabber_server_panel.base_modules.config.models import VirtualHost
 
@@ -87,10 +86,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
     objects = UserManager()
 
-    token = models.TextField(
-        blank=True,
-        null=True
-    )
     username = models.CharField(
         max_length=256,
         unique=True,
@@ -166,13 +161,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         elif self.last_name:
             return self.last_name
         return ''
-
-    @property
-    def api(self):
-        api = EjabberdAPI()
-        if self.token:
-            api.fetch_token(self.token)
-        return api
 
     @property
     def is_expired(self):

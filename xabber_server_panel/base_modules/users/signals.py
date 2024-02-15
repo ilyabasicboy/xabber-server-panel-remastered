@@ -1,6 +1,6 @@
-from django.core import management
+from xabber_server_panel.base_modules.users.utils import update_permissions
 
 
 # @receiver(post_migrate)
 def update_custom_permissions(sender, **kwargs):
-    management.call_command('update_permissions')
+    update_permissions()

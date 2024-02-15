@@ -10,6 +10,7 @@ from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
+from xabber_server_panel.api.utils import get_api
 
 from .models import RegistrationSettings
 
@@ -21,6 +22,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
     @permission_read
     def get(self, request, *args, **kwargs):
         hosts = request.user.get_allowed_hosts()
+        api = get_api(request)
 
         context = {
             'hosts': hosts,
@@ -42,7 +44,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
                 host=host_obj
             )
 
-            keys = self.request.user.api.get_keys(
+            keys = api.get_keys(
                 {"host": host}
             ).get('keys')
 
@@ -65,6 +67,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
         hosts = VirtualHost.objects.all()
         self.host = hosts.filter(name=host_name).first()
         self.status = request.POST.get('status', 'disabled')
+        self.api = get_api(request)
 
         self.context = {
             'hosts': hosts,
@@ -73,6 +76,8 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
         if self.host:
             self.update_settings()
+            make_xmpp_config()
+            reload_ejabberd_config()
             messages.success(request, 'Registration changed successfully.')
 
         return self.render_to_response(self.context)
@@ -87,7 +92,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
         self.context['settings'] = settings
 
         if self.status == 'link':
-            keys = self.request.user.api.get_keys(
+            keys = self.api.get_keys(
                 {"host": self.host.name}
             ).get('keys')
             self.context['keys'] = keys
@@ -124,9 +129,11 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
         except:
             expire = None
 
+        api = get_api(request)
+
         description = request.POST.get('description')
         if expire:
-            request.user.api.create_key(
+            api.create_key(
                 {
                     "host": host.name,
                      "expire": expire,
@@ -159,13 +166,15 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         context = {
             'host': host,
             "key": key
         }
 
         # get key data
-        keys = request.user.api.get_keys({"host": host}).get('keys')
+        keys = api.get_keys({"host": host}).get('keys')
         key_data_list = [obj for obj in keys if obj['key'] == key]
         key_data = key_data_list[0] if key_data_list else None
 
@@ -193,9 +202,11 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
         except:
             expire = None
 
+        api = get_api(request)
+
         description = request.POST.get('description')
         if expire:
-            request.user.api.change_key(
+            api.change_key(
                 {
                     "host": host.name,
                      "expire": expire,
@@ -228,7 +239,9 @@ class RegistrationDelete(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        request.user.api.delete_key({"host": host.name}, key=key)
+        api = get_api(request)
+
+        api.delete_key({"host": host.name}, key=key)
         messages.success(request, 'Registration key deleted successfully.')
         return HttpResponseRedirect(
             reverse('registration:list') + f'?host={host.name}'

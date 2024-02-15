@@ -127,7 +127,7 @@ def ban_user(api, user):
     }
 
     if not user.is_active:
-        user.api.unblock_user(data)
+        api.unblock_user(data)
 
     api.ban_user(data)
     user.status = 'BANNED'

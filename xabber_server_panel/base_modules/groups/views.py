@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.base_modules.users.decorators import permission_read
+from xabber_server_panel.api.utils import get_api
 
 
 class GroupList(LoginRequiredMixin, TemplateView):
@@ -14,6 +15,7 @@ class GroupList(LoginRequiredMixin, TemplateView):
     @permission_read
     def get(self, request, *args, **kwargs):
         hosts = request.user.get_allowed_hosts()
+        api = get_api(request)
 
         if hosts.exists():
             host = request.GET.get('host', request.session.get('host'))
@@ -26,7 +28,7 @@ class GroupList(LoginRequiredMixin, TemplateView):
         else:
             host = ''
 
-        chats = request.user.api.get_groups(
+        chats = api.get_groups(
             {
                 "host": host
             }

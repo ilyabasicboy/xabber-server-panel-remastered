@@ -28,9 +28,17 @@ class CustomAuthenticationForm(forms.Form):
         ),
     )
 
+    def __init__(self, *args, request=None, **kwargs):
+
+        """ add request in arguments to provide it in authenticate func """
+
+        self.request = request
+        super(CustomAuthenticationForm, self).__init__(*args, **kwargs)
+
     def clean(self):
         super(CustomAuthenticationForm, self).clean()
         self.user = authenticate(
+            request=self.request,
             username=self.cleaned_data['username'],
             password=self.cleaned_data['password']
         )
@@ -72,15 +80,17 @@ class ApiAuthenticationForm(forms.Form):
         widget=forms.HiddenInput()
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, request=None, **kwargs):
         self.api = EjabberdAPI()
+        self.request = request
         super(ApiAuthenticationForm, self).__init__(*args, **kwargs)
 
     def after_clean(self):
         self.user = authenticate(
+            request=self.request,
             username=self.cleaned_data['username'],
             password=self.cleaned_data['password'],
-            api=self.api
+            api=self.api,
         )
         if self.user is None:
             self.add_error(
@@ -91,6 +101,8 @@ class ApiAuthenticationForm(forms.Form):
         super(ApiAuthenticationForm, self).clean()
         if not self.errors:
             self.api.login(self.cleaned_data)
+
+            # check api errors
             if self.api.errors:
                 for field, error in self.api.response.items():
                     try:

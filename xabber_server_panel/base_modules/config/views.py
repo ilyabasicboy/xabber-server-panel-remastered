@@ -15,6 +15,7 @@ from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
+from xabber_server_panel.api.utils import get_api
 
 from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
@@ -43,7 +44,10 @@ class Hosts(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
-        check_hosts(request.user)
+
+        api = get_api(request)
+
+        check_hosts(api)
 
         hosts = VirtualHost.objects.all()
 
@@ -65,9 +69,11 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         except VirtualHost.DoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         users = User.objects.filter(host=host.name)
         for user in users:
-            request.user.api.unregister_user(
+            api.unregister_user(
                 {
                     'username': user.username,
                     'host': host.name
@@ -77,7 +83,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
 
         circles = Circle.objects.filter(host=host.name)
         for circle in circles:
-            request.user.api.delete_circle(
+            api.delete_circle(
                 {
                     'circle': circle.circle,
                     'host': host.name
@@ -125,6 +131,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
     @permission_admin
     def post(self, request, *args, **kwargs):
         host = request.POST.get('host')
+        self.api = get_api(request)
 
         if host_is_valid(host):
             VirtualHost.objects.create(
@@ -146,7 +153,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
-        request.user.api.create_circle(
+        self.api.create_circle(
             {
                 'circle': host,
                 'host': host,
@@ -189,10 +196,11 @@ class Admins(LoginRequiredMixin, TemplateView):
         # exclude authenticated user because he cant change self status
         users = User.objects.exclude(id=request.user.id)
         admins = request_data.get('admins', [])
+        api = get_api(request)
 
         admins_to_add = users.filter(id__in=admins, is_admin=False)
         for user in admins_to_add:
-            request.user.api.set_admin(
+            api.set_admin(
                 {
                     "username": user.username,
                     "host": user.host
@@ -203,7 +211,7 @@ class Admins(LoginRequiredMixin, TemplateView):
 
         admins_to_delete = users.exclude(id__in=admins, is_admin=True)
         for user in admins_to_delete:
-            request.user.api.del_admin(
+            api.del_admin(
                 {
                     "username": user.username,
                     "host": user.host,

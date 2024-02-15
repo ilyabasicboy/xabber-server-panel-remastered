@@ -2,13 +2,13 @@ from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
 
 
-def check_circles(user: User, host: str) -> None:
+def check_circles(api, host: str) -> None:
     """
         Check registered circles and create
         if it doesn't exist in django db
     """
     try:
-        registered_circles = user.api.get_circles({"host": host}).get('circles')
+        registered_circles = api.get_circles({"host": host}).get('circles')
     except:
         registered_circles = []
 
@@ -22,7 +22,7 @@ def check_circles(user: User, host: str) -> None:
         if unknown_circles:
             circles_to_create = []
             for circle in unknown_circles:
-                circle_info = user.api.get_circles_info(
+                circle_info = api.get_circles_info(
                     {
                         'host': host,
                         'circle': circle

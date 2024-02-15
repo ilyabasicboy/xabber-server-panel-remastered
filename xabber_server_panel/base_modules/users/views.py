@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse, loader
+from django.shortcuts import reverse, loader
 from django.views.generic import TemplateView
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,6 +9,7 @@ from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
+from xabber_server_panel.api.utils import get_api
 
 from .models import User, CustomPermission, get_apps_choices
 from .forms import UserForm
@@ -34,7 +35,8 @@ class CreateUser(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
 
         form = UserForm(request.POST)
-        print(request.POST)
+        self.api = get_api(request)
+
         if form.is_valid():
             user = form.save()
             self.create_user_api(user, form.cleaned_data)
@@ -55,11 +57,11 @@ class CreateUser(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
     def create_user_api(self, user, cleaned_data):
-        self.request.user.api.create_user(
+        self.api.create_user(
             get_user_data_for_api(user, cleaned_data.get('password'))
         )
         if user.is_admin:
-            user.api.set_admin(
+            self.api.set_admin(
                 {
                     "username": cleaned_data['username'],
                     "host": cleaned_data['host']
@@ -94,6 +96,8 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        self.api = get_api(request)
+
         self.errors = []
         self.circles = Circle.objects.filter(host=self.user.host)
 
@@ -124,7 +128,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
             elif password == confirm_password:
 
-                self.request.user.api.change_password_api(
+                self.api.change_password_api(
                     {
                         'password': password,
                         'username': self.user.username,
@@ -142,7 +146,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         # BEFORE CHANGE STATUS!!!
         if 'expires' in self.request.POST:
             expires = self.request.POST.get('expires')
-            set_expires(self.request.user.api, self.user, expires)
+            set_expires(self.api, self.user, expires)
 
         status = self.request.POST.get('status')
         if status and self.user.status != status:
@@ -157,18 +161,18 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         if status == 'BLOCKED':
             reason = self.request.POST.get('reason')
             if self.request.user != self.user:
-                block_user(self.request.user.api, self.user, reason)
+                block_user(self.api, self.user, reason)
             else:
                 self.errors += ['You can not block yourself.']
 
         elif status == 'BANNED' and not self.user.auth_backend_is_ldap:
             if self.request.user != self.user:
-                ban_user(self.request.user.api, self.user)
+                ban_user(self.api, self.user)
             else:
                 self.errors += ['You can not ban yourself.']
 
         elif status == 'ACTIVE':
-            unblock_user(self.request.user.api, self.user)
+            unblock_user(self.api, self.user)
 
 
 class UserBlock(LoginRequiredMixin, TemplateView):
@@ -181,8 +185,10 @@ class UserBlock(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         reason = self.request.GET.get('reason')
-        block_user(request.user.api, user, reason)
+        block_user(api, user, reason)
         return HttpResponseRedirect(reverse('users:list'))
 
 
@@ -196,7 +202,9 @@ class UserUnBlock(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        unblock_user(request.user.api, user)
+        api = get_api(request)
+
+        unblock_user(api, user)
         return HttpResponseRedirect(reverse('users:list'))
 
 
@@ -211,11 +219,13 @@ class UserDelete(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         if user.auth_backend_is_ldap:
             messages.error(request, 'User auth backend is "ldap". User cant be deleted.')
         elif user.full_jid != request.user.full_jid:
             user.delete()
-            request.user.api.unregister_user(
+            api.unregister_user(
                 {
                     'username': user.username,
                     'host': user.host
@@ -251,6 +261,8 @@ class UserVcard(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        self.api = get_api(request)
+
         # update user params
         self.update_user()
 
@@ -268,7 +280,7 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 
         self.user.last_name = self.request.POST.get('last_name')
 
-        self.request.user.api.set_vcard(
+        self.api.set_vcard(
             get_user_data_for_api(self.user)
         )
 
@@ -303,6 +315,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
             return HttpResponseNotFound
 
         self.circles = Circle.objects.filter(host=self.user.host)
+        self.api = get_api(request)
 
         # update user params
         self.update_user()
@@ -331,7 +344,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # add circles
         circles_to_add = self.circles.filter(id__in=ids_to_add)
         for circle in circles_to_add:
-            self.user.api.add_circle_members(
+            self.api.add_circle_members(
                 {
                     'circle': circle.circle,
                     'host': circle.host,
@@ -342,7 +355,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # delete circles
         circles_to_delete = self.circles.filter(id__in=ids_to_delete)
         for circle in circles_to_delete:
-            self.user.api.del_circle_members(
+            self.api.del_circle_members(
                 {
                     'circle': circle.circle,
                     'host': circle.host,
@@ -363,6 +376,7 @@ class UserList(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         hosts = request.user.get_allowed_hosts()
         self.users = User.objects.none()
+        api = get_api(request)
 
         context = {
             'hosts': hosts,
@@ -378,7 +392,7 @@ class UserList(LoginRequiredMixin, TemplateView):
             request.session['host'] = host
 
             context['curr_host'] = host
-            check_users(request.user.api, host)
+            check_users(api, host)
 
             self.users = User.objects.filter(host=host)
 
@@ -434,6 +448,8 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
             messages.error(request, 'You cant change self permissions.',)
             return HttpResponseRedirect(reverse('home'))
 
+        self.api = get_api(request)
+
         self.update_permissions()
 
         messages.success(self.request, 'Permissions changed successfully.')
@@ -468,14 +484,14 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
         self.user.save()
 
         if is_admin:
-            self.request.user.api.set_admin(
+            self.api.set_admin(
                 {
                     "username": self.user.username,
                     "host": self.user.host
                 }
             )
         else:
-            self.request.user.api.del_admin(
+            self.api.del_admin(
                 {
                     "username": self.user.username,
                     "host": self.user.host,
@@ -484,7 +500,7 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
             permissions = self.get_permissions_dict()
 
-            self.request.user.api.set_permissions(
+            self.api.set_permissions(
                 {
                     "username": self.user.username,
                     "host": self.user.host,
