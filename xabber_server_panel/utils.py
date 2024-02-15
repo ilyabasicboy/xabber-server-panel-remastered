@@ -45,6 +45,7 @@ def start_ejabberd(first_start=False):
     response = execute_ejabberd_cmd('start')
 
     while not is_ejabberd_started():
+        print('wait 1 sec')
         time.sleep(1)
 
     write_ejabberd_state(settings.EJABBERD_STATE_ON)

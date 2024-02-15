@@ -155,6 +155,9 @@ INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 # ============ CONFIG ===============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
 
+# ============ INSTALLATION ===============#
+INSTALLED_APPS += ['xabber_server_panel.installation']
+
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']
 WEBHOOKS_SIGNATURE_HEADER = 'x-xmpp-server-signature'

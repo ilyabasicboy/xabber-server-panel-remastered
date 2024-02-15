@@ -144,6 +144,7 @@ acme:
 
 sm_db_type: mnesia
 default_db: sql
+default_ram_db: mnesia
 
 modules:
   mod_adhoc: {}
@@ -152,16 +153,15 @@ modules:
     access: announce
   mod_blocking: {} # requires mod_privacy
   mod_caps: {}
-  mod_carboncopy:
-    db_type: mnesia
+  mod_carboncopy: {}
   mod_client_state: {}
   mod_configure: {} # requires mod_adhoc
   mod_disco: {}
   mod_echo: {}
   mod_http_upload:
     docroot: "{{ PROJECT_DIR }}/user_images"
-    put_url: "https://@HOST@:5443/upload"
-
+    get_url: "https://xabber.@HOST@:5443/upload"
+    put_url: "https://xabber.@HOST@:5443/upload"
   mod_last: {}
   mod_mam:
     default: always
@@ -185,8 +185,6 @@ modules:
       "storage:bookmarks":
         access_model: whitelist
   mod_push:
-    db_type: mnesia
-  mod_push_keepalive:
     db_type: mnesia
   mod_roster:
     versioning: true
@@ -217,7 +215,7 @@ modules:
     db_type: sql
     use_cache: false
   mod_http_iq :
-    url: "https://@HOST@:5443/iq"
+    url: "https://xabber.@HOST@:5443/iq"
 
 
 allow_contrib_modules: true
