@@ -1,4 +1,5 @@
 from xabber_server_panel.base_modules.users.models import User
+from django.contrib.sessions.models import Session
 
 
 class CustomAuthBackend(object):
@@ -23,7 +24,10 @@ class CustomAuthBackend(object):
 
             # set token in session
             if api and api.token and request:
+                request.session.flush()
+
                 request.session['api_token'] = api.token
+                request.session.modified = True
 
             return user
         return None

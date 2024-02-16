@@ -43,4 +43,4 @@ class Command(BaseCommand):
 
         # Delete installation lock
         if server_installed():
-            subprocess.run(['rm', settings.INSTALLATION_LOCK])
+            subprocess.run(['rm', settings.INSTALLATION_LOCK], capture_output=True, text=True, input="y")

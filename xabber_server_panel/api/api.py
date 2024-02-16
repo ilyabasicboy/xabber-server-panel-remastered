@@ -82,6 +82,7 @@ class EjabberdAPI(object):
             # logout if user unauthorized
             # if self.raw_response.status_code == 401 and self.request:
             #     logout(self.request)
+
             if self.raw_response.reason not in self.errors:
                 self.errors += [self.raw_response.reason]
 

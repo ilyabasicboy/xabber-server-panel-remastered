@@ -35,9 +35,6 @@ class CustomLoginView(TemplateView):
                 return HttpResponseRedirect(next)
             else:
                 return HttpResponseRedirect(reverse('home'))
-        else:
-            for error in form.errors.values():
-                messages.error(request, error)
 
         context = {
             'form': form

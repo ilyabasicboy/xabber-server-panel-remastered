@@ -195,11 +195,13 @@ class Admins(LoginRequiredMixin, TemplateView):
 
         # exclude authenticated user because he cant change self status
         users = User.objects.exclude(id=request.user.id)
+
         admins = request_data.get('admins', [])
         api = get_api(request)
 
         admins_to_add = users.filter(id__in=admins, is_admin=False)
         for user in admins_to_add:
+            user.permissions.set([])
             api.set_admin(
                 {
                     "username": user.username,
@@ -209,7 +211,7 @@ class Admins(LoginRequiredMixin, TemplateView):
 
         admins_to_add.update(is_admin=True)
 
-        admins_to_delete = users.exclude(id__in=admins, is_admin=True)
+        admins_to_delete = users.exclude(id__in=admins).filter(is_admin=True)
         for user in admins_to_delete:
             api.del_admin(
                 {

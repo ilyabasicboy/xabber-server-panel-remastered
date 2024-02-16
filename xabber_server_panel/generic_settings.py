@@ -40,6 +40,9 @@ MIDDLEWARE = [
     # 'xabber_server_panel.installation.middleware.InstallationMiddleware'
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = True
+
 ROOT_URLCONF = 'xabber_server_panel.urls'
 
 TEMPLATES = [

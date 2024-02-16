@@ -77,7 +77,7 @@ class Steps(TemplateView):
             'password': self.form.cleaned_data.get('password')
         }
 
-        auth_form = ApiAuthenticationForm(data)
+        auth_form = ApiAuthenticationForm(data, request=self.request)
 
         if auth_form.is_valid():
             login(self.request, auth_form.user)
@@ -136,7 +136,7 @@ class Quick(TemplateView):
             'password': self.form.cleaned_data.get('password')
         }
 
-        auth_form = ApiAuthenticationForm(data)
+        auth_form = ApiAuthenticationForm(data, request=self.request)
 
         if auth_form.is_valid():
             login(self.request, auth_form.user)
