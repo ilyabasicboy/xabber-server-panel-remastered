@@ -30,34 +30,54 @@ class Steps(TemplateView):
     def post(self, request, *args, **kwargs):
 
         self.form = InstallationForm(request.POST)
+        self.previous = request.POST.get('previous')
+        self.step = request.POST.get('step', '1')
+        response = self._validate_data()
 
-        previous = request.POST.get('previous')
-        if previous:
-            return self.render_to_response({
-                "form": self.form,
-                'step': previous
-            })
+        return response
+
+    def _validate_data(self):
+
+        """ Validates form depending of current step and return response """
 
         context = {}
 
-        if self.form.is_valid():
-            try:
-                success, message = install_cmd(request, data=self.form.cleaned_data)
-            except Exception as e:
-                success, message = False, e
-                print(e)
+        # don't validate form if previous
+        if self.previous:
+            return self.render_to_response({
+                "form": self.form,
+                'step': self.previous
+            })
 
-            if not success:
-                return self.render_to_response({
-                    "form": self.form,
-                    "installation_error": message,
-                    'step': '4'
-                })
+        # validate by step
+        elif self.step == '1':
+            context['step'] = '2' if self.form.validate_1_step() else '1'
 
-            create_circles(self.form.cleaned_data)
-            self.login_admin()
-            return HttpResponseRedirect(reverse('installation:success'))
+        elif self.step == '2':
+            context['step'] = '3' if self.form.validate_1_step() and self.form.validate_2_step() else '2'
 
+        elif self.step == '3':
+
+            # full clean if form filled
+            if self.form.is_valid():
+                try:
+                    success, message = install_cmd(self.request, data=self.form.cleaned_data)
+                except Exception as e:
+                    success, message = False, e
+                    print(e)
+
+                if not success:
+                    return self.render_to_response({
+                        "form": self.form,
+                        "installation_error": message,
+                        'step': '4'
+                    })
+
+                create_circles(self.form.cleaned_data)
+                self._login_admin()
+                return HttpResponseRedirect(reverse('installation:success'))
+
+        # additional errors check
         else:
             if self.form.step_1_errors():
                 context['step'] = '1'
@@ -67,11 +87,9 @@ class Steps(TemplateView):
                 context['step'] = '3'
 
         context['form'] = self.form
-
-
         return self.render_to_response(context)
 
-    def login_admin(self):
+    def _login_admin(self):
         data = {
             'username': f"{self.form.cleaned_data.get('username')}@{self.form.cleaned_data.get('host')}",
             'password': self.form.cleaned_data.get('password')
@@ -101,11 +119,22 @@ class Quick(TemplateView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
+
+        previous = request.POST.get('previous')
+
         data = load_predefined_config()
         data['username'] = request.POST.get('username')
         data['password'] = request.POST.get('password')
 
         self.form = InstallationForm(data)
+
+        context = {
+            "form": self.form
+        }
+
+        # don't validate form if previous
+        if previous:
+            return self.render_to_response(context)
 
         if self.form.is_valid():
             try:
@@ -123,10 +152,6 @@ class Quick(TemplateView):
             create_circles(self.form.cleaned_data)
             self.login_admin()
             return HttpResponseRedirect(reverse('installation:success'))
-
-        context = {
-            "form": self.form
-        }
 
         return self.render_to_response(context)
 

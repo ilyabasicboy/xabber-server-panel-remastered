@@ -58,12 +58,12 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.host.errors %}text-danger{% endif %}">{{ form.host.label }}</label>
-                                            {{ form.host }}
+                                            <label class="form-label {% if form.step_errors.host %}text-danger{% endif %}">{{ form.host.label }}</label>
+                                            <input type="text" name="host" {% if form.host.data %}value="{{ form.host.data }}"{% endif %} placeholder="example.com" maxlength="128" required="" id="id_host">
                                         </div>
 
                                         <div class="d-flex justify-content-between align-items-center mt-4">
-                                            <button class="btn btn-primary ms-auto" type="submit" name="next" value="2">
+                                            <button class="btn btn-primary ms-auto" type="submit" name="step" value="1">
                                                 Next
                                             </button>
                                         </div>
@@ -77,20 +77,20 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.username.errors %}text-danger{% endif %}">{{ form.username.label }}</label>
-                                            {{ form.username }}
+                                            <label class="form-label {% if form.step_errors.username %}text-danger{% endif %}">{{ form.username.label }}</label>
+                                            <input type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" required="" id="id_username">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.password.errors %}text-danger{% endif %}">{{ form.password.label }}</label>
-                                            {{ form.password }}
+                                            <label class="form-label {% if form.step_errors.password %}text-danger{% endif %}">{{ form.password.label }}</label>
+                                            <input type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" required="" id="id_password">
                                         </div>
 
                                         <div class="d-flex justify-content-between align-items-center mt-4">
                                             <button class="btn btn-secondary" type="submit" name="previous" value="1">
                                                 Previous
                                             </button>
-                                            <button class="btn btn-primary ms-auto" type="submit" name="next" value="3">
+                                            <button class="btn btn-primary ms-auto" type="submit" name="step" value="2">
                                                 Next
                                             </button>
                                         </div>
@@ -104,30 +104,30 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.db_host.errors %}text-danger{% endif %}">{{ form.db_host.label }}</label>
-                                            {{ form.db_host }}
+                                            <label class="form-label {% if form.step_errors.db_host %}text-danger{% endif %}">{{ form.db_host.label }}</label>
+                                            <input type="text" name="db_host" {% if form.db_host.data %}value="{{ form.db_host.data }}"{% endif %} placeholder="localhost" maxlength="100" required="" id="id_db_host">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.db_name.errors %}text-danger{% endif %}">{{ form.db_name.label }}</label>
-                                            {{ form.db_name }}
+                                            <label class="form-label {% if form.step_errors.db_name %}text-danger{% endif %}">{{ form.db_name.label }}</label>
+                                            <input type="text" name="db_name" {% if form.db_name.data %}value="{{ form.db_name.data }}"{% endif %} placeholder="xabberserver" maxlength="100" required="" id="id_db_name">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.db_user.errors %}text-danger{% endif %}">{{ form.db_user.label }}</label>
-                                            {{ form.db_user }}
+                                            <label class="form-label {% if form.step_errors.db_user %}text-danger{% endif %}">{{ form.db_user.label }}</label>
+                                            <input type="text" name="db_user" {% if form.db_user.data %}value="{{ form.db_user.data }}"{% endif %} placeholder="admin" maxlength="100" required="" id="id_db_user">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label {% if form.db_user_pass.errors %}text-danger{% endif %}">{{ form.db_user_pass.label }}</label>
-                                            {{ form.db_user_pass }}
+                                            <label class="form-label {% if form.step_errors.db_user_pass %}text-danger{% endif %}">{{ form.db_user_pass.label }}</label>
+                                            <input type="password" name="db_user_pass" {% if form.db_user_pass.data %}value="{{ form.db_user_pass.data }}"{% endif %} placeholder="Password" maxlength="100" id="id_db_user_pass">
                                         </div>
 
                                         <div class="d-flex justify-content-between align-items-center mt-4">
-                                            <button class="btn btn-secondary" type="submit" name="previous" value="3">
+                                            <button class="btn btn-secondary" type="submit" name="previous" value="2">
                                                 Previous
                                             </button>
-                                            <button class="btn btn-success ms-auto" type="submit" name="next" value="4">
+                                            <button class="btn btn-success ms-auto" type="submit" name="step" value="3">
                                                 Next
                                             </button>
                                         </div>

@@ -10,6 +10,11 @@ def host_validation(value):
 
 class InstallationForm(forms.Form):
 
+    def __init__(self, *args, **kwargs):
+        self.step_errors = {}
+        super(InstallationForm, self).__init__(*args, **kwargs)
+
+
     host = forms.CharField(
         max_length=128,
         label='XMPP host',
@@ -51,11 +56,32 @@ class InstallationForm(forms.Form):
         widget=forms.PasswordInput(render_value=True, attrs={'placeholder': 'Password'})
     )
 
+    def validate_1_step(self):
+        self._validate_field('host')
+        return not self.step_1_errors()
+
+    def validate_2_step(self):
+        self._validate_field('username')
+        self._validate_field('password')
+        return not self.step_2_errors()
+
+    def _validate_field(self, field_name):
+
+        """ Validate concrete form field by field name """
+
+        field = self.fields.get(field_name)
+        data = self.data.get(field_name, '')
+        if field:
+            try:
+                field.clean(data)
+            except forms.ValidationError as e:
+                self.step_errors[field_name] = e
+
     def step_1_errors(self):
-        return 'host' in self.errors.keys()
+        return 'host' in self.step_errors.keys()
 
     def step_2_errors(self):
-        return any(field in self.errors.keys() for field in ['username', 'password'])
+        return any(field in self.step_errors.keys() for field in ['username', 'password'])
 
     def step_3_errors(self):
-        return any(field in self.errors.keys() for field in ['server_name', 'db_name', 'db_user'])
+        return any(field in self.step_errors.keys() for field in ['server_name', 'db_name', 'db_user'])
