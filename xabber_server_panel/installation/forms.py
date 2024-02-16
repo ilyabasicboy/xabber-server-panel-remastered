@@ -65,6 +65,13 @@ class InstallationForm(forms.Form):
         self._validate_field('password')
         return not self.step_2_errors()
 
+    def validate_3_step(self):
+        self._validate_field('db_host')
+        self._validate_field('db_name')
+        self._validate_field('db_user')
+        self._validate_field('db_user_pass')
+        return not self.step_3_errors()
+
     def _validate_field(self, field_name):
 
         """ Validate concrete form field by field name """

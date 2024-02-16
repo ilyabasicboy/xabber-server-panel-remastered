@@ -59,7 +59,7 @@ class Steps(TemplateView):
         elif self.step == '3':
 
             # full clean if form filled
-            if self.form.is_valid():
+            if self.form.validate_1_step() and self.form.validate_2_step() and self.form.validate_3_step():
                 try:
                     success, message = install_cmd(self.request, data=self.form.cleaned_data)
                 except Exception as e:
@@ -77,14 +77,14 @@ class Steps(TemplateView):
                 self._login_admin()
                 return HttpResponseRedirect(reverse('installation:success'))
 
-        # additional errors check
-        else:
-            if self.form.step_1_errors():
-                context['step'] = '1'
-            elif self.form.step_2_errors():
-                context['step'] = '2'
-            elif self.form.step_3_errors():
-                context['step'] = '3'
+            # additional errors check
+            else:
+                if self.form.step_1_errors():
+                    context['step'] = '1'
+                elif self.form.step_2_errors():
+                    context['step'] = '2'
+                elif self.form.step_3_errors():
+                    context['step'] = '3'
 
         context['form'] = self.form
         return self.render_to_response(context)
