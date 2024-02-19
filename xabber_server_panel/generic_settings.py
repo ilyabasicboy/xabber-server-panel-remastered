@@ -40,9 +40,6 @@ MIDDLEWARE = [
     # 'xabber_server_panel.installation.middleware.InstallationMiddleware'
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_SECURE = True
-
 ROOT_URLCONF = 'xabber_server_panel.urls'
 
 TEMPLATES = [
@@ -128,7 +125,7 @@ HTTP_REQUEST_TIMEOUT = 5
 INSTALLED_APPS += ['xabber_server_panel.custom_auth']
 
 LOGIN_REDIRECT_URL = '/auth/login/'
-LOGIN_URL='/auth/login/'
+LOGIN_URL = '/auth/login/'
 
 AUTHENTICATION_BACKENDS = [
     'xabber_server_panel.custom_auth.backends.CustomAuthBackend',

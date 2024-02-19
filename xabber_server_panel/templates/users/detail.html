@@ -94,8 +94,7 @@
                                 </div>
                                 {% if user != request.user %}
                                     <div>
-                                        <input type="checkbox" name="clear_expires" id="id_clear_expires">
-                                        <label class="form-label" for="id_clear_expires">clear expires</label>
+                                        <button name="delete_expires" value="on">Set never</button>
                                     </div>
                                 {% endif %}
                             {% endif %}

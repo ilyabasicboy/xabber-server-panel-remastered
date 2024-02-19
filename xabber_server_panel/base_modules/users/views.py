@@ -145,9 +145,9 @@ class UserDetail(LoginRequiredMixin, TemplateView):
         # set expires if its provided
         # BEFORE CHANGE STATUS!!!
         expires = self.request.POST.get('expires')
-        clear_expires = self.request.POST.get('clear_expires')
+        delete_expires = self.request.POST.get('delete_expires')
         if self.user != self.request.user:
-            if clear_expires:
+            if delete_expires:
                 set_expires(self.api, self.user, None)
             elif expires:
                 set_expires(self.api, self.user, expires)
