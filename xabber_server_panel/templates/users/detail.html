@@ -87,17 +87,16 @@
 
                         <hr class="border border-2">
 
-
-                            {% if user.expires %}
-                                <div>
-                                    Expires: {{ user.expires|date:'Y-m-d h:i' }}
-                                </div>
+                        {% if user.expires %}
+                            <div>
+                                <label class="form-label">Expires: {{ user.expires|date:'Y-m-d h:i' }}</label>
                                 {% if user != request.user %}
                                     <div>
-                                        <button name="delete_expires" value="on">Set never</button>
+                                        <button class="btn btn-danger" name="delete_expires" value="on">Set never</button>
                                     </div>
                                 {% endif %}
-                            {% endif %}
+                            </div>
+                        {% endif %}
 
                         {% if user != request.user %}
                             <div>

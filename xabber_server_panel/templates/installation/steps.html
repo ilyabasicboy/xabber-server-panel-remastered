@@ -12,7 +12,7 @@
                     </div>
 
                     <div class="col-12">
-                        <form method="POST" id="stepper_form" {% if step == "3" %}class="submit-form-js"{% endif %}>
+                        <form method="POST" class="installation-form" id="stepper_form">
                             {% csrf_token %}
 
                             <div class="bs-stepper">
@@ -50,7 +50,7 @@
                                 </div>
 
                                 <div class="bs-stepper-content">
-                                    <div id="host_tab" class="content {% if step == '1' %}active{% endif %}" role="tabpanel" aria-labelledby="host_tab-trigger">
+                                    <div id="host_tab" class="installation-content content {% if step == '1' %}active{% endif %}" role="tabpanel" aria-labelledby="host_tab-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             <div class="mb-4">
                                                 <p>
@@ -60,18 +60,18 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.host %}text-danger{% endif %}">{{ form.host.label }}</label>
-                                                <input class="form-control {% if form.step_errors.host %}is-invalid{% endif %}" type="text" name="host" {% if form.host.data %}value="{{ form.host.data }}"{% endif %} placeholder="example.com" maxlength="128" {% if step == '1' %}required{% endif %} id="id_host">
+                                                <input class="form-control {% if form.step_errors.host %}is-invalid{% endif %} {% if step == '1' %}installation-required{% endif %}" id="id_host" type="text" name="host" {% if form.host.data %}value="{{ form.host.data }}"{% endif %} placeholder="example.com" maxlength="128">
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                                <button class="btn btn-primary ms-auto" type="submit" name="step" value="1">
+                                                <button class="btn btn-primary ms-auto installation-next" type="submit" name="step" value="1">
                                                     Next
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div id="admin_settings" class="content {% if step == '2' %}active{% endif %}" role="tabpanel" aria-labelledby="admin_settings-trigger">
+                                    <div id="admin_settings" class="installation-content content {% if step == '2' %}active{% endif %}" role="tabpanel" aria-labelledby="admin_settings-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             <div class="mb-4">
                                                 <p>
@@ -81,27 +81,27 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.username %}text-danger{% endif %}">{{ form.username.label }}</label>
-                                                <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" {% if step == '2' %}required{% endif %} id="id_username">
+                                                <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %} {% if step == '2' %}installation-required{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
                                                 {% if form.host.data %}@{{ form.host.data }}{% endif %}
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.password %}text-danger{% endif %}">{{ form.password.label }}</label>
-                                                <input class="form-control {% if form.step_errors.password %}is-invalid{% endif %}" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" {% if step == '2' %}required{% endif %} id="id_password">
+                                                <input class="form-control {% if form.step_errors.password %}is-invalid{% endif %} {% if step == '2' %}installation-required{% endif %}" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" id="id_password">
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                                <button class="btn btn-secondary" type="submit" name="previous" value="1">
+                                                <button class="btn btn-secondary installation-prev" type="submit" name="previous" value="1">
                                                     Previous
                                                 </button>
-                                                <button class="btn btn-primary ms-auto" type="submit" name="step" value="2">
+                                                <button class="btn btn-primary ms-auto installation-next" type="submit" name="step" value="2">
                                                     Next
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div id="database_settings" class="content {% if step == '3' %}active{% endif %}" role="tabpanel" aria-labelledby="database_settings-trigger">
+                                    <div id="database_settings" class="installation-content content {% if step == '3' %}active{% endif %}" role="tabpanel" aria-labelledby="database_settings-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             <div class="mb-4">
                                                 <p>
@@ -111,17 +111,17 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_host %}text-danger{% endif %}">{{ form.db_host.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_host %}is-invalid{% endif %}" type="text" name="db_host" {% if form.db_host.data %}value="{{ form.db_host.data }}"{% endif %} placeholder="localhost" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_host">
+                                                <input class="form-control {% if form.step_errors.db_host %}is-invalid{% endif %} {% if step == '3' %}installation-required{% endif %}" type="text" name="db_host" {% if form.db_host.data %}value="{{ form.db_host.data }}"{% endif %} placeholder="localhost" maxlength="100" id="id_db_host">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_name %}text-danger{% endif %}">{{ form.db_name.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_name %}is-invalid{% endif %}" type="text" name="db_name" {% if form.db_name.data %}value="{{ form.db_name.data }}"{% endif %} placeholder="xabberserver" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_name">
+                                                <input class="form-control {% if form.step_errors.db_name %}is-invalid{% endif %} {% if step == '3' %}installation-required{% endif %}" type="text" name="db_name" {% if form.db_name.data %}value="{{ form.db_name.data }}"{% endif %} placeholder="xabberserver" maxlength="100" id="id_db_name">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_user %}text-danger{% endif %}">{{ form.db_user.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_user %}is-invalid{% endif %}" type="text" name="db_user" {% if form.db_user.data %}value="{{ form.db_user.data }}"{% endif %} placeholder="admin" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_user">
+                                                <input class="form-control {% if form.step_errors.db_user %}is-invalid{% endif %} {% if step == '3' %}installation-required{% endif %}" type="text" name="db_user" {% if form.db_user.data %}value="{{ form.db_user.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_db_user">
                                             </div>
 
                                             <div class="mb-3">
@@ -130,17 +130,17 @@
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                                <button class="btn btn-secondary" type="submit" name="previous" value="2">
+                                                <button class="btn btn-secondary installation-prev" type="submit" name="previous" value="2">
                                                     Previous
                                                 </button>
-                                                <button class="btn btn-success ms-auto" type="submit" name="step" value="3">
+                                                <button class="btn btn-success ms-auto installation-next installation-final" type="submit" name="step" value="3">
                                                     Next
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div id="installation" class="content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
+                                    <div id="installation" class="installation-content content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             {% if installation_error %}
                                                 <div class="mb-4 text-danger">
@@ -148,7 +148,7 @@
                                                 </div>
 
                                                 <div class="d-flex justify-content-between align-items-center mt-4">
-                                                    <button class="btn btn-secondary mx-auto" type="submit" name="previous" value="3">
+                                                    <button class="btn btn-secondary mx-auto installation-prev" type="submit" name="previous" value="3">
                                                         Back
                                                     </button>
                                                 </div>
@@ -170,9 +170,4 @@
             </div>
         </div>
     </body>
-{% endblock %}
-
-{% block js %}
-    {{ block.super }}
-    <script src="{% static 'js/installation.js' %}"></script>
 {% endblock %}

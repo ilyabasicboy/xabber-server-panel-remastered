@@ -1,9 +1,34 @@
 $(function () {
-    $('.submit-form-js').on('submit', function(e){
-        $('.step.active').removeClass('active');
-        $('.content.active').removeClass('active');
 
-        $('.step[data-target="#installation"]').addClass('active');
-        $('#installation').addClass('active');
+    $(document).on('click', '.installation-next', function(event) {
+        let btnNext = $(this);
+        let input = $(btnNext).parents('.installation-content').find('.installation-required');
+
+        let inputValue = input.filter(function() {
+            return this.value === '';
+        });
+
+        if (inputValue.length) {
+            event.preventDefault();
+        } else {
+            if($(btnNext).hasClass('installation-final')) {
+                $('.step.active').removeClass('active');
+                $('.content.active').removeClass('active');
+
+                $('.step[data-target="#installation"]').addClass('active');
+                $('#installation').addClass('active');
+            }
+        }
+
+       $(input).each(function() {
+            if ($(this).val() === '') {
+                $(this).addClass('is-invalid');
+                $(this).prev().addClass('text-danger');
+            } else {
+                $(this).removeClass('is-invalid');
+                $(this).prev().removeClass('text-danger');
+            }
+        });
     });
+
 });
