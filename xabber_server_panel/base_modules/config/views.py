@@ -384,9 +384,7 @@ class Modules(LoginRequiredMixin, TemplateView):
                 # Copy module in modules dir
                 for module_dir in os.listdir(panel_path):
                     app_name = f'modules.{module_dir}'
-
-                    if not apps.is_installed(app_name):
-                        self.install_module(panel_path, module_dir, app_name)
+                    self.install_module(panel_path, module_dir, app_name)
 
                 # create permissions for new modules
                 management.call_command('update_permissions')
@@ -409,13 +407,18 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         target_path = os.path.join(settings.MODULES_DIR, module_dir)
         module_path = os.path.join(panel_path, module_dir)
+
+        if os.path.exists(target_path):
+            shutil.rmtree(target_path)
+
         shutil.copytree(module_path, target_path)
 
-        # Append app in settings.py
-        settings.INSTALLED_APPS += [app_name]
+        if not apps.is_installed(app_name):
+            # Append app in settings.py
+            settings.INSTALLED_APPS += [app_name]
 
-        # update app list
-        update_app_list(settings.INSTALLED_APPS)
+            # update app list
+            update_app_list(settings.INSTALLED_APPS)
 
         # migrate db if module has migrations
         if os.path.exists(os.path.join(target_path, 'migrations', '__init__.py')):

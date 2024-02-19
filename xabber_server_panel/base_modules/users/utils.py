@@ -137,7 +137,7 @@ def ban_user(api, user):
 def set_expires(api, user, expires):
     if expires:
         try:
-            expires_datetime = datetime.strptime(expires, '%Y-%m-%d')
+            expires_datetime = datetime.strptime(expires, '%Y-%m-%dT%H:%M')
             user.expires = expires_datetime.replace(tzinfo=timezone.utc)
         except Exception as e:
             user.expires = None

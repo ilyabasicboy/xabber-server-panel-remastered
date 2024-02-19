@@ -12,7 +12,7 @@
                     </div>
 
                     <div class="col-12">
-                        <form method="POST" novalidate>
+                        <form method="POST" id="stepper_form" {% if step == "3" %}class="submit-form-js"{% endif %}>
                             {% csrf_token %}
 
                             <div class="bs-stepper">
@@ -60,7 +60,7 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.host %}text-danger{% endif %}">{{ form.host.label }}</label>
-                                                <input class="form-control {% if form.step_errors.host %}is-invalid{% endif %}" type="text" name="host" {% if form.host.data %}value="{{ form.host.data }}"{% endif %} placeholder="example.com" maxlength="128" required="" id="id_host">
+                                                <input class="form-control {% if form.step_errors.host %}is-invalid{% endif %}" type="text" name="host" {% if form.host.data %}value="{{ form.host.data }}"{% endif %} placeholder="example.com" maxlength="128" {% if step == '1' %}required{% endif %} id="id_host">
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
@@ -81,12 +81,13 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.username %}text-danger{% endif %}">{{ form.username.label }}</label>
-                                                <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" required="" id="id_username">
+                                                <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" {% if step == '2' %}required{% endif %} id="id_username">
+                                                {% if form.host.data %}@{{ form.host.data }}{% endif %}
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.password %}text-danger{% endif %}">{{ form.password.label }}</label>
-                                                <input class="form-control {% if form.step_errors.password %}is-invalid{% endif %}" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" required="" id="id_password">
+                                                <input class="form-control {% if form.step_errors.password %}is-invalid{% endif %}" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" {% if step == '2' %}required{% endif %} id="id_password">
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
@@ -110,17 +111,17 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_host %}text-danger{% endif %}">{{ form.db_host.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_host %}is-invalid{% endif %}" type="text" name="db_host" {% if form.db_host.data %}value="{{ form.db_host.data }}"{% endif %} placeholder="localhost" maxlength="100" required="" id="id_db_host">
+                                                <input class="form-control {% if form.step_errors.db_host %}is-invalid{% endif %}" type="text" name="db_host" {% if form.db_host.data %}value="{{ form.db_host.data }}"{% endif %} placeholder="localhost" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_host">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_name %}text-danger{% endif %}">{{ form.db_name.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_name %}is-invalid{% endif %}" type="text" name="db_name" {% if form.db_name.data %}value="{{ form.db_name.data }}"{% endif %} placeholder="xabberserver" maxlength="100" required="" id="id_db_name">
+                                                <input class="form-control {% if form.step_errors.db_name %}is-invalid{% endif %}" type="text" name="db_name" {% if form.db_name.data %}value="{{ form.db_name.data }}"{% endif %} placeholder="xabberserver" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_name">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.db_user %}text-danger{% endif %}">{{ form.db_user.label }}</label>
-                                                <input class="form-control {% if form.step_errors.db_user %}is-invalid{% endif %}" type="text" name="db_user" {% if form.db_user.data %}value="{{ form.db_user.data }}"{% endif %} placeholder="admin" maxlength="100" required="" id="id_db_user">
+                                                <input class="form-control {% if form.step_errors.db_user %}is-invalid{% endif %}" type="text" name="db_user" {% if form.db_user.data %}value="{{ form.db_user.data }}"{% endif %} placeholder="admin" maxlength="100" {% if step == '3' %}required{% endif %} id="id_db_user">
                                             </div>
 
                                             <div class="mb-3">
@@ -152,9 +153,6 @@
                                                     </button>
                                                 </div>
                                             {% else %}
-                                                <button class="btn btn-success" type="submit" name="submit">
-                                                    Submit
-                                                </button>
                                                 <div class="text-center">
                                                     <div class="spinner-border text-primary" role="status">
                                                         <span class="visually-hidden">Loading...</span>
@@ -172,4 +170,9 @@
             </div>
         </div>
     </body>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/installation.js' %}"></script>
 {% endblock %}

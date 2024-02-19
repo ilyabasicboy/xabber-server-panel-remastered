@@ -1,4 +1,5 @@
-<select class="form-select" id="host" name="host" data-url="{{ url }}" role="button">
+<select class="form-select" id="host" name="host" data-url="{{ url }}" role="button" {% if hosts|length < 2 %}{% endif %}>
+
     {% for host in hosts %}
         <option value="{{ host.name }}" {% if host.name == curr_host %}selected{% endif %}>
             {{ host.name }}

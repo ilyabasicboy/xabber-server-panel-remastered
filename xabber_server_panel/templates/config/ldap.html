@@ -22,11 +22,11 @@
                 </h4>
 
                 <div class="row mb-3">
-                    <label class="col-form-label col-12 col-md-3">
+                    <label class="col-form-label col-12 col-md-3 {% if form.host.errors %}error{% endif %}">
                         Host
                     </label>
                     <div class="col-12 col-md-9">
-                        <select class="form-select" id="host" name="host" data-url="{{ url }}">
+                        <select class="form-select" id="host" name="host" data-url="{{ url }}" {% if hosts.count < 2 %}{% endif %}>
                             {% for host in hosts %}
                                 <option value="{{ host.id }}" {% if host.name == curr_host %}selected{% endif %}>
                                     {{ host.name }}

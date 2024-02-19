@@ -1,3 +1,5 @@
+import time
+
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
@@ -57,10 +59,10 @@ class Steps(TemplateView):
             context['step'] = '3' if self.form.validate_1_step() and self.form.validate_2_step() else '2'
 
         elif self.step == '3':
-
             # full clean if form filled
             if self.form.validate_1_step() and self.form.validate_2_step() and self.form.validate_3_step():
                 try:
+                    self.form.full_clean()
                     success, message = install_cmd(self.request, data=self.form.cleaned_data)
                 except Exception as e:
                     success, message = False, e
@@ -110,10 +112,8 @@ class Quick(TemplateView):
         # if server_installed():
         #     return HttpResponseRedirect(reverse('root'))
 
-        data = load_predefined_config()
-
         context = {
-            'form': InstallationForm(data)
+            'form': InstallationForm()
         }
 
         return self.render_to_response(context)

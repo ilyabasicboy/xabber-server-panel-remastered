@@ -87,10 +87,25 @@
 
                         <hr class="border border-2">
 
-                        <div>
-                            <label class="form-label">Expires:</label>
-                            <input class="form-control" type="date" {% if user.expires %}value="{{ user.expires|date:'Y-m-d' }}"{% endif %} name="expires">
-                        </div>
+
+                            {% if user.expires %}
+                                <div>
+                                    Expires: {{ user.expires|date:'Y-m-d h:i' }}
+                                </div>
+                                {% if user != request.user %}
+                                    <div>
+                                        <input type="checkbox" name="clear_expires" id="id_clear_expires">
+                                        <label class="form-label" for="id_clear_expires">clear expires</label>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+                        {% if user != request.user %}
+                            <div>
+                                <label class="form-label">Set expires:</label>
+                                <input class="form-control" type="datetime-local" name="expires">
+                            </div>
+                        {% endif %}
                     </div>
 
                     {% if not user.auth_backend_is_ldap %}
