@@ -25,7 +25,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
         context = {
-            'hosts': VirtualHost.objects.all(),
+            'hosts': request.user.get_allowed_hosts(),
             'form': UserForm()
         }
 
@@ -51,7 +51,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
             )
 
         context = {
-            'hosts': VirtualHost.objects.all(),
+            'hosts': request.user.get_allowed_hosts(),
             'form': form
         }
         return self.render_to_response(context)
