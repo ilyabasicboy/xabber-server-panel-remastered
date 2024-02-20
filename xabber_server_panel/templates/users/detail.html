@@ -84,7 +84,7 @@
                         </div>
 
                         {% if user.expires %}
-                            <div>
+                            <div class="mt-3">
                                 <label class="form-label">Expires: {{ user.expires|date:'Y-m-d h:i' }}</label>
                                 {% if user != request.user %}
                                     <div>
@@ -95,7 +95,7 @@
                         {% endif %}
 
                         {% if user != request.user %}
-                            <div>
+                            <div class="mt-3">
                                 <label class="form-label">Set expires:</label>
                                 <input class="form-control" type="datetime-local" name="expires">
                             </div>
