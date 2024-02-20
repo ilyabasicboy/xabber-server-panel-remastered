@@ -68,7 +68,8 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
         form = CircleForm()
         context = {
             'form': form,
-            'hosts': VirtualHost.objects.all(),
+            'hosts': request.user.get_allowed_hosts(),
+            'current_host': request.session.get('host'),
         }
         return self.render_to_response(context)
 
@@ -102,12 +103,9 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
                 )
             )
 
-        for error in form.errors.values():
-            messages.error(request, error)
-
         context = {
             'form': form,
-            'hosts': VirtualHost.objects.all(),
+            'hosts': request.user.get_allowed_hosts(),
         }
         return self.render_to_response(context)
 

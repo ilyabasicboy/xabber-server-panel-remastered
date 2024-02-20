@@ -26,6 +26,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
 
         context = {
             'hosts': request.user.get_allowed_hosts(),
+            'current_host': request.session.get('host'),
             'form': UserForm()
         }
 
@@ -60,7 +61,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
         self.api.create_user(
             get_user_data_for_api(user, cleaned_data.get('password'))
         )
-        if user.is_admin:
+        if user.is_admin and self.request.user.is_admin:
             self.api.set_admin(
                 {
                     "username": cleaned_data['username'],

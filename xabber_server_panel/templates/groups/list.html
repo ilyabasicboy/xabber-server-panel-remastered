@@ -17,7 +17,7 @@
             </h4>
         </div>
 
-        {% if hosts %}
+        {% if hosts and request.user.is_admin %}
             <div class="ms-auto col-12 col-md-auto mt-3 mt-md-0">
                 {% include 'parts/host_select.html' %}
             </div>

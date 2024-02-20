@@ -68,6 +68,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
         self.host = hosts.filter(name=host_name).first()
         self.status = request.POST.get('status', 'disabled')
         self.api = get_api(request)
+        self.keys = []
 
         self.context = {
             'hosts': hosts,
@@ -78,6 +79,15 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
             self.update_settings()
             make_xmpp_config()
             reload_ejabberd_config()
+
+            if self.status == 'link' and not self.keys:
+                return HttpResponseRedirect(
+                    reverse(
+                        'registration:create',
+                        kwargs={'vhost_id': self.host.id}
+                    )
+                )
+
             messages.success(request, 'Registration changed successfully.')
 
         return self.render_to_response(self.context)
@@ -92,10 +102,10 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
         self.context['settings'] = settings
 
         if self.status == 'link':
-            keys = self.api.get_keys(
+            self.keys = self.api.get_keys(
                 {"host": self.host.name}
             ).get('keys')
-            self.context['keys'] = keys
+            self.context['keys'] = self.keys
 
 
 class RegistrationCreate(LoginRequiredMixin, TemplateView):
@@ -125,7 +135,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         try:
             expire = request.POST.get('expire')
-            expire = int(datetime.strptime(expire, '%Y-%m-%d').timestamp())
+            expire = int(datetime.strptime(expire, '%Y-%m-%dT%H:%M').timestamp())
         except:
             expire = None
 
@@ -183,7 +193,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
             expire = datetime.fromtimestamp(key_data['expire'])
 
             # format datetime
-            expire = expire.strftime('%Y-%m-%d')
+            expire = expire.strftime('%Y-%m-%dT%H:%M')
             context['expire'] = expire
             context['description'] = key_data['description']
 
@@ -198,7 +208,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
         try:
             expire = request.POST.get('expire')
-            expire = int(datetime.strptime(expire, '%Y-%m-%d').timestamp())
+            expire = int(datetime.strptime(expire, '%Y-%m-%dT%H:%M').timestamp())
         except:
             expire = None
 

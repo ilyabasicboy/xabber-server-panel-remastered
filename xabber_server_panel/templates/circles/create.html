@@ -16,9 +16,12 @@
                         <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>
 
                         {% if hosts %}
-                            <select class="form-select" name="host">
+                            <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" name="host">
                                 {% for host in hosts %}
-                                    <option value="{{ host.name }}">
+                                    <option value="{{ host.name }}"
+                                        {% if form.host.data %}
+                                            {% if form.host.data == host.name %}selected{% endif %}
+                                        {% elif current_host == host.name %}selected{% endif %}>
                                         @{{ host.name }}
                                     </option>
                                 {% endfor %}

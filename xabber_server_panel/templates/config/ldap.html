@@ -21,20 +21,22 @@
                     LDAP authentication
                 </h4>
 
-                <div class="row mb-3">
-                    <label class="col-form-label col-12 col-md-3">
-                        Host
-                    </label>
-                    <div class="col-12 col-md-9">
-                        <select class="form-select {% if hosts.count < 2 %}pe-none{% endif %}" id="host" name="host" data-url="{{ url }}">
-                            {% for host in hosts %}
-                                <option value="{{ host.id }}" {% if host.name == curr_host %}selected{% endif %}>
-                                    {{ host.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                {% if request.user.is_admin %}
+                    <div class="row mb-3">
+                        <label class="col-form-label col-12 col-md-3">
+                            Host
+                        </label>
+                        <div class="col-12 col-md-9">
+                            <select class="form-select {% if hosts.count < 2 %}pe-none{% endif %}" id="host" name="host" data-url="{{ url }}">
+                                {% for host in hosts %}
+                                    <option value="{{ host.id }}" {% if host.name == curr_host %}selected{% endif %}>
+                                        {{ host.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
 
             <div class="list-js" data-url="{{ url }}">

@@ -88,7 +88,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     username = models.CharField(
         max_length=256,
-        unique=True,
         validators=[username_validator],
         error_messages={
             'unique': "A user with that username already exists.",
@@ -131,7 +130,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     class Meta:
-        unique_together = ('username', 'host')
+        unique_together = ['username', 'host']
 
     @property
     def is_active(self):
