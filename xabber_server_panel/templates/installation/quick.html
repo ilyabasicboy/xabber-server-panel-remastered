@@ -12,7 +12,7 @@
                     </div>
 
                     <div class="col-12">
-                        <form method="POST">
+                        <form method="POST" class="installation-form">
                             {% csrf_token %}
 
                             <div class="bs-stepper">
@@ -27,7 +27,7 @@
                                 </div>
 
                                 <div class="bs-stepper-content">
-                                    <div id="configure_admin" class="content {% if not installation_error %}active{% endif %}" role="tabpanel" aria-labelledby="configure_admin-trigger">
+                                    <div id="configure_admin" class="installation-content content {% if not installation_error %}active{% endif %}" role="tabpanel" aria-labelledby="configure_admin-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             <div class="mb-4">
                                                 <p>
@@ -38,7 +38,7 @@
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.username.errors %}text-danger{% endif %}">{{ form.username.label }}</label>
                                                 <div class="input-group">
-                                                    <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" required="" id="id_username">
+                                                    <input class="form-control {% if form.username.errors %}is-invalid{% endif %} installation-required" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
                                                     <span class="input-group-text">
                                                         @{{ form.data.host }}
                                                     </span>
@@ -47,18 +47,18 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.password.errors %}text-danger{% endif %}">{{ form.password.label }}</label>
-                                                <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" required="" id="id_password">
+                                                <input class="form-control {% if form.password.errors %}is-invalid{% endif %} installation-required" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" id="id_password">
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                                <button class="btn btn-primary ms-auto submit-form-js" type="submit">
+                                                <button class="btn btn-primary ms-auto installation-next installation-final" type="submit">
                                                     Next
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div id="installation" class="content {% if installation_error %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
+                                    <div id="installation" class="installation-content content {% if installation_error %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
                                             {% if installation_error %}
                                                 <div class="mb-4 text-danger">

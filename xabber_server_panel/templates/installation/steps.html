@@ -81,8 +81,14 @@
 
                                             <div class="mb-3">
                                                 <label class="form-label {% if form.step_errors.username %}text-danger{% endif %}">{{ form.username.label }}</label>
-                                                <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %} {% if step == '2' %}installation-required{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
-                                                {% if form.host.data %}@{{ form.host.data }}{% endif %}
+                                                <div class="input-group">
+                                                    <input class="form-control {% if form.step_errors.username %}is-invalid{% endif %} {% if step == '2' %}installation-required{% endif %}" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
+                                                    {% if form.host.data %}
+                                                        <span class="input-group-text">
+                                                            @{{ form.data.host }}
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
 
                                             <div class="mb-3">

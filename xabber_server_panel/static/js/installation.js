@@ -12,11 +12,11 @@ $(function () {
             event.preventDefault();
         } else {
             if($(btnNext).hasClass('installation-final')) {
-                $('.step.active').removeClass('active');
-                $('.content.active').removeClass('active');
+                $(btnNext).parents('.installation-form').find('.step').removeClass('active');
+                $(btnNext).parents('.installation-form').find('.content').removeClass('active');
 
-                $('.step[data-target="#installation"]').addClass('active');
-                $('#installation').addClass('active');
+                $(btnNext).parents('.installation-form').find('.step[data-target="#installation"]').addClass('active');
+                $(btnNext).parents('.installation-form').find('#installation').addClass('active');
             }
         }
 
