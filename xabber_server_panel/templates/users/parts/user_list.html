@@ -22,7 +22,11 @@
                 {% for user in paginated_users %}
                     <tr>
                         <td data-title="#">
-                            {{ forloop.counter }}
+                            <div class="d-flex">
+                                <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                            </div>
                         </td>
                         <td data-title="Username">
                             <a href="{% url 'users:detail' id=user.id %}">

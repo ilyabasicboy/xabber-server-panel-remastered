@@ -81,8 +81,8 @@
                 <div class="ms-auto me-2 me-md-4">
                     {% if request.user.is_authenticated %}
                         <div class="dropdown">
-                            <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ request.user.username|slice:'2' }}
+                            <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i>
                             </div>
 
                             <ul class="dropdown-menu dropdown-menu-end">

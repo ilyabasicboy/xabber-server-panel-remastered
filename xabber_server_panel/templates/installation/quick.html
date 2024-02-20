@@ -6,7 +6,7 @@
         <div class="container flex-md-grow-1">
             <div class="row h-100">
                 <main class="px-md-4 py-4">
-                    <div class="d-flex align-items-center mb-4 fs-4">
+                    <div class="d-flex align-items-center my-4 fs-4">
                         <img src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
                         Xabber server installation
                     </div>
@@ -35,30 +35,32 @@
                                                 </p>
                                             </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label {% if form.username.errors %}text-danger{% endif %}">{{ form.username.label }}</label>
-                                                <div class="input-group">
-                                                    <input class="form-control {% if form.username.errors %}is-invalid{% endif %} installation-required" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
-                                                    <span class="input-group-text">
-                                                        @
-                                                        {% if form.data.host %}
-                                                            {{ form.data.host }}
-                                                        {% else %}
-                                                            {{ data.host }}
-                                                        {% endif %}
-                                                    </span>
+                                            <div class="mw-480 mx-auto">
+                                                <div class="mb-3">
+                                                    <label class="form-label {% if form.username.errors %}text-danger{% endif %}">{{ form.username.label }}</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control {% if form.username.errors %}is-invalid{% endif %} installation-required" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
+                                                        <span class="input-group-text">
+                                                            @
+                                                            {% if form.data.host %}
+                                                                {{ form.data.host }}
+                                                            {% else %}
+                                                                {{ data.host }}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label {% if form.password.errors %}text-danger{% endif %}">{{ form.password.label }}</label>
-                                                <input class="form-control {% if form.password.errors %}is-invalid{% endif %} installation-required" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" id="id_password">
-                                            </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label {% if form.password.errors %}text-danger{% endif %}">{{ form.password.label }}</label>
+                                                    <input class="form-control {% if form.password.errors %}is-invalid{% endif %} installation-required" type="password" name="password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %} placeholder="Password" maxlength="100" id="id_password">
+                                                </div>
 
-                                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                                <button class="btn btn-primary ms-auto installation-next installation-final" type="submit">
-                                                    Next
-                                                </button>
+                                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                                    <button class="btn btn-primary ms-auto installation-next installation-final" type="submit">
+                                                        Next
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -70,10 +72,12 @@
                                                     {{ installation_error }}
                                                 </div>
 
-                                                <div class="d-flex justify-content-between align-items-center mt-4">
-                                                    <button class="btn btn-secondary mx-auto" type="submit" name="previous" value="1">
-                                                        Back
-                                                    </button>
+                                                <div class="mw-480 mx-auto">
+                                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                                        <button class="btn btn-secondary mx-auto" type="submit" name="previous" value="1">
+                                                            Back
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             {% else %}
                                                 <div class="text-center">

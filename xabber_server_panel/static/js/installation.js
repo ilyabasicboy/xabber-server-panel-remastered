@@ -11,7 +11,7 @@ $(function () {
         if (inputValue.length) {
             event.preventDefault();
         } else {
-            if($(btnNext).hasClass('installation-final')) {
+            if ($(btnNext).hasClass('installation-final')) {
                 $(btnNext).parents('.installation-form').find('.step').removeClass('active');
                 $(btnNext).parents('.installation-form').find('.content').removeClass('active');
 

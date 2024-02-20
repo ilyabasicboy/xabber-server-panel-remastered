@@ -4,12 +4,12 @@
 
 {% block body %}
     <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
-        <div class="container-fluid d-flex flex-column justify-content-start flex-grow-1 overflow-auto bg-dark bg-cover bg-repeat bg-center" style="background-image: url('{% static 'img/bg-login.png' %}');">
-            <a class="d-flex justify-content-center py-4" href="https://www.xabber.com/" target="_blank">
+        <div class="container-fluid d-flex flex-column justify-content-start flex-grow-1 overflow-auto bg-primary bg-gradient position-relative login-page">
+            <a class="d-flex justify-content-center py-4 position-relative z-3" href="https://www.xabber.com/" target="_blank">
                 <img class="me-2" src="{% static 'img/logo.png' %}" width="128" height="128" alt="Xabber">
             </a>
 
-            <div class="w-100 cmw-480 mx-auto px-3 px-md-4 py-5 p-md-5 bg-body rounded-2 text-center">
+            <div class="w-100 cmw-480 mx-auto px-3 px-md-4 py-5 p-md-5 bg-body rounded-2 text-center position-relative z-3">
                 <form method="post" action="{% url 'custom_auth:login' %}">
                     {% csrf_token %}
                     <input type="hidden" value="{{ request.GET.next }}" name="next">
@@ -41,7 +41,7 @@
                 </form>
             </div>
 
-            <div class="w-100 cmw-480 mx-auto py-5">
+            <div class="w-100 cmw-480 mx-auto py-5 position-relative z-3">
                 <div class="row">
                     <a class="col-6 text-center text-white" target="_blank" href="https://play.google.com/store/apps/details?id=com.xabber.android">
                         <svg width="36" height="66" viewBox="0 0 36 66" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,8 +67,15 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-center mt-auto py-4">
+            <div class="d-flex justify-content-center mt-auto py-4 position-relative z-3 mt-auto">
                 <a class="text-white" href="https://www.xabber.com/">www.xabber.com</a>
+            </div>
+
+            <div class="login-page__bottom mt-auto">
+                <div class="login-page__wave login-page__wave--1"></div>
+                <div class="login-page__wave login-page__wave--2"></div>
+                <div class="login-page__wave login-page__wave--3"></div>
+                <div class="login-page__wave login-page__wave--4"></div>
             </div>
         </div>
     </body>
