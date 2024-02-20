@@ -54,7 +54,7 @@
                             {% endif %}
                         </div>
 
-                        <hr class="border border-2">
+                        <hr class="border border-2 my-4">
 
                         <div class="mb-3">
                             Status:
@@ -76,16 +76,12 @@
                             </select>
                         </div>
 
-                        <div class="collapse {% if user.status == 'BLOCKED' %}show{% endif %}">
-                            <hr class="border border-2">
-
+                        <div class="collapse mt-3 {% if user.status == 'BLOCKED' %}show{% endif %}">
                             <div>
                                 <label class="form-label">Reason for blocking:</label>
                                 <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
                             </div>
                         </div>
-
-                        <hr class="border border-2">
 
                         {% if user.expires %}
                             <div>
@@ -107,6 +103,7 @@
                     </div>
 
                     {% if not user.auth_backend_is_ldap %}
+                        <hr class="border border-2 my-4">
                         <div class="d-flex flex-column mb-4">
                             <h4 class="text-secondary mt-0">
                                 Change password
