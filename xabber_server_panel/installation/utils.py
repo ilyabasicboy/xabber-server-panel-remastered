@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 
-from xabber_server_panel.base_modules.config.utils import get_modules_config, update_vhosts_config
+from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.users.models import User
@@ -143,7 +143,7 @@ def create_config(data):
     config_file.write(config_template.render(context=data))
     config_file.close()
     update_vhosts_config([data['host']])
-    get_modules_config()
+    make_xmpp_config()
 
 
 def create_admin(data):
@@ -312,9 +312,14 @@ def check_predefined_config():
 
 
 def load_predefined_config():
-    with open(os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH)) as file:
-        try:
-            data = json.load(file)
-        except:
-            data = {}
-        return data
+    path = os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH)
+    data = {}
+
+    if os.path.exists(path):
+        with open(path) as file:
+            try:
+                data = json.load(file)
+            except:
+                pass
+
+    return data

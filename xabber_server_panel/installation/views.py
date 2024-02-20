@@ -19,8 +19,8 @@ class Steps(TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        # if server_installed():
-        #     return HttpResponseRedirect(reverse('root'))
+        if server_installed():
+            return HttpResponseRedirect(reverse('root'))
 
         context = {
             'form': InstallationForm(),
@@ -109,11 +109,14 @@ class Quick(TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        # if server_installed():
-        #     return HttpResponseRedirect(reverse('root'))
+        if server_installed():
+            return HttpResponseRedirect(reverse('root'))
+
+        data = load_predefined_config()
 
         context = {
-            'form': InstallationForm()
+            'form': InstallationForm(),
+            'data': data
         }
 
         return self.render_to_response(context)

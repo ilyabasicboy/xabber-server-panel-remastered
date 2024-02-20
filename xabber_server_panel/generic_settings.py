@@ -37,7 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'xabber_server_panel.installation.middleware.InstallationMiddleware'
+    'xabber_server_panel.installation.middleware.InstallationMiddleware'
 ]
 
 ROOT_URLCONF = 'xabber_server_panel.urls'

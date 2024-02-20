@@ -40,7 +40,12 @@
                                                 <div class="input-group">
                                                     <input class="form-control {% if form.username.errors %}is-invalid{% endif %} installation-required" type="text" name="username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %} placeholder="admin" maxlength="100" id="id_username">
                                                     <span class="input-group-text">
-                                                        @{{ form.data.host }}
+                                                        @
+                                                        {% if form.data.host %}
+                                                            {{ form.data.host }}
+                                                        {% else %}
+                                                            {{ data.host }}
+                                                        {% endif %}
                                                     </span>
                                                 </div>
                                             </div>
