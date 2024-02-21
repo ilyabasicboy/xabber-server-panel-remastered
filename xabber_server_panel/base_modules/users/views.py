@@ -4,8 +4,8 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from datetime import datetime
 
-from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.utils import get_user_data_for_api
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
@@ -145,12 +145,16 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
         # set expires if its provided
         # BEFORE CHANGE STATUS!!!
-        expires = self.request.POST.get('expires')
+        expires_date = self.request.POST.get('expires_date')
+        expires_time = self.request.POST.get('expires_time')
         delete_expires = self.request.POST.get('delete_expires')
         if self.user != self.request.user:
             if delete_expires:
                 set_expires(self.api, self.user, None)
-            elif expires:
+            elif expires_date and expires_time:
+                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+                expires_time = datetime.strptime(expires_time, '%H:%M').time()
+                expires = datetime.combine(expires_date, expires_time)
                 set_expires(self.api, self.user, expires)
 
         status = self.request.POST.get('status')

@@ -36,6 +36,8 @@
                             </select>
                         </div>
                     </div>
+                {% else %}
+                    <input type="hidden" value="{{ hosts.first.id }}" name="host">
                 {% endif %}
             </div>
 

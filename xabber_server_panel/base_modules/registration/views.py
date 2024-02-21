@@ -133,20 +133,24 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        expires_date = self.request.POST.get('expires_date')
+        expires_time = self.request.POST.get('expires_time')
         try:
-            expire = request.POST.get('expire')
-            expire = int(datetime.strptime(expire, '%Y-%m-%dT%H:%M').timestamp())
+            # combine date and time
+            expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+            expires_time = datetime.strptime(expires_time, '%H:%M').time()
+            expires = int(datetime.combine(expires_date, expires_time).timestamp())
         except:
-            expire = None
+            expires = None
 
         api = get_api(request)
 
         description = request.POST.get('description')
-        if expire:
+        if expires:
             api.create_key(
                 {
                     "host": host.name,
-                     "expire": expire,
+                     "expire": expires,
                      "description": description
                 }
             )
@@ -206,20 +210,24 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        expires_date = self.request.POST.get('expires_date')
+        expires_time = self.request.POST.get('expires_time')
         try:
-            expire = request.POST.get('expire')
-            expire = int(datetime.strptime(expire, '%Y-%m-%dT%H:%M').timestamp())
+            # combine date and time
+            expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+            expires_time = datetime.strptime(expires_time, '%H:%M').time()
+            expires = int(datetime.combine(expires_date, expires_time).timestamp())
         except:
-            expire = None
+            expires = None
 
         api = get_api(request)
 
         description = request.POST.get('description')
-        if expire:
+        if expires:
             api.change_key(
                 {
                     "host": host.name,
-                     "expire": expire,
+                     "expire": expires,
                      "description": description
                 },
                 key

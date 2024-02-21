@@ -80,7 +80,8 @@
                 <div class="row mb-3">
                     <label class="col-form-label col-12 col-md-3">Expires</label>
                     <div class="col-12 col-md-9">
-                        <input class="form-control" type="datetime-local" name="expires" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
+                        <input class="form-control" type="date" name="expires_date" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
+                        <input class="form-control" type="time" name="expires_time" value="{{ form.expires.data|default:'12:00' }}">
                         <span class="form-text text-secondary">User expiration date.</span>
                     </div>
                 </div>
