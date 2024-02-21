@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create new group
+{% endblock %}
+
+{% block content %}
+    <div class="col-12">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Localpart *</label>
+                <div class="col-12 col-md-9">
+                    <div class="input-group">
+                        <input class="form-control" type="text" name="localpart" placeholder="Localpart" required>
+                        {% if hosts %}
+                            <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" name="host" required>
+                                {% for host in hosts %}
+                                    <option value="{{ host.name }}" {% if current_host == host.name %}selected{% endif %}>
+                                        @{{ host.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Group name *</label>
+                <div class="col-12 col-md-9">
+                    <input class="form-control" type="text" required placeholder="Group name" name="name">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Privacy</label>
+
+                <div class="col-12 col-md-9">
+                    <input id="privacy_public" type="radio" name="privacy" value="public" checked>
+                    <label for="privacy_public">
+                        public
+                    </label>
+                    <input id="privacy_incognito" type="radio" name="privacy" value="incognito">
+                    <label for="privacy_incognito">
+                        incognito
+                    </label>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Index</label>
+
+                <div class="col-12 col-md-9">
+                    <input id="index_none" type="radio" name="index" value="none" checked>
+                    <label for="index_none">
+                        none
+                    </label>
+                    <input id="index_local" type="radio" name="index" value="local">
+                    <label for="index_local">
+                        local
+                    </label>
+                    <input id="index_global" type="radio" name="index" value="global">
+                    <label for="index_global">
+                        global
+                    </label>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Membership</label>
+
+                <div class="col-12 col-md-9">
+                    <input id="membership_open" type="radio" name="membership" value="open" checked>
+                    <label for="membership_open">
+                        open
+                    </label>
+                    <input id="membership_member_only" type="radio" name="membership" value="member-only">
+                    <label for="membership_member_only">
+                        member-only
+                    </label>
+                </div>
+            </div>
+
+
+            <button class="btn btn-primary" type="submit">Create group</button>
+        </form>
+    </div>
+{% endblock %}

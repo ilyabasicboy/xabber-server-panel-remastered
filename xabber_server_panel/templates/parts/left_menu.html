@@ -48,7 +48,7 @@
         </li>
     {% endif %}
 
-    {% if registration_read_permissions %}
+    {% if request.user.is_admin %}
         <li class="nav-item">
             {% url 'registration:list' as registration %}
             <a href="{{ registration }}" class="nav-link text-white {% if registration in request.path_info %}active{% endif %}">

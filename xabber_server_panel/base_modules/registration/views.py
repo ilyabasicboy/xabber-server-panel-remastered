@@ -9,7 +9,7 @@ from datetime import datetime
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config
-from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
+from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.api.utils import get_api
 
 from .models import RegistrationSettings
@@ -19,7 +19,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
     template_name = 'registration/list.html'
     app = 'registration'
 
-    @permission_read
+    @permission_admin
     def get(self, request, *args, **kwargs):
         hosts = request.user.get_allowed_hosts()
         api = get_api(request)
@@ -61,7 +61,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
-    @permission_write
+    @permission_admin
     def post(self, request, *args, **kwargs):
         host_name = request.POST.get('host')
         hosts = VirtualHost.objects.all()
@@ -112,7 +112,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
     template_name = 'registration/create.html'
     app = 'registration'
 
-    @permission_write
+    @permission_admin
     def get(self, request, vhost_id, *args, **kwargs):
 
         try:
@@ -126,7 +126,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
-    @permission_write
+    @permission_admin
     def post(self, request, vhost_id, *args, **kwargs):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
@@ -172,7 +172,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
     template_name = 'registration/change.html'
     app = 'registration'
 
-    @permission_write
+    @permission_admin
     def get(self, request, vhost_id, key, *args, **kwargs):
 
         try:
@@ -196,14 +196,16 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
             # timestamp to datetime
             expire = datetime.fromtimestamp(key_data['expire'])
 
-            # format datetime
-            expire = expire.strftime('%Y-%m-%dT%H:%M')
-            context['expire'] = expire
+            expire_date = expire.strftime('%Y-%m-%d')  # Format date as 'YYYY-MM-DD'
+            expire_time = expire.strftime('%H:%M')
+
+            context['expire_date'] = expire_date
+            context['expire_time'] = expire_time
             context['description'] = key_data['description']
 
         return self.render_to_response(context)
 
-    @permission_write
+    @permission_admin
     def post(self, request, vhost_id, key, *args, **kwargs):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
@@ -249,7 +251,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 class RegistrationDelete(LoginRequiredMixin, TemplateView):
     app = 'registration'
 
-    @permission_write
+    @permission_admin
     def get(self, request, vhost_id, key, *args, **kwargs):
 
         try:
@@ -270,7 +272,7 @@ class RegistrationUrl(LoginRequiredMixin, TemplateView):
     template_name = 'registration/url.html'
     app = 'registration'
 
-    @permission_write
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
         try:
             settings = RegistrationSettings.objects.get(id=id)
@@ -282,7 +284,7 @@ class RegistrationUrl(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response(context)
 
-    @permission_write
+    @permission_admin
     def post(self, request, id, *args, **kwargs):
         try:
             settings = RegistrationSettings.objects.get(id=id)

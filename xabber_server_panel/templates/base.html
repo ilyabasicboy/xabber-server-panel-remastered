@@ -68,6 +68,15 @@
                                     </a>
                                 </li>
                             {% endif %}
+                            {% if groups_write_permissions %}
+                                <li>
+                                    <a class="dropdown-item text-wrap" href="{% url 'groups:create' %}">
+                                        <b>Group</b><br>
+<!--                                        TODO: change description-->
+                                        I dont know what groups are used for. Ilya Kalashnikov still did'nt told me. Best regards, Ilya Basyrov.
+                                    </a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 {% endif %}

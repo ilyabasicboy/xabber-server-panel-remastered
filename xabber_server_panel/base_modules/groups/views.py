@@ -1,9 +1,10 @@
 from django.views.generic import TemplateView
-from django.shortcuts import loader
-from django.http import JsonResponse
+from django.shortcuts import loader, reverse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
-from xabber_server_panel.base_modules.users.decorators import permission_read
+from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
 
 
@@ -48,3 +49,43 @@ class GroupList(LoginRequiredMixin, TemplateView):
             }
             return JsonResponse(response_data)
         return self.render_to_response(context)
+
+
+class GroupCreate(LoginRequiredMixin, TemplateView):
+
+    template_name = 'groups/create.html'
+    app = 'groups'
+
+    @permission_write
+    def get(self, request, *args, **kwargs):
+        hosts = request.user.get_allowed_hosts()
+
+        context = {
+            'hosts': hosts,
+            'current_host': request.session.get('host')
+        }
+        return self.render_to_response(context)
+
+    @permission_write
+    def post(self, request, *args, **kwargs):
+        api = get_api(request)
+        localpart = request.POST.get('localpart')
+        name = request.POST.get('name')
+        host = request.POST.get('host')
+        privacy = request.POST.get('privacy', 'public')
+        index = request.POST.get('index', 'none')
+        membership = request.POST.get('membership', 'open')
+
+        api.create_group({
+            "localpart": localpart,
+            "host": host,
+            "owner": f"{localpart}@{host}",
+            "name": name,
+            "privacy": privacy,
+            "index": index,
+            "membership": membership
+        })
+
+        messages.success(request, 'Group created successfully')
+
+        return HttpResponseRedirect(reverse('groups:list'))
