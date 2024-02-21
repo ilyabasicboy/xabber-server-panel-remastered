@@ -97,8 +97,14 @@
                         {% if user != request.user %}
                             <div class="mt-3">
                                 <label class="form-label">Set expires:</label>
-                                <input class="form-control" type="date" value="" name="expires_date">
-                                <input class="form-control" type="time" value="12:00" name="expires_time">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input class="form-control" type="date" value="" name="expires_date">
+                                    </div>
+                                    <div class="col-6">
+                                        <input class="form-control" type="time" value="12:00" name="expires_time">
+                                    </div>
+                                </div>
                             </div>
                         {% endif %}
                     </div>
