@@ -20,7 +20,7 @@ class CustomAuthBackend(object):
             return None
 
         # check permissions
-        if (user.is_admin or user.has_any_permissions) and user.check_password(password):
+        if (user.is_admin or user.has_any_permissions) and user.check_password(password) and user.is_active:
 
             # set token in session
             if api and api.token and request:

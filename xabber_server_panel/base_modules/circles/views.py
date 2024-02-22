@@ -6,10 +6,10 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.base_modules.circles.models import Circle
-from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.utils import get_error_messages
 
 from .forms import CircleForm
 from .utils import check_circles
@@ -84,10 +84,11 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
             circle = form.save()
 
             name = form.cleaned_data.get('name')
+            # use circle if name is not provided
             if not name:
                 name = form.cleaned_data.get('circle')
 
-            api.create_circle(
+            response = api.create_circle(
                 {
                     'circle': form.cleaned_data.get('circle'),
                     'host': form.cleaned_data.get('host'),
@@ -95,13 +96,15 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
                     'description': form.cleaned_data.get('description'),
                 }
             )
-            messages.success(request, 'Circle created successfully.')
-            return HttpResponseRedirect(
-                reverse(
-                    'circles:detail',
-                    kwargs={'id': circle.id}
+
+            if not response.get('errors'):
+                messages.success(request, 'Circle created successfully.')
+                return HttpResponseRedirect(
+                    reverse(
+                        'circles:detail',
+                        kwargs={'id': circle.id}
+                    )
                 )
-            )
 
         context = {
             'form': form,
@@ -139,7 +142,9 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
         self.update_circle()
 
-        messages.success(request, 'Circle changed successfully.')
+        if not self.response.get('errors'):
+            messages.success(request, 'Circle changed successfully.')
+
         context = {
             'circle': self.circle,
         }
@@ -154,7 +159,7 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         description = self.request.POST.get('description')
         self.circle.description = description
 
-        api.create_circle(
+        self.response = api.create_circle(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host,
@@ -309,7 +314,11 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         self.circle.members.set(members)
         self.circle.save()
-        messages.success(self.request, 'Members changed successfully.')
+
+        # check server errors
+        error_messages = get_error_messages(self.request)
+        if not error_messages:
+            messages.success(self.request, 'Members changed successfully.')
 
     def check_members(self):
 
@@ -353,6 +362,11 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        try:
+            member = User.objects.get(id=member_id)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound
+
         api = get_api(request)
 
         members = circle.members.exclude(id=member_id)
@@ -365,7 +379,9 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
                 'members': [member.full_jid]
             }
         )
-        messages.success(self.request, 'Member deleted successfully.')
+
+        if not response.get('errors'):
+            messages.success(self.request, 'Member deleted successfully.')
         return HttpResponseRedirect(reverse('circles:members', kwargs={'id': circle.id}))
 
 
@@ -404,7 +420,8 @@ class CircleShared(LoginRequiredMixin, TemplateView):
 
         self.update_circle()
 
-        messages.success(self.request, 'Shared contacts changed successfully.')
+        if not self.response.get('errors'):
+            messages.success(self.request, 'Shared contacts changed successfully.')
 
         context = {
             'circle': self.circle,
@@ -419,7 +436,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
         contacts = self.request.POST.getlist('contacts', [])
         str_contacts = ','.join(contacts)
 
-        self.api.create_circle(
+        self.response = self.api.create_circle(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host,

@@ -7,7 +7,7 @@ from django.contrib import messages
 from datetime import datetime
 
 from xabber_server_panel.base_modules.circles.models import Circle
-from xabber_server_panel.utils import get_user_data_for_api
+from xabber_server_panel.utils import get_user_data_for_api, get_error_messages
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 
@@ -40,8 +40,14 @@ class CreateUser(LoginRequiredMixin, TemplateView):
 
         if form.is_valid():
             user = form.save()
+
             self.create_user_api(user, form.cleaned_data)
-            messages.success(request, 'User created successfully.')
+
+            # check api errors
+            error_messages = get_error_messages(request)
+            if not error_messages:
+                messages.success(request, 'User created successfully.')
+
             return HttpResponseRedirect(
                 reverse(
                     'users:detail',
@@ -109,7 +115,10 @@ class UserDetail(LoginRequiredMixin, TemplateView):
             for error in self.errors:
                 messages.error(request, error)
         else:
-            messages.success(request, 'User changed successfully.')
+            # check api errors
+            error_messages = get_error_messages(request)
+            if not error_messages:
+                messages.success(request, 'User changed successfully.')
 
         context = {
             'user': self.user,
@@ -234,13 +243,16 @@ class UserDelete(LoginRequiredMixin, TemplateView):
             messages.error(request, 'User auth backend is "ldap". User cant be deleted.')
         elif user.full_jid != request.user.full_jid:
             user.delete()
-            api.unregister_user(
+            response = api.unregister_user(
                 {
                     'username': user.username,
                     'host': user.host
                 }
             )
-            messages.success(request, 'User deleted successfully.')
+
+            # check api errors
+            if not response.get('errors'):
+                messages.success(request, 'User deleted successfully.')
         else:
             messages.error(request, 'You can not delete yourself.')
         return HttpResponseRedirect(reverse('users:list'))
@@ -275,8 +287,6 @@ class UserVcard(LoginRequiredMixin, TemplateView):
         # update user params
         self.update_user()
 
-        messages.success(request, 'User changed successfully.')
-
         context = {
             'user': self.user,
         }
@@ -289,11 +299,15 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 
         self.user.last_name = self.request.POST.get('last_name')
 
-        self.api.set_vcard(
+        response = self.api.set_vcard(
             get_user_data_for_api(self.user)
         )
 
         self.user.save()
+
+        # check api errors
+        if not response.get('errors'):
+            messages.success(self.request, 'User changed successfully.')
 
 
 class UserCircles(LoginRequiredMixin, TemplateView):
@@ -329,7 +343,10 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # update user params
         self.update_user()
 
-        messages.success(self.request, 'User changed successfully.')
+        # check api errors
+        error_messages = get_error_messages(request)
+        if not error_messages:
+            messages.success(self.request, 'User changed successfully.')
 
         context = {
             'user': self.user,
@@ -461,7 +478,10 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
 
         self.update_permissions()
 
-        messages.success(self.request, 'Permissions changed successfully.')
+        # check api errors
+        error_messages = get_error_messages(request)
+        if not error_messages:
+            messages.success(self.request, 'Permissions changed successfully.')
 
         permissions = {
             app[0]: CustomPermission.objects.filter(app=app[0])

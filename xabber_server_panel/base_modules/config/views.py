@@ -16,6 +16,7 @@ from xabber_server_panel.base_modules.config.utils import update_ejabberd_config
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.utils import get_error_messages
 
 from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
@@ -91,7 +92,11 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
             )
         circles.delete()
 
-        messages.success(request, 'Host deleted successfully.')
+        # check api errors
+        error_messages = get_error_messages(request)
+        if not error_messages:
+            messages.success(request, 'Host deleted successfully.')
+
         host.delete()
         update_ejabberd_config()
         return HttpResponseRedirect(
@@ -144,7 +149,6 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             # create groups after update config
             self.create_everybody_group(request, host)
 
-            messages.success(request, 'Vhost created successfully.')
             return HttpResponseRedirect(
                 reverse('config:hosts')
             )
@@ -153,7 +157,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
-        self.api.create_circle(
+        response = self.api.create_circle(
             {
                 'circle': host,
                 'host': host,
@@ -171,6 +175,10 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             prefix=get_system_group_suffix(),
             all_users=True
         )
+
+        # check api errors
+        if not response.get('errors'):
+            messages.success(request, 'Vhost created successfully.')
 
 
 class Admins(LoginRequiredMixin, TemplateView):
@@ -221,7 +229,12 @@ class Admins(LoginRequiredMixin, TemplateView):
             )
 
         admins_to_delete.update(is_admin=False)
-        messages.success(request, 'Admins changed successfully.')
+
+        # check api errors
+        error_messages = get_error_messages(request)
+        if not error_messages:
+            messages.success(request, 'Admins changed successfully.')
+
         update_ejabberd_config()
         context = {
             'admins': User.objects.filter(is_admin=True),

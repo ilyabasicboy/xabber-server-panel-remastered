@@ -10,6 +10,11 @@ class CircleForm(forms.ModelForm):
         model = Circle
 
     def save(self, commit=True):
+        """
+            Customized to use circle instead of name
+            if name is not provided
+        """
+
         instance = super().save(commit=False)
 
         # Check if the "name" field is empty

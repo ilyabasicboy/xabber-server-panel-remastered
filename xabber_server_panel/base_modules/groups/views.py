@@ -76,7 +76,7 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
         index = request.POST.get('index', 'none')
         membership = request.POST.get('membership', 'open')
 
-        api.create_group({
+        response = api.create_group({
             "localpart": localpart,
             "host": host,
             "owner": f"{localpart}@{host}",
@@ -86,6 +86,8 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
             "membership": membership
         })
 
-        messages.success(request, 'Group created successfully')
+        # Check api errors
+        if not response.get('errors'):
+            messages.success(request, 'Group created successfully')
 
         return HttpResponseRedirect(reverse('groups:list'))

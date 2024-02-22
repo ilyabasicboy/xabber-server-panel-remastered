@@ -8,7 +8,7 @@ from datetime import datetime
 
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config
-from xabber_server_panel.utils import reload_ejabberd_config
+from xabber_server_panel.utils import reload_ejabberd_config, get_error_messages
 from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.api.utils import get_api
 
@@ -16,6 +16,9 @@ from .models import RegistrationSettings
 
 
 class RegistrationList(LoginRequiredMixin, TemplateView):
+
+    """ Render list of registration keys if registration is link """
+
     template_name = 'registration/list.html'
     app = 'registration'
 
@@ -88,7 +91,10 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
                     )
                 )
 
-            messages.success(request, 'Registration changed successfully.')
+            # check api errors
+            error_messages = get_error_messages(request)
+            if not error_messages:
+                messages.success(request, 'Registration changed successfully.')
 
         return self.render_to_response(self.context)
 
@@ -109,6 +115,9 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
 
 
 class RegistrationCreate(LoginRequiredMixin, TemplateView):
+
+    """ Create registration key """
+
     template_name = 'registration/create.html'
     app = 'registration'
 
@@ -147,14 +156,18 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         description = request.POST.get('description')
         if expires:
-            api.create_key(
+            response = api.create_key(
                 {
                     "host": host.name,
                      "expire": expires,
                      "description": description
                 }
             )
-            messages.success(request, 'Registration key created successfully.')
+
+            # check api errors
+            if not response.get('errors'):
+                messages.success(request, 'Registration key created successfully.')
+
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={host.name}'
             )
@@ -169,6 +182,9 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
 
 class RegistrationChange(LoginRequiredMixin, TemplateView):
+
+    """ Change registration key """
+
     template_name = 'registration/change.html'
     app = 'registration'
 
@@ -226,7 +242,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
         description = request.POST.get('description')
         if expires:
-            api.change_key(
+            response = api.change_key(
                 {
                     "host": host.name,
                      "expire": expires,
@@ -234,7 +250,10 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
                 },
                 key
             )
-            messages.success(request, 'Registration key changed successfully.')
+
+            if not response.get('errors'):
+                messages.success(request, 'Registration key changed successfully.')
+
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={host.name}'
             )
@@ -249,6 +268,9 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
 
 class RegistrationDelete(LoginRequiredMixin, TemplateView):
+
+    """ Delete registration key """
+
     app = 'registration'
 
     @permission_admin
@@ -261,14 +283,21 @@ class RegistrationDelete(LoginRequiredMixin, TemplateView):
 
         api = get_api(request)
 
-        api.delete_key({"host": host.name}, key=key)
-        messages.success(request, 'Registration key deleted successfully.')
+        response = api.delete_key({"host": host.name}, key=key)
+
+        # check api errors
+        if not response.get('errors'):
+            messages.success(request, 'Registration key deleted successfully.')
+
         return HttpResponseRedirect(
             reverse('registration:list') + f'?host={host.name}'
         )
 
 
 class RegistrationUrl(LoginRequiredMixin, TemplateView):
+
+    """ Change web client url"""
+
     template_name = 'registration/url.html'
     app = 'registration'
 
