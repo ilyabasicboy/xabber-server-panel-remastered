@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.apps import apps
 from collections import OrderedDict
+from django.contrib import messages
 
 import subprocess
 import time
@@ -140,3 +141,17 @@ def reload_server():
             os.utime(os.path.join(settings.BASE_DIR, 'xabber_server_panel/wsgi.py'), times=None)
     except:
         pass
+
+
+def get_error_messages(request):
+    error_messages = []
+
+    # Get all messages for the current request
+    message_list = messages.get_messages(request)
+
+    # Filter messages with the 'error' tag
+    for message in message_list:
+        if message.tags == 'error':
+            error_messages.append(message.message)
+
+    return error_messages

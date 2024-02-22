@@ -1,7 +1,10 @@
 import requests
 
 from django.conf import settings
-from django.contrib.auth import logout
+from django.contrib import messages
+
+from xabber_server_panel.custom_auth.exceptions import UnauthorizedException
+from xabber_server_panel.utils import get_error_messages, is_ejabberd_started
 
 
 class EjabberdAPI(object):
@@ -49,21 +52,26 @@ class EjabberdAPI(object):
              resolve exceptions and check response data
          """
 
-        method = getattr(self.session, http_method)
-        url = self.base_url + relative_url
+        if is_ejabberd_started():
+            method = getattr(self.session, http_method)
+            url = self.base_url + relative_url
 
-        # request data from api
-        self._wrapped_call(method, url, data, http_method)
+            # request data from api
+            self._wrapped_call(method, url, data, http_method)
 
-        # check errors and convert response to json
-        if self.raw_response is not None:
-            self._parse_response()
+            # check errors and convert response to json
+            if self.raw_response is not None:
+                self._parse_response()
 
-        if settings.DEBUG:
-            print('request:', http_method, url, data)
-            print('raw response:', self.raw_response)
-            print('response', self.response)
-            print('errors:', self.errors)
+            if settings.DEBUG:
+                print('request:', http_method, url, data)
+                print('raw response:', self.raw_response)
+                print('response', self.response)
+                print('errors:', self.errors)
+
+            self._create_error_messages()
+        else:
+            self.errors += ['Ejabberd is not started']
 
         self.response['errors'] = self.errors
 
@@ -80,11 +88,22 @@ class EjabberdAPI(object):
                 self.errors += ['invalid_json_response']
         else:
             # logout if user unauthorized
-            # if self.raw_response.status_code == 401 and self.request:
-            #     logout(self.request)
+            if self.raw_response.status_code in [401, 403] and self.request:
+                raise UnauthorizedException
 
             if self.raw_response.reason not in self.errors:
                 self.errors += [self.raw_response.reason]
+
+    def _create_error_messages(self):
+
+        """ Add error messages to request if it exists """
+
+        if self.errors and self.request:
+            error_messages = get_error_messages(self.request)
+
+            for error in self.errors:
+                if error not in error_messages:
+                    messages.error(self.request, error)
 
     def login(self, credentials):
         """
