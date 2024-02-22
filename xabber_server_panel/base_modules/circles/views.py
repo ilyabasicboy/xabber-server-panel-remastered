@@ -357,10 +357,12 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
 
         members = circle.members.exclude(id=member_id)
         circle.members.set(members)
-        api.delete_circle(
+
+        response = api.del_circle_members(
             {
                 'circle': circle.circle,
-                'host': circle.host
+                'host': circle.host,
+                'members': [member.full_jid]
             }
         )
         messages.success(self.request, 'Member deleted successfully.')
