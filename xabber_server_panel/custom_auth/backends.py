@@ -1,5 +1,4 @@
 from xabber_server_panel.base_modules.users.models import User
-from django.contrib.sessions.models import Session
 
 
 class CustomAuthBackend(object):

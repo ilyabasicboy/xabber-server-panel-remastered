@@ -347,6 +347,19 @@ class EjabberdAPI(object):
         self._call_method('post', '/groups', data=data)
         return self.response
 
+    def delete_group(self, data):
+
+        """
+            Example:
+                {
+                    "localpart": "name",
+                    "host": "example.com"
+                }
+        """
+
+        self._call_method('delete', '/groups', data=data)
+        return self.response
+
     def add_circle_members(self, data):
 
         """

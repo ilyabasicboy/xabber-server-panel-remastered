@@ -2,6 +2,7 @@
 
 {% if groups %}
     {% paginate groups 5 as paginated_groups %}
+    {% check_user_permissions request.user 'groups' 'write' as groups_write_permissions %}
 
     <div class="table-adaptive">
         <table class="table table-striped mb-0">
@@ -11,6 +12,7 @@
                     <th>Chat identifier</th>
                     <th>Owner</th>
                     <th>Members</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +32,25 @@
                         </td>
                         <td data-title="Members">
                             {{ group.size }}
+                        </td>
+                        <td data-title="Actions">
+                            {% if groups_write_permissions %}
+                                <div class="d-flex">
+                                    <div class="dropdown">
+                                        <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical d-flex"></i>
+                                        </div>
+
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'groups:delete' owner=group.owner %}">
+                                                     Delete circle
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

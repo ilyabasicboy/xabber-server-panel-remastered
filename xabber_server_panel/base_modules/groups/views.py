@@ -6,6 +6,7 @@ from django.contrib import messages
 
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.utils import host_is_valid
 
 
 class GroupList(LoginRequiredMixin, TemplateView):
@@ -89,5 +90,32 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
         # Check api errors
         if not response.get('errors'):
             messages.success(request, 'Group created successfully')
+
+        return HttpResponseRedirect(reverse('groups:list'))
+
+
+class GroupDelete(LoginRequiredMixin, TemplateView):
+
+    app = 'groups'
+
+    @permission_write
+    def get(self, request, owner, *args, **kwargs):
+        api = get_api(request)
+
+        try:
+            localpart, host = owner.split('@')
+        except:
+            localpart, host = None, None
+
+        if localpart and host and host_is_valid(host):
+            response = api.delete_group(
+                {
+                    'localpart': localpart,
+                    'host': host
+                }
+            )
+
+            if not response.get('errors'):
+                messages.success(request, 'Group deleted successfully')
 
         return HttpResponseRedirect(reverse('groups:list'))

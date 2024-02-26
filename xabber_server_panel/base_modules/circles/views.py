@@ -46,7 +46,7 @@ class CircleList(LoginRequiredMixin, TemplateView):
             self.circles = Circle.objects.filter(host=host)
 
             context['hosts'] = hosts
-            context['circles'] = self.circles.order_by('circle')
+            context['circles'] = self.circles.order_by('id')
 
         if request.is_ajax():
             html = loader.render_to_string('circles/parts/circle_list.html', context, request)
@@ -236,7 +236,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         self.users = User.objects.filter(status='ACTIVE', host=self.circle.host)
 
-        self.update_circle()
+        self.members_api()
 
         context = {
             'circle': self.circle,
@@ -245,16 +245,9 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         return self.render_to_response(context)
 
-    def update_circle(self):
+    def members_api(self):
 
         self.members = self.request.POST.getlist('members')
-
-        self.members_api()
-
-        # send data to server if members was changed
-        self.circle.save()
-
-    def members_api(self):
 
         # set all members and clear id members list
         if "@all@" in self.members:
