@@ -16,7 +16,7 @@ from xabber_server_panel.base_modules.config.utils import update_ejabberd_config
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
-from xabber_server_panel.utils import get_error_messages, restart_ejabberd
+from xabber_server_panel.utils import get_error_messages, restart_ejabberd, is_ejabberd_started
 
 from .models import LDAPSettings, LDAPServer, RootPage
 from .forms import LDAPSettingsForm
@@ -309,11 +309,14 @@ class Ldap(LoginRequiredMixin, TemplateView):
         if self.form.is_valid():
             self.update_or_create_ldap()
             update_ejabberd_config()
-            restart_ejabberd()
+
+            if is_ejabberd_started():
+                restart_ejabberd()
 
             messages.success(request, 'Ldap changed successfully.')
         else:
-            messages.error(request, 'Form data is incorrect.')
+            for error in self.form.errors.values():
+                messages.error(request, f'{error}')
 
         return self.render_to_response(context)
 

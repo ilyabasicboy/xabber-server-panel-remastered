@@ -177,7 +177,7 @@
                                                 <ul class="list-group list-group-flush">
                                                     {% for message in messages %}
                                                         <li class="list-group-item {% if message.tags == 'error' %}text-danger{% elif message.tags == 'success' %}text-success{% endif  %}">
-                                                            {{ message }}
+                                                            {{ message|striptags }}
                                                         </li>
                                                     {% endfor %}
                                                 </ul>

@@ -9,6 +9,7 @@ import os
 import re
 import random
 import string
+from importlib import import_module
 
 
 def write_ejabberd_state(state):
@@ -93,6 +94,36 @@ def get_modules():
     if os.path.isdir(settings.MODULES_DIR):
         return os.listdir(settings.MODULES_DIR)
     return []
+
+
+def get_modules_data():
+
+    """ Create list of dicts with modules data """
+
+    modules = []
+    if os.path.isdir(settings.MODULES_DIR):
+        modules_dirs = os.listdir(settings.MODULES_DIR)
+        for module_dir in modules_dirs:
+
+            module_data = {
+                'module': module_dir
+            }
+
+            # get apps file to append module verbose_name in data
+            try:
+                module_app = import_module('.apps', package=f'modules.{module_dir}')
+            except:
+                module_app = None
+
+            if module_app:
+                module_config = getattr(module_app, 'ModuleConfig', None)
+
+                if module_config:
+                    verbose_name = getattr(module_config, 'verbose_name', module_dir)
+                    module_data['verbose_name'] = verbose_name
+
+            modules += [module_data]
+    return modules
 
 
 def get_user_data_for_api(user, password=None):
