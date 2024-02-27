@@ -12,6 +12,8 @@ from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.utils import get_modules
 from xabber_server_panel.api.utils import get_api
 
+import importlib
+
 
 class Root(TemplateView):
 
@@ -20,11 +22,17 @@ class Root(TemplateView):
         # redirect to module root
         rp = RootPage.objects.first()
         modules = get_modules()
+
         if rp and rp.module:
             if rp.module != 'home' and rp.module in modules:
-                return HttpResponseRedirect(
-                    reverse(f'{rp.module}:root')
-                )
+                module = f'modules.{rp.module}'
+
+                # return current root module view
+                try:
+                    module_view = importlib.import_module(module).views.RootView.as_view()
+                    return module_view(request)
+                except(AttributeError, ModuleNotFoundError):
+                    pass
 
         return HttpResponseRedirect(
             reverse('home')
