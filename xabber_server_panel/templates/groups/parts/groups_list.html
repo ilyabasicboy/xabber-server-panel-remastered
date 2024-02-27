@@ -1,7 +1,7 @@
 {% load base_tags users_tags %}
 
 {% if groups %}
-    {% paginate groups 5 as paginated_groups %}
+    {% paginate groups 10 as paginated_groups %}
     {% check_user_permissions request.user 'groups' 'write' as groups_write_permissions %}
 
     <div class="table-adaptive">
@@ -58,7 +58,7 @@
         </table>
     </div>
 
-    {% if groups.count > 5 %}
+    {% if groups.count > 10 %}
         {% include 'parts/pagination.html' with objects=paginated_groups %}
     {% endif %}
 {% endif %}

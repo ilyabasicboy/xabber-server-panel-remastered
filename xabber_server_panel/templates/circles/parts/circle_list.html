@@ -3,7 +3,7 @@
 {% check_user_permissions request.user 'circles' 'write' as circles_write_permissions %}
 
 {% if circles %}
-    {% paginate circles 5 as paginated_circles %}
+    {% paginate circles 10 as paginated_circles %}
 
     <div class="table-adaptive">
         <table class="table table-striped mb-0">
@@ -62,7 +62,7 @@
         </table>
     </div>
 
-    {% if circles.count > 5 %}
+    {% if circles.count > 10 %}
         {% include 'parts/pagination.html' with objects=paginated_circles %}
     {% endif %}
 {% endif %}
