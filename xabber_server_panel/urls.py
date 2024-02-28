@@ -6,8 +6,8 @@ from xabber_server_panel.utils import get_modules
 
 urlpatterns = [
     path('', Root.as_view(), name='root'),
-    path('', include('xabber_server_panel.base_modules.urls')),
-    path('home/', HomePage.as_view(), name='home'),
+    path('panel/', HomePage.as_view(), name='home'),
+    path('panel/', include('xabber_server_panel.base_modules.urls')),
     path('search/', Search.as_view(), name='search'),
     path('auth/', include(('xabber_server_panel.custom_auth.urls', 'custom_auth'), namespace='custom_auth')),
     path('webhooks/', include(('xabber_server_panel.webhooks.urls', 'webhooks'), namespace='webhooks')),
