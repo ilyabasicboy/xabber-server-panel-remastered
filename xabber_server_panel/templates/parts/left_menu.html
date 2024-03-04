@@ -10,7 +10,7 @@
 
     {% if dashboard_read_permissions %}
         <li class="nav-item">
-            {% url 'dashboard' as dashboard %}
+            {% url 'dashboard:dashboard' as dashboard %}
             <a href="{{ dashboard }}" class="nav-link text-white {% if request.path_info == dashboard %}active{% endif %}">
                 <i class="bi bi-speedometer2 me-1 pe-none"></i>
                 Dashboard
@@ -80,7 +80,7 @@
 
         {% for module in modules %}
             {% with namespace=module.module|add:':info' %}
-                {% check_user_permissions request.user module as module_read_permissions %}
+                {% check_user_permissions request.user module.module as module_read_permissions %}
                 {% if module_read_permissions %}
                     <li class="nav-item">
                         {% url namespace as module_url %}

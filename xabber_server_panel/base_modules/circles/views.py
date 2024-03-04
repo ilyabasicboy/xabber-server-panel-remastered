@@ -17,7 +17,6 @@ from .utils import check_circles
 
 class CircleList(LoginRequiredMixin, TemplateView):
     template_name = 'circles/list.html'
-    app = 'circles'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -43,7 +42,7 @@ class CircleList(LoginRequiredMixin, TemplateView):
                 host
             )
 
-            self.circles = Circle.objects.filter(host=host)
+            self.circles = Circle.objects.filter(host=host).exclude(circle=host)
 
             context['hosts'] = hosts
             context['circles'] = self.circles.order_by('id')
@@ -60,7 +59,6 @@ class CircleList(LoginRequiredMixin, TemplateView):
 
 class CircleCreate(LoginRequiredMixin, TemplateView):
     template_name = 'circles/create.html'
-    app = 'circles'
 
     @permission_write
     def get(self, request, *args, **kwargs):
@@ -82,22 +80,35 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
         if form.is_valid():
 
             circle = form.save()
-
+            autoshare = form.cleaned_data.get('autoshare')
             name = form.cleaned_data.get('name')
             # use circle if name is not provided
             if not name:
                 name = form.cleaned_data.get('circle')
 
-            response = api.create_circle(
+            api.create_circle(
                 {
                     'circle': form.cleaned_data.get('circle'),
                     'host': form.cleaned_data.get('host'),
                     'name': name,
+                    'displayed_groups': [circle.circle] if autoshare else [],
                     'description': form.cleaned_data.get('description'),
                 }
             )
 
-            if not response.get('errors'):
+            if circle.all_users:
+                api.add_circle_members(
+                    {
+                        'circle': circle.circle,
+                        'host': circle.host,
+                        'grouphost': circle.host,
+                        'members': ['@all@']
+                    }
+                )
+
+            # check server errors
+            error_messages = get_error_messages(request)
+            if not error_messages:
                 messages.success(request, 'Circle created successfully.')
                 return HttpResponseRedirect(
                     reverse(
@@ -116,7 +127,6 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
 class CircleDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/detail.html'
-    app = 'circles'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -142,7 +152,9 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
         self.update_circle()
 
-        if not self.response.get('errors'):
+        # check server errors
+        error_messages = get_error_messages(request)
+        if not error_messages:
             messages.success(request, 'Circle changed successfully.')
 
         context = {
@@ -153,13 +165,41 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
     def update_circle(self):
         api = get_api(self.request)
+
+        # set name
         name = self.request.POST.get('name')
         self.circle.name = name
 
+        # set description
         description = self.request.POST.get('description')
         self.circle.description = description
 
-        self.response = api.create_circle(
+        # set all users
+        all_users = self.request.POST.get('all_users')
+        if not self.circle.all_users and all_users:
+            api.add_circle_members(
+                {
+                    'circle': self.circle.circle,
+                    'host': self.circle.host,
+                    'grouphost': self.circle.host,
+                    'members': ['@all@']
+                }
+            )
+            self.circle.all_users = True
+
+        elif self.circle.all_users and not all_users:
+            api.del_circle_members(
+                {
+                    'circle': self.circle.circle,
+                    'host': self.circle.host,
+                    'grouphost': self.circle.host,
+                    'members': ['@all@']
+                }
+            )
+            self.circle.all_users = False
+
+        # send data to server
+        api.create_circle(
             {
                 'circle': self.circle.circle,
                 'host': self.circle.host,
@@ -174,8 +214,6 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
 
 
 class CirclesDelete(LoginRequiredMixin, TemplateView):
-
-    app = 'circles'
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -199,7 +237,6 @@ class CirclesDelete(LoginRequiredMixin, TemplateView):
 
 class CircleMembers(LoginRequiredMixin, TemplateView):
     template_name = 'circles/members.html'
-    app = 'circles'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -248,30 +285,6 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
     def members_api(self):
 
         self.members = self.request.POST.getlist('members')
-
-        # set all members and clear id members list
-        if "@all@" in self.members:
-            self.api.add_circle_members(
-                {
-                    'circle': self.circle.circle,
-                    'host': self.circle.host,
-                    'grouphost': self.circle.host,
-                    'members': ['@all@']
-                }
-            )
-            self.members = []
-            self.circle.all_users = True
-        else:
-            if self.circle.all_users:
-                self.api.del_circle_members(
-                    {
-                        'circle': self.circle.circle,
-                        'host': self.circle.host,
-                        'grouphost': self.circle.host,
-                        'members': ['@all@']
-                    }
-                )
-            self.circle.all_users = False
 
         members = User.objects.filter(id__in=self.members)
         new_members = set(map(int, self.members))
@@ -345,7 +358,6 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
 
 class DeleteMember(LoginRequiredMixin, TemplateView):
-    app = 'circles'
 
     @permission_write
     def get(self, request, circle_id, member_id, *args, **kwargs):
@@ -381,7 +393,6 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
 class CircleShared(LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/shared.html'
-    app = 'circles'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -391,7 +402,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        circles = Circle.objects.filter(host=circle.host)
+        circles = Circle.objects.filter(host=circle.host).exclude(circle=circle.host)
 
         context = {
             'circle': circle,
@@ -408,7 +419,7 @@ class CircleShared(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        circles = Circle.objects.filter(host=self.circle.host)
+        circles = Circle.objects.filter(host=self.circle.host).exclude(circle=self.circle.host)
         self.api = get_api(request)
 
         self.update_circle()

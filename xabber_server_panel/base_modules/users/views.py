@@ -19,7 +19,6 @@ from .utils import check_users, block_user, ban_user, unblock_user, set_expires
 class CreateUser(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/create.html'
-    app = 'users'
 
     @permission_write
     def get(self, request, *args, **kwargs):
@@ -79,7 +78,6 @@ class CreateUser(LoginRequiredMixin, TemplateView):
 class UserDetail(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/detail.html'
-    app = 'users'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -194,7 +192,6 @@ class UserDetail(LoginRequiredMixin, TemplateView):
 
 
 class UserBlock(LoginRequiredMixin, TemplateView):
-    app = 'users'
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -206,12 +203,15 @@ class UserBlock(LoginRequiredMixin, TemplateView):
         api = get_api(request)
 
         reason = self.request.GET.get('reason')
-        block_user(api, user, reason)
+
+        if request.user == user:
+            messages.error(request, 'You can not block yourself')
+        else:
+            block_user(api, user, reason)
         return HttpResponseRedirect(reverse('users:list'))
 
 
 class UserUnBlock(LoginRequiredMixin, TemplateView):
-    app = 'users'
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -227,7 +227,6 @@ class UserUnBlock(LoginRequiredMixin, TemplateView):
 
 
 class UserDelete(LoginRequiredMixin, TemplateView):
-    app = 'users'
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -261,7 +260,6 @@ class UserDelete(LoginRequiredMixin, TemplateView):
 class UserVcard(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/vcard.html'
-    app = 'users'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -313,7 +311,6 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 class UserCircles(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/circles.html'
-    app = 'users'
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
@@ -322,7 +319,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        self.circles = Circle.objects.filter(host=user.host)
+        self.circles = Circle.objects.filter(host=user.host).exclude(circle=user.host)
 
         context = {
             'user': user,
@@ -337,7 +334,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
-        self.circles = Circle.objects.filter(host=self.user.host)
+        self.circles = Circle.objects.filter(host=self.user.host).exclude(circle=self.user.host)
         self.api = get_api(request)
 
         # update user params
@@ -396,7 +393,6 @@ class UserCircles(LoginRequiredMixin, TemplateView):
 class UserList(LoginRequiredMixin, TemplateView):
 
     template_name = 'users/list.html'
-    app = 'users'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -437,7 +433,6 @@ class UserList(LoginRequiredMixin, TemplateView):
 
 class UserPermissions(LoginRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
-    app = 'users'
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):
@@ -452,7 +447,10 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(reverse('home'))
 
         permissions = {
-            app[0]: CustomPermission.objects.filter(app=app[0])
+            app[0]: {
+                'app_name': app[1],
+                'permissions': CustomPermission.objects.filter(app=app[0])
+            }
             for app in get_apps_choices()
         }
 
@@ -484,7 +482,10 @@ class UserPermissions(LoginRequiredMixin, TemplateView):
             messages.success(self.request, 'Permissions changed successfully.')
 
         permissions = {
-            app[0]: CustomPermission.objects.filter(app=app[0])
+            app[0]: {
+                'app_name': app[1],
+                'permissions': CustomPermission.objects.filter(app=app[0])
+            }
             for app in get_apps_choices()
         }
 

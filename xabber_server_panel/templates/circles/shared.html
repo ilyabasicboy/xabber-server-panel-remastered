@@ -36,6 +36,10 @@
         {% include 'circles/parts/links.html' %}
     </div>
 
+    <div>
+        When selecting shared circles, you're specifying which users from other circles can be viewed by users within the current circle.
+    </div>
+
     <div class="pb-5 mb-5 col-12">
         <form class="check-change-js" action="{% url 'circles:shared' id=circle.id %}" method="post">
             {% csrf_token %}

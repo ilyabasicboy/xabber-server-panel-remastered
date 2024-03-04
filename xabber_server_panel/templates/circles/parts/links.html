@@ -14,7 +14,7 @@
     <li class="nav-item">
         {% url 'circles:shared' id=circle.id as shared %}
         <a class="nav-link {% if request.path_info == shared %}active{% endif %}" href="{{ shared }}">
-            Shared contacts
+            Shared circles
         </a>
     </li>
 </ul>

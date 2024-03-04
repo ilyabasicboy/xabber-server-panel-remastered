@@ -55,6 +55,19 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Include all users</label>
+                <div class="col-12 col-md-9">
+                    <input type="checkbox" name="all_users" {% if circle.all_users %}checked{% endif %} {% if circle.members.exists %}disabled{% endif %}>
+                    <div>Create global circle including all users in selected host.</div>
+                    {% if circle.members.exists %}
+                        <div>
+                            Members list is not empty.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
             {% if circles_write_permissions %}
                 <div class="fixed-bottom row col-md-9 col-xl-10 m-0 ms-auto py-4 px-0 px-md-4 bg-body border-top shadow">
                     <div class="col-12 p-md-0">

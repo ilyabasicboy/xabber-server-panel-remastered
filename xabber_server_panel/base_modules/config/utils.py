@@ -8,6 +8,9 @@ from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseX
 
 import copy
 import os
+import re
+import requests
+import subprocess
 from importlib import util, import_module
 
 
@@ -191,3 +194,36 @@ def check_hosts(api):
         hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
         if hosts_to_delete:
             hosts_to_delete.delete()
+
+
+def get_srv_records(domain):
+    srv_records = {}
+    try:
+        for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
+
+            # Make HTTP GET request to Cloudflare DoH API
+            response = requests.get(f"{settings.DNS_SERVICE}?name={service}.{domain}&type=SRV", headers={"accept": "application/dns-json"})
+
+            # Check if response is successful
+            if response.status_code == 200:
+                data = response.json()
+                if 'Answer' in data:
+                    srv_records[service] = []
+                    for record in data['Answer']:
+                        if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
+                            parts = record['data'].split()
+                            if len(parts) == 4:
+                                srv_records[service].append({
+                                    'priority': int(parts[0]),
+                                    'weight': int(parts[1]),
+                                    'port': int(parts[2]),
+                                    'target': parts[3]
+                                })
+                else:
+                    srv_records['error'] = f"No SRV records found for {service}.{domain}"
+            else:
+                srv_records['error'] = f"HTTP Error: {response.status_code}"
+    except Exception as e:
+        srv_records['error'] = f"Error: {e}"
+
+    return srv_records

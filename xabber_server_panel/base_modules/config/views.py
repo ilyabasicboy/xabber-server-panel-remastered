@@ -28,7 +28,6 @@ import re
 
 
 class ConfigRoot(LoginRequiredMixin, TemplateView):
-    app = 'settings'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -41,7 +40,6 @@ class ConfigRoot(LoginRequiredMixin, TemplateView):
 
 class Hosts(LoginRequiredMixin, TemplateView):
     template_name = 'config/hosts.html'
-    app = 'settings'
 
     @permission_admin
     def get(self, request, *args, **kwargs):
@@ -59,8 +57,6 @@ class Hosts(LoginRequiredMixin, TemplateView):
 
 
 class DeleteHost(LoginRequiredMixin, TemplateView):
-
-    app = 'settings'
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):
@@ -106,7 +102,6 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
 
 class DetailHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_detail.html'
-    app = 'settings'
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):
@@ -124,7 +119,6 @@ class DetailHost(LoginRequiredMixin, TemplateView):
 
 class CreateHost(LoginRequiredMixin, TemplateView):
     template_name = 'config/host_create.html'
-    app = 'settings'
 
     @permission_admin
     def get(self, request, *args, **kwargs):
@@ -138,7 +132,10 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         host = request.POST.get('host')
         self.api = get_api(request)
 
-        if host_is_valid(host):
+        # check virtualhost already exists
+        vh_check = VirtualHost.objects.filter(name=host).exists()
+
+        if host_is_valid(host) and not vh_check:
             VirtualHost.objects.create(
                 name=host
             )
@@ -149,15 +146,34 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             # create groups after update config
             self.create_everybody_group(request, host)
 
+            # check api errors
+            error_messages = get_error_messages(request)
+            if not error_messages:
+                messages.success(request, 'Vhost created successfully.')
+
             return HttpResponseRedirect(
                 reverse('config:hosts')
             )
 
-        messages.error(request, 'Host is invalid.')
+        messages.error(request, 'Host is invalid or already exists.')
         return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
-        response = self.api.create_circle(
+
+        try:
+            Circle.objects.create(
+                circle=host,
+                host=host,
+                name=settings.EJABBERD_DEFAULT_GROUP_NAME,
+                description=settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
+                prefix=get_system_group_suffix(),
+                all_users=True
+            )
+        except Exception as e:
+            messages.error(request, e)
+            return
+
+        self.api.create_circle(
             {
                 'circle': host,
                 'host': host,
@@ -167,23 +183,9 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             }
         )
 
-        Circle.objects.create(
-            circle=host,
-            host=host,
-            name=settings.EJABBERD_DEFAULT_GROUP_NAME,
-            description=settings.EJABBERD_DEFAULT_GROUP_DESCRIPTION,
-            prefix=get_system_group_suffix(),
-            all_users=True
-        )
-
-        # check api errors
-        if not response.get('errors'):
-            messages.success(request, 'Vhost created successfully.')
-
 
 class Admins(LoginRequiredMixin, TemplateView):
     template_name = 'config/admins.html'
-    app = 'settings'
 
     @permission_admin
     def get(self, request, *args, **kwargs):
@@ -245,7 +247,6 @@ class Admins(LoginRequiredMixin, TemplateView):
 
 class Ldap(LoginRequiredMixin, TemplateView):
     template_name = 'config/ldap.html'
-    app = 'settings'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -369,7 +370,6 @@ class Ldap(LoginRequiredMixin, TemplateView):
 
 class Modules(LoginRequiredMixin, TemplateView):
     template_name = 'config/modules.html'
-    app = 'settings'
 
     @permission_admin
     def get(self, request, *args, **kwargs):
@@ -447,7 +447,6 @@ class Modules(LoginRequiredMixin, TemplateView):
 
 
 class DeleteModule(LoginRequiredMixin, TemplateView):
-    app = 'settings'
 
     @permission_admin
     def get(self, request, module, *args, **kwargs):
@@ -460,7 +459,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
             messages.success(request, 'Module deleted successfully.')
             return HttpResponseRedirect(reverse('config:modules'))
         else:
-            return HttpResponseNotFound
+            return HttpResponseNotFound()
 
     def hande_delete(self, module_path, module, app_name):
 
@@ -486,7 +485,6 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
 
 class RootPageView(LoginRequiredMixin, TemplateView):
     template_name = 'config/root_page.html'
-    app = 'settings'
 
     @permission_read
     def get(self, request, *args, **kwargs):

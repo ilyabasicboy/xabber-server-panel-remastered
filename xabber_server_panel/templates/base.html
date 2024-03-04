@@ -37,8 +37,8 @@
         {% check_user_permissions request.user 'groups' as groups_read_permissions %}
         {% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
         {% check_user_permissions request.user 'registration' as registration_read_permissions %}
-        {% check_user_permissions request.user 'settings' 'write' as settings_write_permissions %}
-        {% check_user_permissions request.user 'settings' as settings_read_permissions %}
+        {% check_user_permissions request.user 'config' 'write' as settings_write_permissions %}
+        {% check_user_permissions request.user 'config' as settings_read_permissions %}
 
         <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-body bg-opacity-75">
             <header class="navbar d-flex justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
@@ -74,8 +74,7 @@
                                 <li>
                                     <a class="dropdown-item text-wrap" href="{% url 'groups:create' %}">
                                         <b>Group</b><br>
-<!--                                        TODO: change description-->
-                                        I dont know what groups are used for. Ilya Kalashnikov still did'nt told me. Best regards, Ilya Basyrov.
+                                        Create group chat.
                                     </a>
                                 </li>
                             {% endif %}

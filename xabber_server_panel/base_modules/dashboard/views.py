@@ -11,7 +11,6 @@ from xabber_server_panel.api.utils import get_api
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
-    app = 'dashboard'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -39,7 +38,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             if start:
                 start_ejabberd()
                 logout(request)
-                next = reverse('dashboard')
+                next = reverse('dashboard:dashboard')
                 return HttpResponseRedirect(
                     reverse(
                         'custom_auth:login'

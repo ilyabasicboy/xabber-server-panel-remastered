@@ -183,7 +183,7 @@ def get_apps_choices():
         ('circles', 'Circles'),
         ('groups', 'Groups'),
         ('registration', 'Registration'),
-        ('settings', 'Settings'),
+        ('config', 'Settings'),
         *[(module, module) for module in get_modules()]
     ]
     return apps

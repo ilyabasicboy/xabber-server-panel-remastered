@@ -18,6 +18,7 @@
                     <tr>
                         <th>#</th>
                         <th>Virtual host</th>
+                        <th>DNS</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -30,6 +31,14 @@
                             <td data-title="Virtual host">
                                 {{ host.name }}
                             </td>
+
+                            {% check_host_in_dns host.name as host_in_dns %}
+                            <td data-title="DNS">
+                               {% if not host_in_dns %}
+                                    Domain does not exist
+                               {% endif %}
+                            </td>
+
                             <td data-title="Actions">
                                 <div class="d-flex">
                                     <div class="dropdown">

@@ -20,7 +20,6 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
     """ Render list of registration keys if registration is link """
 
     template_name = 'registration/list.html'
-    app = 'registration'
 
     @permission_admin
     def get(self, request, *args, **kwargs):
@@ -119,7 +118,6 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
     """ Create registration key """
 
     template_name = 'registration/create.html'
-    app = 'registration'
 
     @permission_admin
     def get(self, request, vhost_id, *args, **kwargs):
@@ -144,41 +142,39 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
-        try:
-            # combine date and time
-            expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
-            expires_time = datetime.strptime(expires_time, '%H:%M').time()
-            expires = int(datetime.combine(expires_date, expires_time).timestamp())
-        except:
-            expires = None
+        expires = None
+
+        if expires_date and expires_time:
+            try:
+                # combine date and time
+                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+                expires_time = datetime.strptime(expires_time, '%H:%M').time()
+                expires = int(datetime.combine(expires_date, expires_time).timestamp())
+            except:
+                pass
 
         api = get_api(request)
 
         description = request.POST.get('description')
-        if expires:
-            response = api.create_key(
-                {
-                    "host": host.name,
-                     "expire": expires,
-                     "description": description
-                }
-            )
 
-            # check api errors
-            if not response.get('errors'):
-                messages.success(request, 'Registration key created successfully.')
-
-            return HttpResponseRedirect(
-                reverse('registration:list') + f'?host={host.name}'
-            )
-
-        context = {
-            'host': host
-        }
+        response = api.create_key(
+            {
+                "host": host.name,
+                 "expire": expires,
+                 "description": description
+            }
+        )
 
         make_xmpp_config()
         reload_ejabberd_config()
-        return self.render_to_response(context)
+
+        # check api errors
+        if not response.get('errors'):
+            messages.success(request, 'Registration key created successfully.')
+
+        return HttpResponseRedirect(
+            reverse('registration:list') + f'?host={host.name}'
+        )
 
 
 class RegistrationChange(LoginRequiredMixin, TemplateView):
@@ -186,7 +182,6 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
     """ Change registration key """
 
     template_name = 'registration/change.html'
-    app = 'registration'
 
     @permission_admin
     def get(self, request, vhost_id, key, *args, **kwargs):
@@ -208,9 +203,9 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
         key_data_list = [obj for obj in keys if obj['key'] == key]
         key_data = key_data_list[0] if key_data_list else None
 
-        if key_data:
+        if key_data.get('expire'):
             # timestamp to datetime
-            expire = datetime.fromtimestamp(key_data['expire'])
+            expire = datetime.fromtimestamp(key_data.get('expire'))
 
             expire_date = expire.strftime('%Y-%m-%d')  # Format date as 'YYYY-MM-DD'
             expire_time = expire.strftime('%H:%M')
@@ -230,48 +225,44 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
-        try:
-            # combine date and time
-            expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
-            expires_time = datetime.strptime(expires_time, '%H:%M').time()
-            expires = int(datetime.combine(expires_date, expires_time).timestamp())
-        except:
-            expires = None
+        expires = None
+
+        if expires_date and expires_time:
+            try:
+                # combine date and time
+                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+                expires_time = datetime.strptime(expires_time, '%H:%M').time()
+                expires = int(datetime.combine(expires_date, expires_time).timestamp())
+            except:
+                pass
 
         api = get_api(request)
 
         description = request.POST.get('description')
-        if expires:
-            response = api.change_key(
-                {
-                    "host": host.name,
-                     "expire": expires,
-                     "description": description
-                },
-                key
-            )
 
-            if not response.get('errors'):
-                messages.success(request, 'Registration key changed successfully.')
-
-            return HttpResponseRedirect(
-                reverse('registration:list') + f'?host={host.name}'
-            )
-
-        context = {
-            'host': host
-        }
+        response = api.change_key(
+            {
+                "host": host.name,
+                 "expire": expires,
+                 "description": description
+            },
+            key
+        )
 
         make_xmpp_config()
         reload_ejabberd_config()
-        return self.render_to_response(context)
+
+        if not response.get('errors'):
+            messages.success(request, 'Registration key changed successfully.')
+
+        return HttpResponseRedirect(
+            reverse('registration:list') + f'?host={host.name}'
+        )
 
 
 class RegistrationDelete(LoginRequiredMixin, TemplateView):
 
     """ Delete registration key """
-
-    app = 'registration'
 
     @permission_admin
     def get(self, request, vhost_id, key, *args, **kwargs):
@@ -299,7 +290,6 @@ class RegistrationUrl(LoginRequiredMixin, TemplateView):
     """ Change web client url"""
 
     template_name = 'registration/url.html'
-    app = 'registration'
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):

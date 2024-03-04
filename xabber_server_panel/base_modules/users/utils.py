@@ -52,7 +52,7 @@ def check_users(api, host):
     if registered_users:
 
         # Get a list of existing usernames from the User model
-        existing_usernames = User.objects.values_list('username', flat=True)
+        existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)
 
         # get registered usernames list
         registered_usernames = [user['username'] for user in registered_users]

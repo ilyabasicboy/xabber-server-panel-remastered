@@ -63,11 +63,11 @@
                 {{ user.host }}
             </h4>
 
-            {% for app, permissions in permissions.items %}
-                {% if permissions %}
+            {% for app, data in permissions.items %}
+                {% if data %}
                     <div class="mb-3">
                         <label class="form-label">
-                            {{ app }}
+                            {{ data.app_name }}
                         </label>
                         <ul class="list-group mb-3">
                             <li class="list-group-item d-flex flex-wrap align-items-center">
@@ -78,7 +78,7 @@
                                     </label>
                                 </div>
 
-                                {% for permission in permissions %}
+                                {% for permission in data.permissions %}
                                     <div class="form-check form-check-inline mb-0">
                                         <input class="form-check-input" type="radio" name="permissions_{{ app }}" {% if permission in user.permissions.all %}checked{% endif %} value="{{ permission.id }}" id="permissions_{{ permission.id }}" {% if user.is_admin %}disabled{% endif %}>
                                         <label class="form-check-label" for="permissions_{{ permission.id }}">

@@ -17,6 +17,14 @@
             </h4>
         </div>
 
+        {% if users_write_permissions %}
+            <div>
+                <a class="btn btn-primary" href="{% url 'users:create' %}">
+                    Create User
+                </a>
+            </div>
+        {% endif %}
+
         {% if hosts and request.user.is_admin %}
             <div class="ms-auto col-12 col-md-auto mt-3 mt-md-0">
                 {% include 'parts/host_select.html' %}
@@ -26,5 +34,22 @@
 
     <div class="mt-4 list-js" data-url="{{ url }}">
         {% include 'users/parts/user_list.html' %}
+    </div>
+
+<!--    Modal for blocking user. Form url changes using js. -->
+    <div class="modal fade" id="block_user" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="" method="GET">
+                    <label class="form-label">Reason for blocking:</label>
+                    <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Block</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock %}

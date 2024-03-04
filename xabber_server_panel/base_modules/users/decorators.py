@@ -2,6 +2,7 @@ from functools import wraps
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.contrib import messages
+from django.urls import resolve
 
 from .utils import check_permissions
 
@@ -11,7 +12,11 @@ def permission_read(func):
     @wraps(func)
     def wrapper(view, request, *args, **kwargs):
 
-        if check_permissions(request.user, view.app):
+        # resolve app name by url
+        resolver_match = resolve(request.path)
+        app_name = resolver_match.app_name
+
+        if check_permissions(request.user, app_name):
             return func(view, request, *args, **kwargs)
         else:
             messages.error(request, 'You have no permissions for this request.')
@@ -25,11 +30,23 @@ def permission_write(func):
     @wraps(func)
     def wrapper(view, request, *args, **kwargs):
 
-        if check_permissions(request.user, view.app, permission='write'):
+        # resolve app name by url
+        resolver_match = resolve(request.path)
+        app_name = resolver_match.app_name
+
+        if check_permissions(request.user, app_name, permission='write'):
             return func(view, request, *args, **kwargs)
         else:
             messages.error(request, 'You have no permissions for this request.')
-            return HttpResponseRedirect(reverse('home'))
+
+            # redirect logic if user has no permissions
+            if request.method == 'POST':
+                return HttpResponseRedirect(request.path)
+            elif 'HTTP_REFERER' in request.META:
+                # If there is a referer, redirect to it
+                return HttpResponseRedirect(request.META['HTTP_REFERER'])
+            else:
+                return HttpResponseRedirect(reverse('home'))
 
     return wrapper
 

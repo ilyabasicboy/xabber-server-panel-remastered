@@ -12,7 +12,6 @@ from xabber_server_panel.utils import host_is_valid
 class GroupList(LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/list.html'
-    app = 'groups'
 
     @permission_read
     def get(self, request, *args, **kwargs):
@@ -55,7 +54,6 @@ class GroupList(LoginRequiredMixin, TemplateView):
 class GroupCreate(LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/create.html'
-    app = 'groups'
 
     @permission_write
     def get(self, request, *args, **kwargs):
@@ -72,6 +70,7 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
         api = get_api(request)
         localpart = request.POST.get('localpart')
         name = request.POST.get('name')
+        owner = request.POST.get('owner')
         host = request.POST.get('host')
         privacy = request.POST.get('privacy', 'public')
         index = request.POST.get('index', 'none')
@@ -80,7 +79,7 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
         response = api.create_group({
             "localpart": localpart,
             "host": host,
-            "owner": f"{localpart}@{host}",
+            "owner": owner,
             "name": name,
             "privacy": privacy,
             "index": index,
@@ -95,8 +94,6 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
 
 
 class GroupDelete(LoginRequiredMixin, TemplateView):
-
-    app = 'groups'
 
     @permission_write
     def get(self, request, owner, *args, **kwargs):

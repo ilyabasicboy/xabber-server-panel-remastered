@@ -87,7 +87,7 @@
                                         {% if users_write_permissions %}
                                             <li>
                                                 {% if user.status != 'BLOCKED' %}
-                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:block' id=user.id %}">
+                                                    <a class="dropdown-item text-wrap text-info" data-url="{% url 'users:block' id=user.id %}" data-bs-toggle="modal" data-bs-target="#block_user">
                                                          Block user
                                                     </a>
                                                 {% else %}

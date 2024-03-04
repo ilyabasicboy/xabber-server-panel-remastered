@@ -47,6 +47,22 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Autoshare circle</label>
+                <div class="col-12 col-md-9">
+                    <input type="checkbox" name="autoshare" {% if form.autoshare.data or not form.data %}checked{% endif %}>
+                    <div>Share members within this circle amongst themselves..</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-form-label col-12 col-md-3">Include all users</label>
+                <div class="col-12 col-md-9">
+                    <input type="checkbox" name="all_users" {% if form.all_users.data or not form.data %}checked{% endif %}>
+                    <div>Create global circle including all users in selected host.</div>
+                </div>
+            </div>
+
             <button class="btn btn-primary" type="submit">Create circle</button>
         </form>
     </div>
