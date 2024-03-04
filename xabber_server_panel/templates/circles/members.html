@@ -69,18 +69,10 @@
                             </div>
                         {% else %}
                             <div class="modal-body">
-                                <div class="{% if users %}mb-3{% endif %}">
-                                    <div class="form-check mb-0">
-                                        <input class="form-check-input" type="checkbox" {% if circle.all_users %}checked{% endif %} name="members" value="@all@" id="all">
-                                        <label class="form-check-label" for="all">
-                                            All ({{ circle.host }})
-                                        </label>
-                                    </div>
-                                </div>
                                 {% for user in users %}
                                     <div class="{% if not forloop.last %}mb-3{% endif %}">
                                         <div class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
+                                            <input class="form-check-input" type="checkbox" name="members" {% if user in circle.members.all %}data-checked{% endif %} {% if user in circle.members.all %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
                                             <label class="form-check-label" for="user_{{ user.id }}">
                                                 {{ user.full_jid }}
                                             </label>
