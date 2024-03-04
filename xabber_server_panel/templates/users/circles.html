@@ -38,7 +38,7 @@
     </div>
 
     <div class="col-12 pb-5 mb-5">
-        <form action="{% url 'users:circles' id=user.id %}" method="POST">
+        <form class="check-change-js" action="{% url 'users:circles' id=user.id %}" method="POST">
             {% csrf_token %}
 
             <ul class="list-group mb-3">
@@ -57,7 +57,7 @@
             {% if users_write_permissions %}
                 <div class="fixed-bottom row col-md-9 col-xl-10 m-0 ms-auto py-4 px-0 px-md-4 bg-body border-top shadow">
                     <div class="col-12 p-md-0">
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-primary btn-secondary" type="submit" name="save" disabled>
                             Save
                         </button>
                     </div>

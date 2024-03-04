@@ -3,7 +3,7 @@
 {% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
 
 <div class="mb-4 overflow-hidden">
-    <form method="post">
+    <form class="check-change-js" method="post">
         {% csrf_token %}
         <input type="hidden" name="host" value="{{ settings.host.name }}">
 
@@ -20,7 +20,7 @@
             </div>
             {% if registration_write_permissions %}
                 <div class="me-3 mb-3">
-                    <button class="btn btn-primary" type="submit">
+                    <button class="btn btn-primary btn-secondary" type="submit" name="save" disabled>
                         Save
                     </button>
                 </div>
@@ -115,7 +115,7 @@
         </div>
 
         <div class="modal fade" id="show_link" tabindex="-1" aria-labelledby="show_link_label" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="show_link_label">Registration link</h1>

@@ -213,4 +213,17 @@ $(function () {
         });
     };
 
+    //Check change in form
+    let form = $('.check-change-js');
+    form.each(function(index, item) {
+        let origForm = $(item).serialize();
+        $(item).find(':input').on('change input', function() {
+            if ($(item).serialize() !== origForm) {
+                $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
+            } else {
+                $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
+            }
+        });
+    });
+
 });

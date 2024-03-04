@@ -28,24 +28,24 @@
                                 </div>
                             </div>
                         </td>
-                        <td data-title="Username">
+                        <td class="align-middle" data-title="Username">
                             <a href="{% url 'users:detail' id=user.id %}">
                                 {{ user.username }}
                             </a>
                         </td>
-                        <td data-title="Name">
+                        <td class="align-middle" data-title="Name">
                             {% if user.nickname %}
                                 {{ user.nickname|truncatechars:'15' }}
                             {% else %}
                                 {{ user.full_name|truncatechars:'15' }}
                             {% endif %}
                         </td>
-                        <td data-title="Created(UTC)">
+                        <td class="align-middle" data-title="Created(UTC)">
                             <span class="text-body-secondary">
                                 {{ user.created|date:"m.d.Y H:i" }}
                             </span>
                         </td>
-                        <td data-title="Expires(UTC)">
+                        <td class="align-middle" data-title="Expires(UTC)">
                             <span class="text-body-secondary">
                                 {% if user.expires %}
                                     {{ user.expires|date:"m.d.Y H:i" }}
@@ -54,17 +54,17 @@
                                 {% endif %}
                             </span>
                         </td>
-                        <td data-title="Auth">
+                        <td class="align-middle" data-title="Auth">
                             <span class="text-body-secondary">
                                 {{ user.get_auth_backend_display }}
                             </span>
                         </td>
-                        <td data-title="Status">
+                        <td class="align-middle" data-title="Status">
                             <span class="text-success {% if not user.is_active %}text-danger{% endif %}">
                                 {{ user.status|title }}
                             </span>
                         </td>
-                        <td data-title="Actions">
+                        <td class="align-middle" data-title="Actions">
                             <div class="d-flex">
                                 <div class="dropdown">
                                     <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">

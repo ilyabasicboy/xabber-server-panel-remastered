@@ -40,7 +40,7 @@
     </div>
 
     <div class="col-12">
-        <form action="{% url 'registration:change' vhost_id=host.id key=key %}" method="POST">
+        <form class="check-change-js" action="{% url 'registration:change' vhost_id=host.id key=key %}" method="POST">
             {% csrf_token %}
 
             <div class="row mb-3">
@@ -64,7 +64,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-primary btn-secondary" type="submit" name="save" disabled>Save</button>
         </form>
     </div>
 {% endblock %}

@@ -35,7 +35,7 @@
     </div>
 
     <div class="col-12">
-        <form method="post">
+        <form class="check-change-js" method="post">
             {% csrf_token %}
 
             <div class="row mb-3">
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-primary btn-secondary" type="submit" name="save" disabled>Save</button>
         </form>
     </div>
 {% endblock %}

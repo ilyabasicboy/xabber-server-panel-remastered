@@ -81,3 +81,12 @@
         background-position-x: -1000px;
     }
 }
+
+/*Custom change for bootstrap*/
+.form-control::-moz-placeholder {
+    color: var(--bs-tertiary-color);
+}
+
+.form-control::placeholder {
+    color: var(--bs-tertiary-color);
+}

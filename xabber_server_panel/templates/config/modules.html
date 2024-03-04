@@ -56,7 +56,7 @@
 
     {% if settings_write_permissions %}
         <div class="mt-4">
-            <form action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
+            <form class="check-change-js" action="{% url 'config:modules' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <div class="mb-3">
@@ -67,7 +67,7 @@
                     <input class="form-control" id="formFile" type="file" name="file" accept=".tar.gz, .tgz">
                 </div>
 
-                <button class="btn btn-primary">Save</button>
+                <button class="btn btn-primary btn-secondary" type="submit" name="save" disabled>Save</button>
             </form>
         </div>
     {% endif %}
