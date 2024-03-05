@@ -27,4 +27,12 @@
     <div class="mt-4 list-js" data-url="{{ url }}">
         {% include 'circles/parts/circle_list.html' %}
     </div>
+
+    {% if circles_write_permissions %}
+        <div class="col-12 col-md-auto me-0 me-md-4 mt-3 mt-md-0">
+            <a class="btn btn-primary" href="{% url 'circles:create' %}">
+                Create Circle
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

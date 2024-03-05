@@ -77,25 +77,28 @@
                                                 Edit vcard
                                             </a>
                                         </li>
-                                        {% if users_write_permissions and not user.auth_backend_is_ldap %}
-                                            <li>
-                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
-                                                     Delete user
-                                                </a>
-                                            </li>
-                                        {% endif %}
-                                        {% if users_write_permissions %}
-                                            <li>
-                                                {% if user.status != 'BLOCKED' %}
-                                                    <a class="dropdown-item text-wrap text-info" data-block-href="{% url 'users:block' id=user.id %}" data-bs-toggle="modal" data-bs-target="#block_user" type="button">
-                                                         Block user
+
+                                        {% if user != request.user %}
+                                            {% if users_write_permissions and not user.auth_backend_is_ldap %}
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                         Delete user
                                                     </a>
-                                                {% else %}
-                                                    <a class="dropdown-item text-wrap text-info" href="{% url 'users:unblock' id=user.id %}">
-                                                         Unblock user
-                                                    </a>
-                                                {% endif %}
-                                            </li>
+                                                </li>
+                                            {% endif %}
+                                            {% if users_write_permissions %}
+                                                <li>
+                                                    {% if user.status != 'BLOCKED' %}
+                                                        <a class="dropdown-item text-wrap text-info" data-block-href="{% url 'users:block' id=user.id %}" data-bs-toggle="modal" data-bs-target="#block_user" type="button">
+                                                             Block user
+                                                        </a>
+                                                    {% else %}
+                                                        <a class="dropdown-item text-wrap text-info" href="{% url 'users:unblock' id=user.id %}">
+                                                             Unblock user
+                                                        </a>
+                                                    {% endif %}
+                                                </li>
+                                            {% endif %}
                                         {% endif %}
                                     </ul>
                                 </div>

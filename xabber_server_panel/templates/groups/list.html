@@ -27,4 +27,12 @@
     <div class="mt-4 list-js" data-url="{{ url }}">
         {% include 'groups/parts/groups_list.html' %}
     </div>
+
+    {% if groups_write_permissions %}
+        <div class="col-12 col-md-auto me-0 me-md-4 mt-3 mt-md-0">
+            <a class="btn btn-primary" href="{% url 'groups:create' %}">
+                Create Group
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

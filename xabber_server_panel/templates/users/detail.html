@@ -138,7 +138,7 @@
                                 Save
                             </button>
 
-                            {% if user.auth_backend != 'ldap' %}
+                            {% if user.auth_backend != 'ldap' and user != request.user %}
                                 <a class="btn btn-danger me-3 mb-3" data-delete-href="{% url 'users:delete' id=user.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                     Delete User
                                 </a>
