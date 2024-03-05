@@ -47,7 +47,7 @@
 
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete' id=circle.id %}">
+                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'circles:delete' id=circle.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                      Delete circle
                                                 </a>
                                             </li>

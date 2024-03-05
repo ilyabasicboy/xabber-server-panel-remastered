@@ -25,21 +25,25 @@
                 <tbody>
                     {% for host in hosts %}
                         <tr>
-                            <td data-title="#">
+                            <td class="align-middle" data-title="#">
                                 {{ forloop.counter }}
                             </td>
-                            <td data-title="Virtual host">
+                            <td class="align-middle" data-title="Virtual host">
                                 {{ host.name }}
                             </td>
 
                             {% check_host_in_dns host.name as host_in_dns %}
-                            <td data-title="DNS">
+                            <td class="align-middle" data-title="DNS">
                                {% if not host_in_dns %}
-                                    Domain does not exist
+                                    <div class="d-flex">
+                                        <div class="icon-link text-warning fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Domain does not exist">
+                                            <i class="bi bi-exclamation-circle-fill d-flex"></i>
+                                        </div>
+                                    </div>
                                {% endif %}
                             </td>
 
-                            <td data-title="Actions">
+                            <td class="align-middle" data-title="Actions">
                                 <div class="d-flex">
                                     <div class="dropdown">
                                         <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -54,7 +58,7 @@
                                             </li>
                                             {% if settings_write_permissions %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'config:host_delete' id=host.id %}">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
                                                     </a>
                                                 </li>

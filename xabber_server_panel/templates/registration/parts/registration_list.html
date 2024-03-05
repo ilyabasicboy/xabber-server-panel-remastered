@@ -96,7 +96,7 @@
                                             {% endif %}
                                             {% if registration_write_permissions %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
                                                     </a>
                                                 </li>

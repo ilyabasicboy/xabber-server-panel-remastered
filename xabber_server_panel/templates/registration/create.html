@@ -40,7 +40,7 @@
     </div>
 
     <div class="col-12">
-        <form class="" action="{% url 'registration:create' vhost_id=host.id %}" method="POST">
+        <form action="{% url 'registration:create' vhost_id=host.id %}" method="POST">
             {% csrf_token %}
 
             <div class="row mb-3">

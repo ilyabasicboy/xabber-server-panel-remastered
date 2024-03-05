@@ -48,18 +48,36 @@
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Autoshare circle</label>
+                <div class="col-12 col-md-3"></div>
                 <div class="col-12 col-md-9">
-                    <input type="checkbox" name="autoshare" {% if form.autoshare.data or not form.data %}checked{% endif %}>
-                    <div>Share members within this circle amongst themselves..</div>
+                    <div class="d-flex">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" id="autoshare" type="checkbox" name="autoshare" {% if form.autoshare.data or not form.data %}checked{% endif %}>
+                            <label class="form-check-label" for="autoshare">
+                                Autoshare circle
+                            </label>
+                        </div>
+                        <div class="icon-link text-warning fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Share members within this circle amongst themselves.">
+                            <i class="bi bi-exclamation-circle-fill d-flex"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Include all users</label>
+                <div class="col-12 col-md-3"></div>
                 <div class="col-12 col-md-9">
-                    <input type="checkbox" name="all_users" {% if form.all_users.data or not form.data %}checked{% endif %}>
-                    <div>Create global circle including all users in selected host.</div>
+                    <div class="d-flex">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" id="all_users" type="checkbox" name="all_users" {% if form.all_users.data or not form.data %}checked{% endif %}>
+                            <label class="form-check-label" for="all_users">
+                                Include all users
+                            </label>
+                        </div>
+                        <div class="icon-link text-warning fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Create global circle including all users in selected host.">
+                            <i class="bi bi-exclamation-circle-fill d-flex"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 

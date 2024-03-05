@@ -18,7 +18,7 @@
         </div>
 
         {% if users_write_permissions %}
-            <div>
+            <div class="col-12 col-md-auto me-0 me-md-4 mt-3 mt-md-0">
                 <a class="btn btn-primary" href="{% url 'users:create' %}">
                     Create User
                 </a>
@@ -36,20 +36,23 @@
         {% include 'users/parts/user_list.html' %}
     </div>
 
-<!--    Modal for blocking user. Form url changes using js. -->
     <div class="modal fade" id="block_user" tabindex="-1"  aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="" method="GET">
-                    <label class="form-label">Reason for blocking:</label>
-                    <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
+        <div class="modal-dialog modal-dialog-scrollable">
+            <form class="modal-content" action="" method="GET">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="manage_members_label">Reason for blocking</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Block</button>
-                    </div>
-                </form>
-            </div>
+                <div class="modal-body">
+                    <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">Block</button>
+                </div>
+            </form>
         </div>
     </div>
 {% endblock %}

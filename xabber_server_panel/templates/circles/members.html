@@ -45,7 +45,7 @@
 
             {% if circles_write_permissions %}
                 <div class="d-flex align-items-start justify-content-start justify-content-md-end col-12 col-md-6 mt-3 mt-md-0">
-                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage_members">
                         Manage
                     </a>
                 </div>
@@ -53,13 +53,13 @@
         </div>
 
         {% if circles_write_permissions %}
-            <div class="modal fade" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
+            <div class="modal fade" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
-                    <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
+                    <form class="modal-content check-change-js check-members-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
                         {% csrf_token %}
 
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="manage_label">Manage members</h1>
+                            <h1 class="modal-title fs-5" id="manage_members_label">Manage members</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
@@ -106,33 +106,35 @@
                 <tbody>
                     {% if circle.all_users %}
                         <tr>
-                            <td class="d-none d-lg-table-cell">
+                            <td class="align-middle d-none d-lg-table-cell">
                             </td>
-                            <td data-title="All users">
+                            <td class="align-middle" data-title="All users">
                                 All ({{ circle.get_members_count }} on {{ circle.host }})
                             </td>
-                            <td class="d-none d-lg-table-cell">
+                            <td class="align-middle d-none d-lg-table-cell">
                             </td>
-                            <td class="d-none d-lg-table-cell">
+                            <td class="align-middle d-none d-lg-table-cell">
                             </td>
                         </tr>
                     {% endif %}
                     {% for user in circle.members.all %}
                         <tr>
-                            <td data-title="#">
+                            <td class="align-middle" data-title="#">
                                 <div class="d-flex">
                                     <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
                                         {{ user.get_initials }}
                                     </div>
                                 </div>
                             </td>
-                            <td data-title="Username">
-                                {{ user.full_jid }}
+                            <td class="align-middle" data-title="Username">
+                                <span class="text-break">
+                                    {{ user.full_jid }}
+                                </span>
                             </td>
-                            <td data-title="Nickname">
+                            <td class="align-middle" data-title="Nickname">
                                 {{ user.nickname|default:'' }}
                             </td>
-                            <td data-title="Actions">
+                            <td class="align-middle" data-title="Actions">
                                 {% if circles_write_permissions %}
                                     <div class="d-flex">
                                         <div class="dropdown">

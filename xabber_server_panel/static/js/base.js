@@ -266,4 +266,40 @@ $(function () {
         });
     });
 
+    //Check cicles members
+    const manageMembers = document.querySelector('#manage_members');
+    if ($(manageMembers).length > 0) {
+        manageMembers.addEventListener('hidden.bs.modal', event => {
+            let members = $('.check-members-js');
+            members.each(function(index, item) {
+                let membersCheckbox = $(item).find('input[type="checkbox"]');
+                membersCheckbox.each(function(index, checkbox) {
+                    if (typeof $(checkbox).attr('data-checked') === "undefined") {
+                        $(this).prop('checked', false);
+                    } else {
+                        $(this).prop('checked', true);
+                    }
+                });
+            });
+        })
+    };
+
+    //Add delete link to modal
+    let deleteLink = $('[data-delete-href]');
+    deleteLink.each(function(index, link) {
+        $(link).on('click', function() {
+            let deleteLinkHref = $(this).data('delete-href');
+            $('#delete_modal').find('a').attr('href', deleteLinkHref);
+        });
+    });
+
+    //Add block link to form
+    let blockLink = $('[data-block-href]');
+    blockLink.each(function(index, link) {
+        $(link).on('click', function() {
+            let blockLinkHref = $(this).data('block-href');
+            $('#block_user').find('form').attr('action', blockLinkHref);
+        });
+    });
+
 });

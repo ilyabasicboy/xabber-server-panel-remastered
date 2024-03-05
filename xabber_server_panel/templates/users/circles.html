@@ -43,14 +43,22 @@
 
             <ul class="list-group mb-3">
                 {% for circle in circles %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="form-check mb-0">
-                            <input class="form-check-input" type="checkbox" name="circles" {% if circle.all_users %}disabled{% endif %} {% if circle in user.circles.all or circle.all_users %}checked{% endif %} value="{{ circle.id }}" id="circles_{{ circle.id }}">
-                            <label class="form-check-label" for="circles_{{ circle.id }}">
-                                {{ circle.circle }}
-                            </label>
-                            {% if circle.all_users %}This circle is global. Remove "all users" in <a href="{% url 'circles:detail' id=circle.id %}">details</a> if you want manage.{% endif %}
+                    <li class="list-group-item d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" name="circles" {% if circle.all_users %}disabled{% endif %} {% if circle in user.circles.all or circle.all_users %}checked{% endif %} value="{{ circle.id }}" id="circles_{{ circle.id }}">
+                                <label class="form-check-label" for="circles_{{ circle.id }}">
+                                    {{ circle.circle }}
+                                </label>
+                            </div>
                         </div>
+                        {% if circle.all_users %}
+                            <div class="d-flex ms-2">
+                                <div class="icon-link text-warning fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This circle is global. Remove «all users» in details if you want manage.">
+                                    <i class="bi bi-exclamation-circle-fill d-flex"></i>
+                                </div>
+                            </div>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>

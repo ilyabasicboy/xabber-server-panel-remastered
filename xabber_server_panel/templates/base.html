@@ -188,6 +188,22 @@
                                 </div>
                             {% endif %}
                         {% endblock %}
+
+                        <div class="modal fade" id="delete_modal" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="manage_members_label">Do you really want to delete?</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <a class="btn btn-danger" href="">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </main>
                 </div>
             </div>
