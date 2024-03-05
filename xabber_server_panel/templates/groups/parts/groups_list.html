@@ -59,7 +59,7 @@
         </table>
     </div>
 
-    {% if groups.count > 10 %}
+    {% if groups|length > 10 %}
         {% include 'parts/pagination.html' with objects=paginated_groups %}
     {% endif %}
 {% endif %}

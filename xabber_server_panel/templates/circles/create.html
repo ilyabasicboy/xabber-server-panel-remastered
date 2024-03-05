@@ -69,7 +69,7 @@
                 <div class="col-12 col-md-9">
                     <div class="d-flex">
                         <div class="form-check mb-0">
-                            <input class="form-check-input" id="all_users" type="checkbox" name="all_users" {% if form.all_users.data or not form.data %}checked{% endif %}>
+                            <input class="form-check-input" id="all_users" type="checkbox" name="all_users" {% if form.all_users.data %}checked{% endif %}>
                             <label class="form-check-label" for="all_users">
                                 Include all users
                             </label>

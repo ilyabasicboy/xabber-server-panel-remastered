@@ -197,39 +197,47 @@ def check_hosts(api):
             hosts_to_delete.delete()
 
         # check dns records for vhosts
-        # loop = asyncio.new_event_loop()
-        # loop.run_until_complete(
-        #     check_hosts_dns()
-        # )
-        # loop.close()
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(
+            check_hosts_dns()
+        )
+        loop.close()
 
 
-@sync_to_async()
+# ========== ASYNC DNS REQUESTS ===============
+
+semaphore = asyncio.Semaphore(value=50)
+
+
+@sync_to_async
 def get_unchecked_hosts():
-    return VirtualHost.objects.filter(check_dns=False)
+    return list(VirtualHost.objects.filter(check_dns=False))
 
 
-@sync_to_async()
+@sync_to_async
 def update_unchecked_hosts(hosts_dns_checked):
     VirtualHost.objects.filter(id__in=hosts_dns_checked).update(check_dns=True)
 
 
 async def check_hosts_dns():
-    unchecked_hosts = await sync_to_async(list)(VirtualHost.objects.filter(check_dns=False))
+    unchecked_hosts = await get_unchecked_hosts()
 
     async with aiohttp.ClientSession() as session:
         tasks = []
         for host in unchecked_hosts:
             tasks.append(check_host_dns(session, host))
 
-        hosts_dns_checked = asyncio.gather(*tasks)
+        hosts_dns_checked = await asyncio.gather(*tasks)
 
     # update checked hosts
     await update_unchecked_hosts(hosts_dns_checked)
 
 
 async def check_host_dns(session, host):
-    records = await get_srv_records(session, host.name)
+
+    async with semaphore:
+        records = await get_srv_records(session, host.name)
+
     if not 'error' in records:
         return host.id
 
@@ -274,6 +282,8 @@ async def get_srv_records(session, domain):
 
     return srv_records
 
+
+# ========= MODULES ===============
 
 def get_modules_data():
 
