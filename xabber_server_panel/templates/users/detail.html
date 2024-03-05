@@ -97,12 +97,12 @@
                         {% if user != request.user %}
                             <div class="mt-3">
                                 <label class="form-label">Set expires:</label>
-                                <div class="row">
+                                <div class="row check-date-js">
                                     <div class="col-6">
-                                        <input class="form-control" type="date" value="" name="expires_date">
+                                        <input class="form-control text-body-tertiary" type="date" value="" name="expires_date">
                                     </div>
                                     <div class="col-6">
-                                        <input class="form-control" type="time" value="12:00" name="expires_time">
+                                        <input class="form-control text-body-tertiary" type="time" value="12:00" name="expires_time" disabled>
                                     </div>
                                 </div>
                             </div>

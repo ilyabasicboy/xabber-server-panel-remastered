@@ -213,15 +213,55 @@ $(function () {
         });
     };
 
-    //Check change in form
+    // Check change in form
     let form = $('.check-change-js');
     form.each(function(index, item) {
-        let origForm = $(item).serialize();
-        $(item).find(':input').on('change input', function() {
-            if ($(item).serialize() !== origForm) {
+        let origFormTextInputs = $(item).find(':input:not(:file)').serialize();
+        let origFormFileInputs = $(item).find(':file').map(function() {
+            return this.value;
+        }).get().join(',');
+
+        // Check for change in text inputs
+        $(item).find(':input:not(:file)').on('change input', function() {
+            if ($(item).find(':input:not(:file)').serialize() !== origFormTextInputs || $(item).find(':file').map(function() {
+                return this.value;
+            }).get().join(',') !== origFormFileInputs) {
                 $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
             } else {
                 $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
+            }
+        });
+
+        // Check for change in file inputs
+        $(item).find(':file').on('change', function() {
+            let currentFormFileInputs = $(item).find(':file').map(function() {
+                return this.value;
+            }).get().join(',');
+
+            if ($(item).find(':input:not(:file)').serialize() !== origFormTextInputs || currentFormFileInputs !== origFormFileInputs) {
+                $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
+            } else {
+                $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
+            }
+        });
+    });
+
+    //Check change date/time input
+    let input = $('.check-date-js');
+    input.each(function(index, item) {
+        let inputDate = $(item).find('input[type="date"]');
+        let inputTime = $(item).find('input[type="time"]');
+        if (inputDate.val().length != 0) {
+            inputTime.prop('disabled', false).removeClass('text-body-tertiary');
+            inputDate.removeClass('text-body-tertiary');
+        }
+        inputDate.on('change input', function() {
+            if ($(this).val().length != 0) {
+                inputTime.prop('disabled', false).removeClass('text-body-tertiary');
+                $(this).removeClass('text-body-tertiary');
+            } else {
+                inputTime.prop('disabled', true).addClass('text-body-tertiary');
+                $(this).addClass('text-body-tertiary');
             }
         });
     });
