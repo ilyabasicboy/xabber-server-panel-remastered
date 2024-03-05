@@ -72,7 +72,9 @@
                                 {{ obj.key }}
                             </td>
                             <td data-title="Expires">
-                                {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
+                                {% if obj.expire %}
+                                    {{ obj.expire|fromtimestamp|date:"M d, Y H:i" }}
+                                {% endif %}
                             </td>
                             <td data-title="Description">
                                 {{ obj.description }}

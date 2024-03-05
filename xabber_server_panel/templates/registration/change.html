@@ -51,7 +51,7 @@
                             <input class="form-control text-body-tertiary" type="date" value="{{ expire_date }}" name="expires_date">
                         </div>
                         <div class="col-6">
-                            <input class="form-control text-body-tertiary" type="time" name="expires_time" value="{{ expire_time }}" disabled>
+                            <input class="form-control text-body-tertiary" type="time" name="expires_time" value="{{ expire_time|default:'12:00' }}">
                         </div>
                     </div>
                 </div>

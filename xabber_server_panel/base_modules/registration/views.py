@@ -142,7 +142,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
-        expires = None
+        expires = 0
 
         if expires_date and expires_time:
             try:
@@ -225,7 +225,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
-        expires = None
+        expires = 0
 
         if expires_date and expires_time:
             try:

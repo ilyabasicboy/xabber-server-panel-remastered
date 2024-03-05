@@ -155,7 +155,7 @@ INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 
 # ============ CONFIG ===============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
-DNS_SERVICE = 'https://cloudflare-dns.com/dns-query'
+DNS_SERVICE = 'https://dns.google/resolve'
 
 # ============ INSTALLATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.installation']
