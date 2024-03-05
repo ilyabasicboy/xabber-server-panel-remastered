@@ -7,7 +7,8 @@ from django.contrib import messages
 from datetime import datetime
 
 from xabber_server_panel.base_modules.circles.models import Circle
-from xabber_server_panel.utils import get_user_data_for_api, get_error_messages
+from xabber_server_panel.utils import get_error_messages
+from xabber_server_panel.base_modules.users.utils import get_user_data_for_api
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 

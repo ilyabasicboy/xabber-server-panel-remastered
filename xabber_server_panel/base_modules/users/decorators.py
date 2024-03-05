@@ -60,6 +60,14 @@ def permission_admin(func):
             return func(view, request, *args, **kwargs)
         else:
             messages.error(request, 'You have no permissions for this request.')
-            return HttpResponseRedirect(reverse('home'))
+
+            # redirect logic if user has no permissions
+            if request.method == 'POST':
+                return HttpResponseRedirect(request.path)
+            elif 'HTTP_REFERER' in request.META:
+                # If there is a referer, redirect to it
+                return HttpResponseRedirect(request.META['HTTP_REFERER'])
+            else:
+                return HttpResponseRedirect(reverse('home'))
 
     return wrapper

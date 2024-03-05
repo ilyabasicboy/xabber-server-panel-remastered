@@ -6,19 +6,19 @@
 
 {% block content %}
     <div class="col-12">
-        <form method="POST">
+        <form method="POST" novalidate>
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Localpart *</label>
+                <label class="col-form-label col-12 col-md-3 {% if form.localpart.errors %}text-danger{% endif %}">Localpart *</label>
                 <div class="col-12 col-md-9">
                     <div class="input-group">
-                        <input class="form-control" type="text" name="localpart" placeholder="Localpart" required>
+                        <input class="form-control {% if form.localpart.errors %}is-invalid{% endif %}" {% if form.localpart.data %}value="{{ form.localpart.data }}"{% endif %} type="text" name="localpart" placeholder="Localpart" required>
 
                         {% if hosts %}
                             <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" name="host" required>
                                 {% for host in hosts %}
-                                    <option value="{{ host.name }}" {% if current_host == host.name %}selected{% endif %}>
+                                    <option value="{{ host.name }}" {% if form.host.data %}{% if form.host.data == host.name %}selected{% endif %}{% elif current_host == host.name %}selected{% endif %}>
                                         @{{ host.name }}
                                     </option>
                                 {% endfor %}
@@ -29,21 +29,21 @@
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Group name *</label>
+                <label class="col-form-label col-12 col-md-3 {% if form.name.errors %}text-danger{% endif %}">Group name *</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" required placeholder="Group name" name="name">
+                    <input class="form-control {% if form.name.errors %}is-invalid{% endif %}" {% if form.name.data %}value="{{ form.name.data }}"{% endif %} type="text" required placeholder="Group name" name="name">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Owner *</label>
+                <label class="col-form-label col-12 col-md-3 {% if form.owner.errors %}text-danger{% endif %}">Owner *</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" required placeholder="username@example.com" name="owner">
+                    <input class="form-control {% if form.owner.errors %}is-invalid{% endif %}" {% if form.owner.data %}value="{{ form.owner.data }}"{% endif %} type="text" required placeholder="username@example.com" name="owner">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3 pt-0">Privacy</label>
+                <label class="col-form-label col-12 col-md-3 pt-0 {% if form.privacy.errors %}text-danger{% endif %}">Privacy</label>
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">
@@ -59,7 +59,7 @@
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3 pt-0">Index</label>
+                <label class="col-form-label col-12 col-md-3 pt-0 {% if form.index.errors %}text-danger{% endif %}">Index</label>
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">
@@ -80,7 +80,7 @@
             </div>
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3 pt-0">Membership</label>
+                <label class="col-form-label col-12 col-md-3 pt-0 {% if form.membership.errors %}text-danger{% endif %}">Membership</label>
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">

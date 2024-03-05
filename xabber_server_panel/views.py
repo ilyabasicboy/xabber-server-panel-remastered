@@ -9,7 +9,7 @@ from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.base_modules.users.utils import check_users
-from xabber_server_panel.utils import get_modules
+from xabber_server_panel.base_modules.config.utils import get_modules
 from xabber_server_panel.api.utils import get_api
 
 import importlib

@@ -22,7 +22,7 @@
                             {{ forloop.counter }}
                         </td>
                         <td data-title="Chat identifier">
-                            {{ group.name }}
+                            {{ group.localpart }}
                         </td>
                         <td data-title="Owner">
                             {% get_user_by_jid group.owner as user %}
@@ -31,8 +31,9 @@
                             </a>
                         </td>
                         <td data-title="Members">
-                            {{ group.size }}
+                            {{ group.user_count }}
                         </td>
+
                         <td data-title="Actions">
                             {% if groups_write_permissions %}
                                 <div class="d-flex">
@@ -43,7 +44,7 @@
 
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'groups:delete' owner=group.owner %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'groups:delete' localpart=group.localpart host=group.host %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                      Delete group
                                                 </a>
                                             </li>

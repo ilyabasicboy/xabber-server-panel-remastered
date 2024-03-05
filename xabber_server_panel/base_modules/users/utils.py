@@ -162,3 +162,26 @@ def set_expires(api, user, expires):
             user.status = 'EXPIRED'
 
     user.save()
+
+
+def get_user_data_for_api(user, password=None):
+    data = {
+        'username': user.username,
+        'host': user.host,
+        'nickname': user.nickname,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'is_admin': user.is_admin,
+        'expires': user.expires,
+        'vcard': {
+            'nickname': user.nickname,
+            'n': {
+                'given': user.first_name,
+                'family': user.last_name
+            },
+            'photo': {'type': '', 'binval': ''}
+        }
+    }
+    if password:
+        data['password'] = password
+    return data

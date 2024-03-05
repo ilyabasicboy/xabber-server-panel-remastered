@@ -6,7 +6,7 @@ from django.contrib.auth import _get_backends, load_backend
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
-from xabber_server_panel.utils import get_modules
+from xabber_server_panel.base_modules.config.utils import get_modules
 from xabber_server_panel.base_modules.config.models import VirtualHost
 
 

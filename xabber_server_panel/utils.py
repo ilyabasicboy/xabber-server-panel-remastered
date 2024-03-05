@@ -2,6 +2,7 @@ from django.conf import settings
 from django.apps import apps
 from collections import OrderedDict
 from django.contrib import messages
+from django.forms import ValidationError
 
 import subprocess
 import time
@@ -11,6 +12,8 @@ import random
 import string
 from importlib import import_module
 
+
+# ========== XABBER SERVER =============
 
 def write_ejabberd_state(state):
     server_state_file = open(settings.EJABBERD_STATE, "w+")
@@ -84,75 +87,6 @@ def reload_ejabberd_config():
     return execute_ejabberd_cmd('reload_config')
 
 
-def host_is_valid(host_name):
-    # Define a regular expression for the host format: 'example.com'
-    pattern = re.compile(r'^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-    return bool(pattern.match(host_name))
-
-
-def get_modules():
-    if os.path.isdir(settings.MODULES_DIR):
-        return os.listdir(settings.MODULES_DIR)
-    return []
-
-
-def get_modules_data():
-
-    """ Create list of dicts with modules data """
-
-    modules = []
-    if os.path.isdir(settings.MODULES_DIR):
-        modules_dirs = os.listdir(settings.MODULES_DIR)
-        for module_dir in modules_dirs:
-
-            module_data = {
-                'module': module_dir
-            }
-
-            # get apps file to append module verbose_name in data
-            try:
-                module_app = import_module('.apps', package=f'modules.{module_dir}')
-            except:
-                module_app = None
-
-            if module_app:
-                module_config = getattr(module_app, 'ModuleConfig', None)
-
-                if module_config:
-                    verbose_name = getattr(module_config, 'verbose_name', module_dir)
-                    module_data['verbose_name'] = verbose_name
-
-            modules += [module_data]
-    return modules
-
-
-def get_user_data_for_api(user, password=None):
-    data = {
-        'username': user.username,
-        'host': user.host,
-        'nickname': user.nickname,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'is_admin': user.is_admin,
-        'expires': user.expires,
-        'vcard': {
-            'nickname': user.nickname,
-            'n': {
-                'given': user.first_name,
-                'family': user.last_name
-            },
-            'photo': {'type': '', 'binval': ''}
-        }
-    }
-    if password:
-        data['password'] = password
-    return data
-
-
-def get_system_group_suffix():
-    return ''.join(random.choices(string.ascii_lowercase, k=8))
-
-
 def update_app_list(app_list):
 
     apps.app_configs = OrderedDict()
@@ -174,6 +108,37 @@ def reload_server():
         pass
 
 
+# ============ VALIDATORS =============
+
+def validate_jid(jid):
+    # Regular expression for validating JID without resource
+    pattern = r'^[^@<>{}"\'\\]+@[^@<>{}"\'\\]+\.[^@<>{}"\'\\]+$'
+    if re.match(pattern, jid):
+        return True
+    else:
+        return False
+
+
+def jid_form_validation(value):
+    # Define a regular expression for the jid format: 'user@example.com'
+    if not validate_jid(value):
+        raise ValidationError("Invalid jid format.")
+
+
+def host_is_valid(host_name):
+    # Define a regular expression for the host format: 'example.com'
+    pattern = re.compile(r'^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    return bool(pattern.match(host_name))
+
+
+def host_form_validation(value):
+    # Define a regular expression for the host format: 'example.com'
+    if not host_is_valid(value):
+        raise ValidationError("Invalid host format.")
+
+
+# =============== OTHER ==============
+
 def get_error_messages(request):
     error_messages = []
 
@@ -186,3 +151,7 @@ def get_error_messages(request):
             error_messages.append(message.message)
 
     return error_messages
+
+
+def get_system_group_suffix():
+    return ''.join(random.choices(string.ascii_lowercase, k=8))

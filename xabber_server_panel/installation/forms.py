@@ -1,11 +1,5 @@
 from django import forms
-from xabber_server_panel.utils import host_is_valid
-
-
-def host_validation(value):
-    # Define a regular expression for the host format: 'example.com'
-    if not host_is_valid(value):
-        raise forms.ValidationError("Invalid host format.")
+from xabber_server_panel.utils import host_form_validation
 
 
 class InstallationForm(forms.Form):
@@ -14,12 +8,11 @@ class InstallationForm(forms.Form):
         self.step_errors = {}
         super(InstallationForm, self).__init__(*args, **kwargs)
 
-
     host = forms.CharField(
         max_length=128,
         label='XMPP host',
         widget=forms.TextInput(attrs={'placeholder': 'example.com'}),
-        validators=[host_validation]
+        validators=[host_form_validation]
     )
     username = forms.CharField(
         max_length=100,

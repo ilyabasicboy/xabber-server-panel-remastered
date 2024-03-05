@@ -32,9 +32,8 @@
                                 {{ host.name }}
                             </td>
 
-                            {% check_host_in_dns host.name as host_in_dns %}
                             <td class="align-middle" data-title="DNS">
-                               {% if not host_in_dns %}
+                               {% if not host.check_dns %}
                                     <div class="d-flex">
                                         <div class="icon-link text-warning fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Domain does not exist">
                                             <i class="bi bi-exclamation-circle-fill d-flex"></i>

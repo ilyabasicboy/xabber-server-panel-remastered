@@ -1,6 +1,7 @@
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
+from asgiref.sync import sync_to_async
 
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.utils import reload_ejabberd_config
@@ -8,9 +9,9 @@ from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseX
 
 import copy
 import os
-import re
 import requests
-import subprocess
+import asyncio
+import aiohttp
 from importlib import util, import_module
 
 
@@ -195,35 +196,116 @@ def check_hosts(api):
         if hosts_to_delete:
             hosts_to_delete.delete()
 
+        # check dns records for vhosts
+        # loop = asyncio.new_event_loop()
+        # loop.run_until_complete(
+        #     check_hosts_dns()
+        # )
+        # loop.close()
 
-def get_srv_records(domain):
+
+@sync_to_async()
+def get_unchecked_hosts():
+    return VirtualHost.objects.filter(check_dns=False)
+
+
+@sync_to_async()
+def update_unchecked_hosts(hosts_dns_checked):
+    VirtualHost.objects.filter(id__in=hosts_dns_checked).update(check_dns=True)
+
+
+async def check_hosts_dns():
+    unchecked_hosts = await sync_to_async(list)(VirtualHost.objects.filter(check_dns=False))
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for host in unchecked_hosts:
+            tasks.append(check_host_dns(session, host))
+
+        hosts_dns_checked = asyncio.gather(*tasks)
+
+    # update checked hosts
+    await update_unchecked_hosts(hosts_dns_checked)
+
+
+async def check_host_dns(session, host):
+    records = await get_srv_records(session, host.name)
+    if not 'error' in records:
+        return host.id
+
+
+async def get_srv_records(session, domain):
     srv_records = {}
-    try:
-        for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
 
-            # Make HTTP GET request to Cloudflare DoH API
-            response = requests.get(f"{settings.DNS_SERVICE}?name={service}.{domain}&type=SRV", headers={"accept": "application/dns-json"})
-
-            # Check if response is successful
-            if response.status_code == 200:
-                data = response.json()
-                if 'Answer' in data:
-                    srv_records[service] = []
-                    for record in data['Answer']:
-                        if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
-                            parts = record['data'].split()
-                            if len(parts) == 4:
-                                srv_records[service].append({
-                                    'priority': int(parts[0]),
-                                    'weight': int(parts[1]),
-                                    'port': int(parts[2]),
-                                    'target': parts[3]
-                                })
+    for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
+        try:
+            async with session.get(
+                    f"{settings.DNS_SERVICE}?name={service}.{domain}&type=SRV",
+                    headers={"accept": "application/dns-json"},
+                    timeout=3
+            ) as response:
+                # Check if response is successful
+                if response.status == 200:
+                    data = await response.json()
+                    if 'Answer' in data:
+                        srv_records[service] = []
+                        for record in data['Answer']:
+                            if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
+                                parts = record['data'].split()
+                                if len(parts) == 4:
+                                    srv_records[service].append({
+                                        'priority': int(parts[0]),
+                                        'weight': int(parts[1]),
+                                        'port': int(parts[2]),
+                                        'target': parts[3]
+                                    })
+                    else:
+                        srv_records['error'] = f"No SRV records found for {service}.{domain}"
                 else:
-                    srv_records['error'] = f"No SRV records found for {service}.{domain}"
-            else:
-                srv_records['error'] = f"HTTP Error: {response.status_code}"
-    except Exception as e:
-        srv_records['error'] = f"Error: {e}"
+                    srv_records['error'] = f"HTTP Error: {response.status}"
+        except aiohttp.ClientTimeout:
+            # Handle timeout error
+            srv_records['error'] = "Timeout occurred while making the request."
+        except aiohttp.ClientError as e:
+            # Handle other client errors
+            srv_records['error'] = f"An error occurred while making the request: {e}"
+        except Exception as e:
+            srv_records['error'] = f"Error: {e}"
 
     return srv_records
+
+
+def get_modules_data():
+
+    """ Create list of dicts with modules data """
+
+    modules = []
+    if os.path.isdir(settings.MODULES_DIR):
+        modules_dirs = os.listdir(settings.MODULES_DIR)
+        for module_dir in modules_dirs:
+
+            module_data = {
+                'module': module_dir
+            }
+
+            # get apps file to append module verbose_name in data
+            try:
+                module_app = import_module('.apps', package=f'modules.{module_dir}')
+            except:
+                module_app = None
+
+            if module_app:
+                module_config = getattr(module_app, 'ModuleConfig', None)
+
+                if module_config:
+                    verbose_name = getattr(module_config, 'verbose_name', module_dir)
+                    module_data['verbose_name'] = verbose_name
+
+            modules += [module_data]
+    return modules
+
+
+def get_modules():
+    if os.path.isdir(settings.MODULES_DIR):
+        return os.listdir(settings.MODULES_DIR)
+    return []

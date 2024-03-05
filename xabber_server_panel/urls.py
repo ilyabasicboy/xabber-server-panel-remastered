@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from xabber_server_panel.views import HomePage, Search, Root
-from xabber_server_panel.utils import get_modules
+from xabber_server_panel.base_modules.config.utils import get_modules
 
 
 urlpatterns = [
