@@ -224,7 +224,6 @@ $(function () {
 
     //Check change in form
     function checkChange() {
-    console.log('sdsds');
         let form = $('.check-change-js');
         form.each(function(index, item) {
             let origFormTextInputs = $(item).find(':input:not(:file):not(.nocheck-change-js)').serialize();
