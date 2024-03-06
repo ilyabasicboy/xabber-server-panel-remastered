@@ -1,7 +1,7 @@
 $(function () {
 
-    let url, page, change;
-    function ajax_send(url, page='', change=false) {
+    let url, page, updateChange, updateTooltip;
+    function ajax_send(url, page='', updateChange=false, updateTooltip=false) {
         let ajax_url = url + page;
 
         //Create the data objec`t with `the host value and query parameters
@@ -15,15 +15,21 @@ $(function () {
             setCurrentUrl();
 
             //Reinit functions
-            if (change) {
+            if (updateChange) {
                 checkChange();
+            }
+            if (updateTooltip) {
                 initTooltip();
             }
         });
     };
 
     $('#host').on('change', function() {
-        ajax_send($(this).data('url'), page='', change=true);
+        if ($(this).parents('.check-change-js').length > 0) {
+            ajax_send($(this).data('url'), page='', updateChange=true, updateTooltip=true);
+        } else {
+            ajax_send($(this).data('url'), page='', updateChange=true);
+        }
     });
 
     $('.list-js').on('click', '.pagination a', function(e) {
@@ -278,25 +284,22 @@ $(function () {
         });
     });
 
-    //Check cicles members
-    const manageMembers = document.querySelector('#manage_members');
-    if ($(manageMembers).length > 0) {
-        manageMembers.addEventListener('hidden.bs.modal', event => {
-            let members = $('.check-members-js');
-            members.each(function(index, item) {
-                let membersCheckbox = $(item).find('input[type="checkbox"]');
-                membersCheckbox.each(function(index, checkbox) {
-                    if (typeof $(checkbox).attr('data-checked') === "undefined") {
-                        $(this).prop('checked', false);
-                    } else {
-                        $(this).prop('checked', true);
-                    }
-                });
-                //Fix submit disabled
-                membersCheckbox.first().trigger('change');
+    //Reset form in modal
+    const resetModal = document.querySelectorAll('.reset-modal-js');
+    resetModal.forEach((modal) => {
+        modal.addEventListener('hidden.bs.modal', event => {
+            let formCheckbox = $(modal).find('form').find('input[type="checkbox"]');
+            formCheckbox.each(function(index, checkbox) {
+                if (typeof $(checkbox).attr('data-checked') === "undefined") {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).prop('checked', true);
+                }
             });
+            //Fix submit disabled
+            formCheckbox.first().trigger('change');
         })
-    };
+    });
 
     //Add delete link to modal
     let deleteLink = $('[data-delete-href]');

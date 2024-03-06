@@ -53,9 +53,9 @@
         </div>
 
         {% if circles_write_permissions %}
-            <div class="modal fade" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
+            <div class="modal fade reset-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
-                    <form class="modal-content check-change-js check-members-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
+                    <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
                         {% csrf_token %}
 
                         <div class="modal-header">
