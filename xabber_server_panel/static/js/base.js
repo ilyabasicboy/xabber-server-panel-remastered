@@ -23,11 +23,7 @@ $(function () {
     };
 
     $('#host').on('change', function() {
-        if ($(this).parents('.check-change-js').length > 0) {
-            ajax_send($(this).data('url'), page='', change=true);
-        } else {
-            ajax_send($(this).data('url'));
-        }
+        ajax_send($(this).data('url'), page='', change=true);
     });
 
     $('.list-js').on('click', '.pagination a', function(e) {
@@ -228,6 +224,7 @@ $(function () {
 
     //Check change in form
     function checkChange() {
+    console.log('sdsds');
         let form = $('.check-change-js');
         form.each(function(index, item) {
             let origFormTextInputs = $(item).find(':input:not(:file):not(.nocheck-change-js)').serialize();
