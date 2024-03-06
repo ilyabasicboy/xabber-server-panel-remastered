@@ -302,21 +302,15 @@ $(function () {
     });
 
     //Add delete link to modal
-    let deleteLink = $('[data-delete-href]');
-    deleteLink.each(function(index, link) {
-        $(link).on('click', function() {
-            let deleteLinkHref = $(this).data('delete-href');
-            $('#delete_modal').find('a').attr('href', deleteLinkHref);
-        });
+    $(document).on('click', '[data-delete-href]', function() {
+        let deleteLinkHref = $(this).data('delete-href');
+        $('#delete_modal').find('a').attr('href', deleteLinkHref);
     });
 
     //Add block link to form
-    let blockLink = $('[data-block-href]');
-    blockLink.each(function(index, link) {
-        $(link).on('click', function() {
-            let blockLinkHref = $(this).data('block-href');
-            $('#block_user').find('form').attr('action', blockLinkHref);
-        });
+    $(document).on('click', '[data-block-href]', function() {
+        let blockLinkHref = $(this).data('block-href');
+        $('#block_user').find('form').attr('action', blockLinkHref);
     });
 
 });
