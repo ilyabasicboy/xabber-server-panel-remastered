@@ -280,6 +280,8 @@ $(function () {
                         $(this).prop('checked', true);
                     }
                 });
+                //Fix submit disabled
+                membersCheckbox.first().trigger('change');
             });
         })
     };
