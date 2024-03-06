@@ -1,7 +1,7 @@
 $(function () {
 
-    let url, page;
-    function ajax_send(url, page='') {
+    let url, page, change;
+    function ajax_send(url, page='', change=false) {
         let ajax_url = url + page;
 
         //Create the data objec`t with `the host value and query parameters
@@ -9,15 +9,25 @@ $(function () {
             'host': $('#host').val(),
         };
 
-        $.get(ajax_url, data, function(data){
+        $.get(ajax_url, data, function(data) {
             $('.list-js').html(data['html']);
             $('.items-count-js span').html(data['items_count']);
             setCurrentUrl();
+
+            //Reinit functions
+            if (change) {
+                checkChange();
+                initTooltip();
+            }
         });
     };
 
-    $('#host').on('change', function(e){
-        ajax_send($(this).data('url'));
+    $('#host').on('change', function() {
+        if ($(this).parents('.check-change-js').length > 0) {
+            ajax_send($(this).data('url'), page='', change=true);
+        } else {
+            ajax_send($(this).data('url'));
+        }
     });
 
     $('.list-js').on('click', '.pagination a', function(e) {
@@ -138,11 +148,14 @@ $(function () {
     });
 
     //Init tooltips
-    const tooltipTriggerItem = document.querySelector('[data-bs-toggle="tooltip"]');
-    if ($(tooltipTriggerItem).length > 0) {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
+    function initTooltip() {
+        const tooltipTriggerItem = document.querySelector('[data-bs-toggle="tooltip"]');
+        if ($(tooltipTriggerItem).length > 0) {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        }
+    };
+    initTooltip();
 
     //Show/hide reason with change user status
     $('#user_status').on('change', function() {
@@ -213,38 +226,41 @@ $(function () {
         });
     };
 
-    // Check change in form
-    let form = $('.check-change-js');
-    form.each(function(index, item) {
-        let origFormTextInputs = $(item).find(':input:not(:file)').serialize();
-        let origFormFileInputs = $(item).find(':file').map(function() {
-            return this.value;
-        }).get().join(',');
-
-        // Check for change in text inputs
-        $(item).find(':input:not(:file)').on('change input', function() {
-            if ($(item).find(':input:not(:file)').serialize() !== origFormTextInputs || $(item).find(':file').map(function() {
-                return this.value;
-            }).get().join(',') !== origFormFileInputs) {
-                $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
-            } else {
-                $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
-            }
-        });
-
-        // Check for change in file inputs
-        $(item).find(':file').on('change', function() {
-            let currentFormFileInputs = $(item).find(':file').map(function() {
+    //Check change in form
+    function checkChange() {
+        let form = $('.check-change-js');
+        form.each(function(index, item) {
+            let origFormTextInputs = $(item).find(':input:not(:file):not(.nocheck-change-js)').serialize();
+            let origFormFileInputs = $(item).find(':file').map(function() {
                 return this.value;
             }).get().join(',');
 
-            if ($(item).find(':input:not(:file)').serialize() !== origFormTextInputs || currentFormFileInputs !== origFormFileInputs) {
-                $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
-            } else {
-                $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
-            }
+            // Check for change in text inputs
+            $(item).find(':input:not(:file)').on('change input', function() {
+                if ($(item).find(':input:not(:file):not(.nocheck-change-js)').serialize() !== origFormTextInputs || $(item).find(':file').map(function() {
+                    return this.value;
+                }).get().join(',') !== origFormFileInputs) {
+                    $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
+                } else {
+                    $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
+                }
+            });
+
+            // Check for change in file inputs
+            $(item).find(':file').on('change', function() {
+                let currentFormFileInputs = $(item).find(':file').map(function() {
+                    return this.value;
+                }).get().join(',');
+
+                if ($(item).find(':input:not(:file)').serialize() !== origFormTextInputs || currentFormFileInputs !== origFormFileInputs) {
+                    $(item).find('button[name="save"]').prop('disabled', false).removeClass('btn-secondary');
+                } else {
+                    $(item).find('button[name="save"]').prop('disabled', true).addClass('btn-secondary');
+                }
+            });
         });
-    });
+    };
+    checkChange();
 
     //Check change date/time input
     let input = $('.check-date-js');

@@ -27,7 +27,7 @@
                             Host
                         </label>
                         <div class="col-12 col-md-9">
-                            <select class="form-select {% if hosts.count < 2 %}pe-none{% endif %}" id="host" name="host" data-url="{{ url }}">
+                            <select class="form-select nocheck-change-js {% if hosts.count < 2 %}pe-none{% endif %}" id="host" name="host" data-url="{{ url }}">
                                 {% for host in hosts %}
                                     <option value="{{ host.id }}" {% if host.name == curr_host %}selected{% endif %}>
                                         {{ host.name }}
