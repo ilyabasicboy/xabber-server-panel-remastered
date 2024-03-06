@@ -66,6 +66,12 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         except VirtualHost.DoesNotExist:
             return HttpResponseNotFound
 
+        if request.user.host == host.name:
+            messages.error(request, "You can't delete self host!")
+            return HttpResponseRedirect(
+                reverse('config:hosts')
+            )
+
         api = get_api(request)
 
         users = User.objects.filter(host=host.name)

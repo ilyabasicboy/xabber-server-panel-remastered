@@ -1,7 +1,7 @@
 {% load base_tags users_tags %}
 
 {% if users %}
-    {% paginate users 10 as paginated_users %}
+    {% paginate users 8 as paginated_users %}
     {% check_user_permissions request.user 'users' 'write' as users_write_permissions %}
 
     <div class="table-adaptive">
@@ -110,7 +110,7 @@
         </table>
     </div>
 
-    {% if users.count > 10 %}
+    {% if users.count > 8 %}
         {% include 'parts/pagination.html' with objects=paginated_users %}
     {% endif %}
 {% endif %}

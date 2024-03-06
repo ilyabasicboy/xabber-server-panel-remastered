@@ -9,11 +9,12 @@ from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseX
 
 import copy
 import os
-import requests
 import asyncio
 import aiohttp
 from importlib import util, import_module
 
+
+# ========== XABBERSERVER CONFIG ==============
 
 def get_value(key, value, level):
 
@@ -161,49 +162,6 @@ def update_ejabberd_config():
     reload_ejabberd_config()
 
 
-def check_hosts(api):
-
-    """
-        Check registered users and create
-        if it doesn't exist in django db
-    """
-
-    try:
-        registered_hosts = api.get_vhosts().get('vhosts')
-    except:
-        registered_hosts = []
-
-    if registered_hosts:
-
-        # Get a list of existing usernames from the User model
-        existing_hosts = VirtualHost.objects.values_list('name', flat=True)
-
-        # Filter the user_list to exclude existing usernames
-        unknown_hosts = [host for host in registered_hosts if host not in existing_hosts]
-
-        # create in db unknown users
-        if unknown_hosts:
-            hosts_to_create = [
-                VirtualHost(
-                    name=host,
-                )
-                for host in unknown_hosts
-            ]
-            VirtualHost.objects.bulk_create(hosts_to_create)
-
-        # get unregistered users in db and delete
-        hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
-        if hosts_to_delete:
-            hosts_to_delete.delete()
-
-        # check dns records for vhosts
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(
-            check_hosts_dns()
-        )
-        loop.close()
-
-
 # ========== ASYNC DNS REQUESTS ===============
 
 semaphore = asyncio.Semaphore(value=50)
@@ -243,6 +201,9 @@ async def check_host_dns(session, host):
 
 
 async def get_srv_records(session, domain):
+
+    """ Request srv records from dns service """
+
     srv_records = {}
 
     for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
@@ -283,7 +244,7 @@ async def get_srv_records(session, domain):
     return srv_records
 
 
-# ========= MODULES ===============
+# ========= OTHER ===============
 
 def get_modules_data():
 
@@ -319,3 +280,52 @@ def get_modules():
     if os.path.isdir(settings.MODULES_DIR):
         return os.listdir(settings.MODULES_DIR)
     return []
+
+
+def check_hosts(api):
+
+    """
+        Check registered users and create
+        if it doesn't exist in django db
+    """
+
+    try:
+        registered_hosts = api.get_vhosts().get('vhosts')
+    except:
+        registered_hosts = []
+
+    if registered_hosts:
+
+        # Get a list of existing usernames from the User model
+        existing_hosts = VirtualHost.objects.values_list('name', flat=True)
+
+        # Filter the user_list to exclude existing usernames
+        unknown_hosts = [host for host in registered_hosts if host not in existing_hosts]
+
+        # create in db unknown users
+        if unknown_hosts:
+            hosts_to_create = [
+                VirtualHost(
+                    name=host,
+                )
+                for host in unknown_hosts
+            ]
+            VirtualHost.objects.bulk_create(hosts_to_create)
+
+        # get unregistered users in db and delete
+        hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
+        if hosts_to_delete:
+            hosts_to_delete.delete()
+
+        # check dns records for vhosts
+
+        loop = asyncio.new_event_loop()
+
+        try:
+            loop.run_until_complete(
+                check_hosts_dns()
+            )
+        except Exception as e:
+            print(e)
+
+        loop.close()

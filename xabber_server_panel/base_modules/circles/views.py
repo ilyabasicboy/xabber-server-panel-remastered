@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages
@@ -248,6 +249,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         self.api = get_api(request)
 
+        check_users(self.api, self.circle.host)
         self.check_members()
 
         users = User.objects.filter(status='ACTIVE', host=self.circle.host)

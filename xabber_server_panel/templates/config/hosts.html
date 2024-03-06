@@ -55,7 +55,7 @@
                                                     SRV records info
                                                 </a>
                                             </li>
-                                            {% if settings_write_permissions %}
+                                            {% if settings_write_permissions and request.user.host != host.name %}
                                                 <li>
                                                     <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete

@@ -7,6 +7,7 @@ from django.contrib import messages
 from datetime import datetime
 
 from xabber_server_panel.base_modules.circles.models import Circle
+from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.utils import get_error_messages
 from xabber_server_panel.base_modules.users.utils import get_user_data_for_api
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
@@ -319,6 +320,10 @@ class UserCircles(LoginRequiredMixin, TemplateView):
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponseNotFound
+
+        api = get_api(request)
+
+        check_circles(api, user.host)
 
         self.circles = Circle.objects.filter(host=user.host).exclude(circle=user.host)
 
