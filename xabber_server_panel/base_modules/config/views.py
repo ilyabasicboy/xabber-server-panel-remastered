@@ -97,7 +97,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         # check api errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(request, 'Host deleted successfully.')
+            messages.success(request, f'Host "{host.name}" deleted successfully.')
 
         host.delete()
         update_ejabberd_config()
@@ -155,13 +155,13 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, 'Vhost created successfully.')
+                messages.success(request, f'Virtual host "{host}" created successfully.')
 
             return HttpResponseRedirect(
                 reverse('config:hosts')
             )
 
-        messages.error(request, 'Host is invalid or already exists.')
+        messages.error(request, f'Host "{host}" is invalid or already exists.')
         return self.render_to_response({})
 
     def create_everybody_group(self, request, host):
@@ -320,7 +320,7 @@ class Ldap(LoginRequiredMixin, TemplateView):
             if is_ejabberd_started():
                 restart_ejabberd()
 
-            messages.success(request, 'Ldap changed successfully.')
+            messages.success(request, 'Ldap settings changed successfully.')
         else:
             for error in self.form.errors.values():
                 messages.error(request, f'{error}')
@@ -421,7 +421,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
                 reload_server()
 
-                messages.success(self.request, 'Module added successfully.')
+                messages.success(self.request, 'Modules added successfully.')
         except Exception as e:
             # Delete temporary dir
             shutil.rmtree(temp_extract_dir, ignore_errors=True)
@@ -462,7 +462,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
         if os.path.isdir(module_path) and apps.is_installed(app_name):
             self.hande_delete(module_path, module, app_name)
 
-            messages.success(request, 'Module deleted successfully.')
+            messages.success(request, f'Module "{module}" deleted successfully.')
             return HttpResponseRedirect(reverse('config:modules'))
         else:
             return HttpResponseNotFound()
@@ -507,6 +507,6 @@ class RootPageView(LoginRequiredMixin, TemplateView):
         else:
             RootPage.objects.create(module=module)
 
-        messages.success(request, 'Root changed successfully.')
+        messages.success(request, 'Root page changed successfully.')
 
         return self.render_to_response({})

@@ -61,7 +61,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         data = {
             'hosts': [
                 {
-                    'host': host.name,
+                    'host': host,
                     'total': self.api.get_users_count({"host": host.name}).get('count'),
                     'online': self.api.stats_host({"host": host.name}).get('count')
                 }

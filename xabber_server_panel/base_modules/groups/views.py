@@ -92,7 +92,7 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
 
             # Check api errors
             if not response.get('errors'):
-                messages.success(request, 'Group created successfully')
+                messages.success(request, f'Group "{form.cleaned_data.get("localpart")}" created successfully')
 
             return HttpResponseRedirect(reverse('groups:list'))
 
@@ -119,6 +119,6 @@ class GroupDelete(LoginRequiredMixin, TemplateView):
             )
 
             if not response.get('errors'):
-                messages.success(request, 'Group deleted successfully')
+                messages.success(request, f'Group "{localpart}" deleted successfully')
 
         return HttpResponseRedirect(reverse('groups:list'))

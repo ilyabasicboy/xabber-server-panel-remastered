@@ -65,6 +65,7 @@
                         <th>
                             Online users
                         </th>
+                        <th>DNS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,6 +82,15 @@
                             </td>
                             <td data-title="Online users">
                                 {{ obj.online|default:'--' }}
+                            </td>
+                            <td class="align-middle" data-title="DNS">
+                               {% if not obj.host.check_dns %}
+                                    <div class="d-flex">
+                                        <div class="icon-link text-warning fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Domain does not exist">
+                                            <i class="bi bi-exclamation-circle-fill d-flex"></i>
+                                        </div>
+                                    </div>
+                               {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

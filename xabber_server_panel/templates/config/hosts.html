@@ -52,10 +52,10 @@
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
                                                 <a class="dropdown-item text-wrap" href="{% url 'config:host_detail' id=host.id %}">
-                                                    SRV records info
+                                                    Domain settings
                                                 </a>
                                             </li>
-                                            {% if settings_write_permissions and request.user.host != host.name %}
+                                            {% if settings_write_permissions %}
                                                 <li>
                                                     <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
@@ -73,11 +73,15 @@
         {% endif %}
     </div>
 
-    {% if settings_write_permissions %}
-        <div class="mt-4 text-end">
+    <div class="mt-4 text-end">
+        <a href="#" class="btn btn-success" onclick="location.reload(); return false;">
+            Refresh domains info
+        </a>
+        {% if settings_write_permissions %}
             <a class="btn btn-primary" href="{% url 'config:host_create' %}">
                 Add virtual host
             </a>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
+
 {% endblock %}

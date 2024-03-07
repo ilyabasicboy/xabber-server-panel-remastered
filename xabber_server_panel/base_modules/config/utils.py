@@ -10,7 +10,7 @@ from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseX
 import copy
 import os
 import asyncio
-import aiohttp
+import requests
 from importlib import util, import_module
 
 
@@ -164,43 +164,20 @@ def update_ejabberd_config():
 
 # ========== ASYNC DNS REQUESTS ===============
 
-semaphore = asyncio.Semaphore(value=50)
+def check_hosts_dns():
+    unchecked_hosts = VirtualHost.objects.filter(check_dns=False)
 
-
-@sync_to_async
-def get_unchecked_hosts():
-    return list(VirtualHost.objects.filter(check_dns=False))
-
-
-@sync_to_async
-def update_unchecked_hosts(hosts_dns_checked):
-    VirtualHost.objects.filter(id__in=hosts_dns_checked).update(check_dns=True)
-
-
-async def check_hosts_dns():
-    unchecked_hosts = await get_unchecked_hosts()
-
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for host in unchecked_hosts:
-            tasks.append(check_host_dns(session, host))
-
-        hosts_dns_checked = await asyncio.gather(*tasks)
+    checked_hosts = []
+    for host in unchecked_hosts:
+        records = get_srv_records(host.name)
+        if not 'error' in records:
+            checked_hosts += [host.id]
 
     # update checked hosts
-    await update_unchecked_hosts(hosts_dns_checked)
+    VirtualHost.objects.filter(id__in=checked_hosts).update(check_dns=True)
 
 
-async def check_host_dns(session, host):
-
-    async with semaphore:
-        records = await get_srv_records(session, host.name)
-
-    if not 'error' in records:
-        return host.id
-
-
-async def get_srv_records(session, domain):
+def get_srv_records(domain):
 
     """ Request srv records from dns service """
 
@@ -208,34 +185,35 @@ async def get_srv_records(session, domain):
 
     for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
         try:
-            async with session.get(
+            response = requests.get(
                     f"{settings.DNS_SERVICE}?name={service}.{domain}&type=SRV",
                     headers={"accept": "application/dns-json"},
-                    timeout=3
-            ) as response:
-                # Check if response is successful
-                if response.status == 200:
-                    data = await response.json()
-                    if 'Answer' in data:
-                        srv_records[service] = []
-                        for record in data['Answer']:
-                            if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
-                                parts = record['data'].split()
-                                if len(parts) == 4:
-                                    srv_records[service].append({
-                                        'priority': int(parts[0]),
-                                        'weight': int(parts[1]),
-                                        'port': int(parts[2]),
-                                        'target': parts[3]
-                                    })
-                    else:
-                        srv_records['error'] = f"No SRV records found for {service}.{domain}"
+                    timeout=2
+            )
+
+            # Check if response is successful
+            if response.status_code == 200:
+                data = response.json()
+                if 'Answer' in data:
+                    srv_records[service] = []
+                    for record in data['Answer']:
+                        if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
+                            parts = record['data'].split()
+                            if len(parts) == 4:
+                                srv_records[service].append({
+                                    'priority': int(parts[0]),
+                                    'weight': int(parts[1]),
+                                    'port': int(parts[2]),
+                                    'target': parts[3]
+                                })
                 else:
-                    srv_records['error'] = f"HTTP Error: {response.status}"
-        except aiohttp.ClientTimeout:
+                    srv_records['error'] = f"No SRV records found for {service}.{domain}"
+            else:
+                srv_records['error'] = f"HTTP Error: {response.status}"
+        except requests.Timeout:
             # Handle timeout error
             srv_records['error'] = "Timeout occurred while making the request."
-        except aiohttp.ClientError as e:
+        except requests.RequestException as e:
             # Handle other client errors
             srv_records['error'] = f"An error occurred while making the request: {e}"
         except Exception as e:
@@ -318,14 +296,4 @@ def check_hosts(api):
             hosts_to_delete.delete()
 
         # check dns records for vhosts
-
-        loop = asyncio.new_event_loop()
-
-        try:
-            loop.run_until_complete(
-                check_hosts_dns()
-            )
-        except Exception as e:
-            print(e)
-
-        loop.close()
+        check_hosts_dns()

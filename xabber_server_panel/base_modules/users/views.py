@@ -47,7 +47,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, 'User created successfully.')
+                messages.success(request, f'User "{user.full_jid}" created successfully.')
 
             return HttpResponseRedirect(
                 reverse(
@@ -118,7 +118,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, 'User changed successfully.')
+                messages.success(request, f'User "{self.user.full_jid}" changed successfully.')
 
         context = {
             'user': self.user,
@@ -253,7 +253,7 @@ class UserDelete(LoginRequiredMixin, TemplateView):
 
             # check api errors
             if not response.get('errors'):
-                messages.success(request, 'User deleted successfully.')
+                messages.success(request, f'User "{user.full_jid}" deleted successfully.')
         else:
             messages.error(request, 'You can not delete yourself.')
         return HttpResponseRedirect(reverse('users:list'))
@@ -307,7 +307,7 @@ class UserVcard(LoginRequiredMixin, TemplateView):
 
         # check api errors
         if not response.get('errors'):
-            messages.success(self.request, 'User changed successfully.')
+            messages.success(self.request, f'User "{self.user.full_jid}" changed successfully.')
 
 
 class UserCircles(LoginRequiredMixin, TemplateView):
@@ -349,7 +349,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         # check api errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(self.request, 'User changed successfully.')
+            messages.success(self.request, f'User "{self.user.full_jid}" changed successfully.')
 
         context = {
             'user': self.user,

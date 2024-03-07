@@ -12,7 +12,7 @@ from xabber_server_panel.base_modules.users.decorators import permission_read, p
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages
 
-from .forms import CircleForm
+from .forms import CircleForm, MembersForm
 from .utils import check_circles
 
 
@@ -110,7 +110,7 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
             # check server errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, 'Circle created successfully.')
+                messages.success(request, f'Circle "{circle.circle}" created successfully.')
                 return HttpResponseRedirect(
                     reverse(
                         'circles:detail',
@@ -156,7 +156,7 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         # check server errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(request, 'Circle changed successfully.')
+            messages.success(request, f'Circle "{self.circle.circle}" changed successfully.')
 
         context = {
             'circle': self.circle,
@@ -227,12 +227,16 @@ class CirclesDelete(LoginRequiredMixin, TemplateView):
         api = get_api(request)
 
         circle.delete()
-        api.delete_circle(
+        response = api.delete_circle(
             {
                 'circle': circle.circle,
                 'host': circle.host
             }
         )
+
+        # check server errors
+        if not response.get('errors'):
+            messages.success(request, f'Circle "{circle.circle}" deleted successfully.')
         return HttpResponseRedirect(reverse('circles:list'))
 
 
@@ -256,7 +260,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         context = {
             'circle': self.circle,
-            'users': users,
+            'users': users
         }
 
         return self.render_to_response(context)

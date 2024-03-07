@@ -1,4 +1,7 @@
 from django import forms
+from django.contrib.admin.widgets import FilteredSelectMultiple
+
+from xabber_server_panel.base_modules.users.models import User
 
 from .models import Circle
 
@@ -55,3 +58,14 @@ class CircleForm(forms.ModelForm):
 
         return cleaned_data
 
+
+class MembersForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['members'].choices = [(user.id, user.full_jid) for user in User.objects.all()]
+
+    members = forms.MultipleChoiceField(
+        widget=FilteredSelectMultiple('members', False)
+    )
