@@ -8,9 +8,10 @@ from xabber_server_panel.base_modules.users.decorators import permission_read, p
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import host_is_valid
 from xabber_server_panel.base_modules.groups.forms import GroupForm
+from xabber_server_panel.mixins import ServerStartedMixin
 
 
-class GroupList(LoginRequiredMixin, TemplateView):
+class GroupList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/list.html'
 
@@ -56,7 +57,7 @@ class GroupList(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class GroupCreate(LoginRequiredMixin, TemplateView):
+class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'groups/create.html'
 
@@ -104,7 +105,7 @@ class GroupCreate(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class GroupDelete(LoginRequiredMixin, TemplateView):
+class GroupDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, localpart, host, *args, **kwargs):

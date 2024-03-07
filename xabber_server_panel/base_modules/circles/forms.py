@@ -55,17 +55,4 @@ class CircleForm(forms.ModelForm):
             if Circle.objects.filter(circle=circle, host=host).exists():
                 self.add_error('circle', "A circle with that circle and host already exists.")
 
-
         return cleaned_data
-
-
-class MembersForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields['members'].choices = [(user.id, user.full_jid) for user in User.objects.all()]
-
-    members = forms.MultipleChoiceField(
-        widget=FilteredSelectMultiple('members', False)
-    )

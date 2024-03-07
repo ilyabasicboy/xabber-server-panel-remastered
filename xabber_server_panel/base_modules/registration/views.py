@@ -11,11 +11,12 @@ from xabber_server_panel.base_modules.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config, get_error_messages
 from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.mixins import ServerStartedMixin
 
 from .models import RegistrationSettings
 
 
-class RegistrationList(LoginRequiredMixin, TemplateView):
+class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Render list of registration keys if registration is link """
 
@@ -113,7 +114,7 @@ class RegistrationList(LoginRequiredMixin, TemplateView):
             self.context['keys'] = self.keys
 
 
-class RegistrationCreate(LoginRequiredMixin, TemplateView):
+class RegistrationCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Create registration key """
 
@@ -177,7 +178,7 @@ class RegistrationCreate(LoginRequiredMixin, TemplateView):
         )
 
 
-class RegistrationChange(LoginRequiredMixin, TemplateView):
+class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Change registration key """
 
@@ -260,7 +261,7 @@ class RegistrationChange(LoginRequiredMixin, TemplateView):
         )
 
 
-class RegistrationDelete(LoginRequiredMixin, TemplateView):
+class RegistrationDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Delete registration key """
 
@@ -285,7 +286,7 @@ class RegistrationDelete(LoginRequiredMixin, TemplateView):
         )
 
 
-class RegistrationUrl(LoginRequiredMixin, TemplateView):
+class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Change web client url"""
 

@@ -12,13 +12,14 @@ from xabber_server_panel.utils import get_error_messages
 from xabber_server_panel.base_modules.users.utils import get_user_data_for_api
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.mixins import ServerStartedMixin
 
 from .models import User, CustomPermission, get_apps_choices
 from .forms import UserForm
 from .utils import check_users, block_user, ban_user, unblock_user, set_expires
 
 
-class CreateUser(LoginRequiredMixin, TemplateView):
+class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'users/create.html'
 
@@ -77,7 +78,7 @@ class CreateUser(LoginRequiredMixin, TemplateView):
             )
 
 
-class UserDetail(LoginRequiredMixin, TemplateView):
+class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'users/detail.html'
 
@@ -193,7 +194,7 @@ class UserDetail(LoginRequiredMixin, TemplateView):
             unblock_user(self.api, self.user)
 
 
-class UserBlock(LoginRequiredMixin, TemplateView):
+class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -213,7 +214,7 @@ class UserBlock(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('users:list'))
 
 
-class UserUnBlock(LoginRequiredMixin, TemplateView):
+class UserUnBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -228,7 +229,7 @@ class UserUnBlock(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('users:list'))
 
 
-class UserDelete(LoginRequiredMixin, TemplateView):
+class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -259,7 +260,7 @@ class UserDelete(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('users:list'))
 
 
-class UserVcard(LoginRequiredMixin, TemplateView):
+class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'users/vcard.html'
 
@@ -310,7 +311,7 @@ class UserVcard(LoginRequiredMixin, TemplateView):
             messages.success(self.request, f'User "{self.user.full_jid}" changed successfully.')
 
 
-class UserCircles(LoginRequiredMixin, TemplateView):
+class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'users/circles.html'
 
@@ -396,7 +397,7 @@ class UserCircles(LoginRequiredMixin, TemplateView):
         self.user.save()
 
 
-class UserList(LoginRequiredMixin, TemplateView):
+class UserList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'users/list.html'
 
@@ -437,7 +438,7 @@ class UserList(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class UserPermissions(LoginRequiredMixin, TemplateView):
+class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
 
     @permission_admin

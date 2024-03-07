@@ -11,12 +11,13 @@ from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages
+from xabber_server_panel.mixins import ServerStartedMixin
 
-from .forms import CircleForm, MembersForm
+from .forms import CircleForm
 from .utils import check_circles
 
 
-class CircleList(LoginRequiredMixin, TemplateView):
+class CircleList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'circles/list.html'
 
     @permission_read
@@ -58,7 +59,7 @@ class CircleList(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class CircleCreate(LoginRequiredMixin, TemplateView):
+class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'circles/create.html'
 
     @permission_write
@@ -125,7 +126,7 @@ class CircleCreate(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class CircleDetail(LoginRequiredMixin, TemplateView):
+class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/detail.html'
 
@@ -214,7 +215,7 @@ class CircleDetail(LoginRequiredMixin, TemplateView):
         self.circle.save()
 
 
-class CirclesDelete(LoginRequiredMixin, TemplateView):
+class CirclesDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
@@ -240,7 +241,7 @@ class CirclesDelete(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('circles:list'))
 
 
-class CircleMembers(LoginRequiredMixin, TemplateView):
+class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'circles/members.html'
 
     @permission_read
@@ -260,7 +261,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
 
         context = {
             'circle': self.circle,
-            'users': users
+            'users': users,
         }
 
         return self.render_to_response(context)
@@ -363,7 +364,7 @@ class CircleMembers(LoginRequiredMixin, TemplateView):
         self.circle.members.set(server_members)
 
 
-class DeleteMember(LoginRequiredMixin, TemplateView):
+class DeleteMember(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, circle_id, member_id, *args, **kwargs):
@@ -396,7 +397,7 @@ class DeleteMember(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse('circles:members', kwargs={'id': circle.id}))
 
 
-class CircleShared(LoginRequiredMixin, TemplateView):
+class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'circles/shared.html'
 
