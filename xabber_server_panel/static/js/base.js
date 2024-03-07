@@ -181,16 +181,6 @@ $(function () {
         }
     });
 
-    //Show/hide modal messages
-    const messagesItem = document.querySelector('#messages');
-    if ($(messagesItem).length > 0) {
-        let messages = new bootstrap.Modal(document.getElementById('messages'), {})
-        messages.show();
-        setTimeout(function() {
-             messages.hide();
-        }, 4000);
-    }
-
     //Set Cookie
     function setCookie(name, value, options = {}) {
         options = {

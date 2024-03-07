@@ -13,15 +13,15 @@
                         Xabber server have successfully installed
                     </div>
 
-                    <div class="mb-4">
+                    {% with form.xmpp_host.value as xmpp_host %}
+                        {% include 'parts/host_desc.html' %}
+                    {% endwith %}
+
+                    <div class="mb-4 text-end">
                         <a class="btn btn-primary" href="{% url 'dashboard:dashboard' %}" role="button">
                             Go to the management console
                         </a>
                     </div>
-
-                    {% with form.xmpp_host.value as xmpp_host %}
-                        {% include 'parts/host_desc.html' %}
-                    {% endwith %}
                 </main>
             </div>
         </div>

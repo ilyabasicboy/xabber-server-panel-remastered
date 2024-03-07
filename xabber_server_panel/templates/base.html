@@ -156,6 +156,21 @@
                     </div>
 
                     <main class="col-md-9 col-xl-10 overflow-hidden ms-sm-auto px-md-4 py-4">
+                        {% block messages %}
+                            {% if messages %}
+                                <div class="alert alert-warning alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif  %}" role="alert">
+                                    <div class="d-flex flex-column">
+                                        {% for message in messages %}
+                                            <div class="{% if not forloop.last %}mb-1{% endif %}">
+                                                {{ message|striptags }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif %}
+                        {% endblock %}
+
                         {% block section_title %}
                             <h2 class="mb-4 col-12">
                                 {% block content_title %}{% endblock %}
@@ -163,32 +178,6 @@
                         {% endblock %}
 
                         {% block content %}{% endblock %}
-
-                        {% block messages %}
-
-                            {% if messages %}
-                                <div class="modal fade show" id="messages" tabindex="-1" aria-labelledby="messages_label" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-scrollable">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="manage_label">Messages</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-
-                                            <div class="modal-body">
-                                                <ul class="list-group list-group-flush">
-                                                    {% for message in messages %}
-                                                        <li class="list-group-item {% if message.tags == 'error' %}text-danger{% elif message.tags == 'success' %}text-success{% endif  %}">
-                                                            {{ message|striptags }}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endblock %}
 
                         <div class="modal fade" id="delete_modal" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable">
