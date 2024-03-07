@@ -152,6 +152,19 @@ def get_error_messages(request):
 
     return error_messages
 
+def get_success_messages(request):
+    success_messages = []
+
+    # Get all messages for the current request
+    message_list = messages.get_messages(request)
+
+    # Filter messages with the 'error' tag
+    for message in message_list:
+        if message.tags == 'success':
+            success_messages.append(message.message)
+
+    return success_messages
+
 
 def get_system_group_suffix():
     return ''.join(random.choices(string.ascii_lowercase, k=8))

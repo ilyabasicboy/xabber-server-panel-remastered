@@ -4,6 +4,8 @@ from django.utils.html import strip_spaces_between_tags
 from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 
+from xabber_server_panel.utils import get_success_messages, get_error_messages
+
 
 register = template.Library()
 
@@ -66,3 +68,19 @@ def get_items_by_model_name(model_name, ordering=None, num=None, **kwargs):
     if num:
         items = items[:num]
     return items
+
+
+@register.simple_tag(takes_context=True)
+def get_messages(context):
+    messages = {}
+    request = context.get('request')
+    if request:
+        success_messages = get_success_messages(request)
+        if success_messages:
+            messages['success'] = success_messages
+
+        error_messages = get_error_messages(request)
+        if error_messages:
+            messages['error'] = error_messages
+
+    return messages

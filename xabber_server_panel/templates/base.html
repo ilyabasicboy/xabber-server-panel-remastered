@@ -157,17 +157,32 @@
 
                     <main class="col-md-9 col-xl-10 overflow-hidden ms-sm-auto px-md-4 py-4">
                         {% block messages %}
+                            {% get_messages as messages %}
                             {% if messages %}
-                                <div class="alert alert-warning alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif  %}" role="alert">
-                                    <div class="d-flex flex-column">
-                                        {% for message in messages %}
-                                            <div class="{% if not forloop.last %}mb-1{% endif %}">
-                                                {{ message|striptags }}
-                                            </div>
-                                        {% endfor %}
+                                {% if messages.success %}
+                                    <div class="alert alert-warning alert-dismissible fade show alert-success" role="alert">
+                                        <div class="d-flex flex-column">
+                                            {% for message in messages.success %}
+                                                <div class="{% if not forloop.last %}mb-1{% endif %}">
+                                                    {{ message|striptags }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
+                                {% endif %}
+                                {% if messages.error %}
+                                    <div class="alert alert-warning alert-dismissible fade show alert-danger" role="alert">
+                                        <div class="d-flex flex-column">
+                                            {% for message in messages.error %}
+                                                <div class="{% if not forloop.last %}mb-1{% endif %}">
+                                                    {{ message|striptags }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         {% endblock %}
 
