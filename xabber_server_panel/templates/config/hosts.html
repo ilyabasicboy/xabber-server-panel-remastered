@@ -74,15 +74,15 @@
         {% endif %}
     </div>
 
-    <div class="mt-4 text-end">
-        <a href="#" class="btn btn-success" onclick="location.reload(); return false;">
+    <div class="mt-4 mb-n3 me-n3 d-flex justify-content-end flex-wrap">
+        <a class="btn btn-success me-3 mb-3" onclick="location.reload(); return false;" role="button">
             Refresh domains info
         </a>
+
         {% if settings_write_permissions %}
-            <a class="btn btn-primary" href="{% url 'config:host_create' %}">
+            <a class="btn btn-primary me-3 mb-3" href="{% url 'config:host_create' %}">
                 Add virtual host
             </a>
         {% endif %}
     </div>
-
 {% endblock %}
