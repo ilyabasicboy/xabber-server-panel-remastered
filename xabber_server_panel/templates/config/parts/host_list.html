@@ -1,0 +1,63 @@
+{% load users_tags %}
+
+{% check_user_permissions request.user 'config' as settings_read_permissions %}
+{% if hosts %}
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Virtual host</th>
+                <th>DNS records</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for host in hosts %}
+                <tr>
+                    <td class="align-middle" data-title="#">
+                        {{ forloop.counter }}
+                    </td>
+                    <td class="align-middle" data-title="Virtual host">
+                        {{ host.name }}
+                    </td>
+
+                    <td class="align-middle" data-title="DNS">
+                       {% if not host.check_dns %}
+                            <div class="d-flex align-items-center">
+                                <div class="icon-link text-warning fs-5 me-2">
+                                    <i class="bi bi-exclamation-triangle-fill d-flex"></i>
+                                </div>
+                                Domain does not exist
+                            </div>
+                       {% endif %}
+                    </td>
+
+                    <td class="align-middle" data-title="Actions">
+                        <div class="d-flex">
+                            <div class="dropdown">
+                                <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical d-flex"></i>
+                                </div>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item text-wrap" href="{% url 'config:host_detail' id=host.id %}">
+                                            Domain settings
+                                        </a>
+                                    </li>
+                                    {% if settings_write_permissions %}
+                                        <li>
+                                            <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                 Delete
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

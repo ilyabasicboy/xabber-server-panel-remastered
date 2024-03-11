@@ -238,7 +238,15 @@ class CirclesDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         # check server errors
         if not response.get('errors'):
             messages.success(request, f'Circle "{circle.circle}" deleted successfully.')
-        return HttpResponseRedirect(reverse('circles:list'))
+
+        # redirect to previous url or circles list
+        circle_detail_url = reverse('circles:detail', kwargs={'id': id})
+        referer = request.META.get('HTTP_REFERER')
+        if referer and circle_detail_url not in referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('circles:list'))
 
 
 class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):

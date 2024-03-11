@@ -53,7 +53,11 @@ class Search(LoginRequiredMixin, TemplateView):
     template_name = 'search.html'
 
     def get(self, request, *args, **kwargs):
-        text = request.GET.get('text', '')
+        try:
+            text = request.GET.get('search', '').strip()
+        except:
+            text = ''
+
         object = request.GET.get('object')
 
         hosts = request.user.get_allowed_hosts()
@@ -79,7 +83,7 @@ class Search(LoginRequiredMixin, TemplateView):
             circles = Circle.objects.filter(
                 Q(circle__contains=text, host=host)
                 | Q(name__contains=text, host=host)
-            ).order_by('circle')
+            ).exclude(circle=host).order_by('circle')
             context['circles'] = circles
 
             # check users from server

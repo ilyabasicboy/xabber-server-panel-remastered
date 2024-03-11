@@ -1,5 +1,5 @@
-from django.shortcuts import reverse, loader
-from django.views.generic import TemplateView
+from django.shortcuts import reverse, loader, render
+from django.views.generic import TemplateView, View
 from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.template.utils import get_app_template_dirs
 from django.conf import settings
@@ -12,7 +12,7 @@ from django.apps import apps
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
-from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts
+from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
@@ -142,8 +142,16 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         vh_check = VirtualHost.objects.filter(name=host).exists()
 
         if host_is_valid(host) and not vh_check:
+
+            # check srv records
+            check_dns = False
+            records = get_srv_records(host)
+            if not 'error' in records:
+                check_dns = True
+
             VirtualHost.objects.create(
-                name=host
+                name=host,
+                check_dns=check_dns
             )
 
             # update config after creating new host
@@ -188,6 +196,16 @@ class CreateHost(LoginRequiredMixin, TemplateView):
                 'all_users': True
             }
         )
+
+
+class CheckDnsRecords(View):
+
+    def get(self, request):
+        check_hosts_dns()
+        context = {
+            'hosts': VirtualHost.objects.all()
+        }
+        return render(request, 'config/parts/host_list.html', context)
 
 
 class Admins(LoginRequiredMixin, TemplateView):

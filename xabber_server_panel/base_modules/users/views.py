@@ -1,6 +1,6 @@
 from django.shortcuts import reverse, loader
 from django.views.generic import TemplateView
-from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -50,14 +50,14 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if not error_messages:
                 messages.success(request, f'User "{user.full_jid}" created successfully.')
 
-            return HttpResponseRedirect(
-                reverse(
-                    'users:detail',
-                    kwargs={
-                        'id': user.id
-                    }
+                return HttpResponseRedirect(
+                    reverse(
+                        'users:detail',
+                        kwargs={
+                            'id': user.id
+                        }
+                    )
                 )
-            )
 
         context = {
             'hosts': request.user.get_allowed_hosts(),
@@ -87,7 +87,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         circles = Circle.objects.filter(host=user.host)
 
@@ -102,7 +102,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.api = get_api(request)
 
@@ -131,7 +131,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         password = self.request.POST.get('password')
         confirm_password = self.request.POST.get('confirm_password')
-        if password and confirm_password:
+        if password or confirm_password:
 
             # Check user auth backend
             if self.user.auth_backend_is_ldap:
@@ -201,7 +201,7 @@ class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -211,7 +211,14 @@ class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             messages.error(request, 'You can not block yourself')
         else:
             block_user(api, user, reason)
-        return HttpResponseRedirect(reverse('users:list'))
+
+        # redirect to previous url or users list
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('users:list'))
 
 
 class UserUnBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
@@ -221,12 +228,19 @@ class UserUnBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
         unblock_user(api, user)
-        return HttpResponseRedirect(reverse('users:list'))
+
+        # redirect to previous url or users list
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('users:list'))
 
 
 class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
@@ -237,7 +251,7 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -257,7 +271,15 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                 messages.success(request, f'User "{user.full_jid}" deleted successfully.')
         else:
             messages.error(request, 'You can not delete yourself.')
-        return HttpResponseRedirect(reverse('users:list'))
+
+        # redirect to previous url or users list
+        user_detail_url = reverse('users:detail', kwargs={'id': id})
+        referer = request.META.get('HTTP_REFERER')
+        if referer and user_detail_url not in referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('users:list'))
 
 
 class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
@@ -269,7 +291,7 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         context = {
             'user': user,
@@ -281,7 +303,7 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.api = get_api(request)
 
@@ -320,7 +342,7 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -339,7 +361,7 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.circles = Circle.objects.filter(host=self.user.host).exclude(circle=self.user.host)
         self.api = get_api(request)
@@ -446,7 +468,7 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         # check if user change himself
         if user == request.user:
@@ -472,7 +494,7 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.user = User.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         # check if user change himself
         if self.user == request.user:

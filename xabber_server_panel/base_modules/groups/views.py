@@ -122,4 +122,10 @@ class GroupDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if not response.get('errors'):
                 messages.success(request, f'Group "{localpart}" deleted successfully')
 
-        return HttpResponseRedirect(reverse('groups:list'))
+        # redirect to previous url or groups list
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('groups:list'))

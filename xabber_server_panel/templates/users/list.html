@@ -35,24 +35,4 @@
             </a>
         </div>
     {% endif %}
-
-    <div class="modal fade" id="block_user" tabindex="-1"  aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <form class="modal-content" action="" method="GET">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="manage_members_label">Reason for blocking</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking">{{ user.reason|default:'' }}</textarea>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-info">Block</button>
-                </div>
-            </form>
-        </div>
-    </div>
 {% endblock %}

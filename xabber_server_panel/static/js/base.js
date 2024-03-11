@@ -39,6 +39,16 @@ $(function () {
         ajax_send(url, $(this).attr('href'));
     });
 
+    //Check dns records ajax
+    $('.check-records-js').click(function(e){
+        e.preventDefault();
+        let url = $(this).data('url');
+        $.get(url, {}, function(data){
+            console.log(data);
+            $('.host-list-js').html(data);
+        });
+    });
+
     //Separate logic for search
     let target, object;
     function search_ajax(url, $target=$('.search-list-js'), object='', page='') {

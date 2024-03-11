@@ -162,7 +162,7 @@ def update_ejabberd_config():
     reload_ejabberd_config()
 
 
-# ========== ASYNC DNS REQUESTS ===============
+# ========== DNS REQUESTS ===============
 
 def check_hosts_dns():
     unchecked_hosts = VirtualHost.objects.filter(check_dns=False)
@@ -294,6 +294,3 @@ def check_hosts(api):
         hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
         if hosts_to_delete:
             hosts_to_delete.delete()
-
-        # check dns records for vhosts
-        check_hosts_dns()

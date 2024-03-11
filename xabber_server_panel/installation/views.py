@@ -7,6 +7,7 @@ from django.contrib.auth import login
 
 from xabber_server_panel.utils import server_installed
 from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.base_modules.config.utils import check_hosts_dns
 from xabber_server_panel.custom_auth.forms import ApiAuthenticationForm
 
 from .forms import InstallationForm
@@ -77,6 +78,7 @@ class Steps(TemplateView):
 
                 create_circles(self.form.cleaned_data)
                 self._login_admin()
+                check_hosts_dns()
                 return HttpResponseRedirect(reverse('installation:success'))
 
             # additional errors check
@@ -153,12 +155,13 @@ class Quick(TemplateView):
                 })
 
             create_circles(self.form.cleaned_data)
-            self.login_admin()
+            self._login_admin()
+            check_hosts_dns()
             return HttpResponseRedirect(reverse('installation:success'))
 
         return self.render_to_response(context)
 
-    def login_admin(self):
+    def _login_admin(self):
         data = {
             'username': f"{self.form.cleaned_data.get('username')}@{self.form.cleaned_data.get('host')}",
             'password': self.form.cleaned_data.get('password')

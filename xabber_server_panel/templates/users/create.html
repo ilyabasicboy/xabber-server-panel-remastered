@@ -56,7 +56,7 @@
                 <div class="row mb-3">
                     <label class="col-form-label col-12 col-md-3">Nickname</label>
                     <div class="col-12 col-md-9">
-                        <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if form.password.data %}value="{{ form.nickname.data }}"{% endif %}>
+                        <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if form.nickname.data %}value="{{ form.nickname.data }}"{% endif %}>
                         <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
                     </div>
                 </div>
@@ -82,10 +82,10 @@
                     <div class="col-12 col-md-9">
                         <div class="row check-date-js">
                             <div class="col-6">
-                                <input class="form-control text-body-tertiary" type="date" name="expires_date" {% if form.expires.data %}value="{{ form.expires.data }}"{% endif %}>
+                                <input class="form-control text-body-tertiary" type="date" name="expires_date" {% if form.expires_date.data %}value="{{ form.expires_date.data }}"{% endif %}>
                             </div>
                             <div class="col-6">
-                                <input class="form-control text-body-tertiary" type="time" name="expires_time" value="{{ form.expires.data|default:'12:00' }}" disabled>
+                                <input class="form-control text-body-tertiary" type="time" name="expires_time" value="{{ form.expires_time.data|default:'12:00' }}" disabled>
                             </div>
                         </div>
                         <span class="form-text text-secondary">User expiration date.</span>
@@ -98,7 +98,7 @@
 
                         <div class="col-12 col-md-9">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin">
+                                <input class="form-check-input" type="checkbox" name="is_admin" id="is_admin" {% if form.is_admin.data %}checked{% endif %}>
                                 <label class="form-check-label" for="is_admin">
                                     Administrator
                                 </label>

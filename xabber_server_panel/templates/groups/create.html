@@ -47,12 +47,12 @@
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="privacy_public" type="radio" name="privacy" value="public" checked>
+                        <input class="form-check-input" id="privacy_public" type="radio" name="privacy" value="public" {% if form.privacy.data == 'public' or not form.privacy.data %}checked{% endif %}>
                         <label class="form-check-label" for="privacy_public">public</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="privacy_incognito" type="radio" name="privacy" value="incognito">
+                        <input class="form-check-input" id="privacy_incognito" type="radio" name="privacy" value="incognito" {% if form.privacy.data == 'incognito' %}checked{% endif %}>
                         <label class="form-check-label" for="privacy_incognito">incognito</label>
                     </div>
                 </div>
@@ -63,17 +63,17 @@
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="index_none" type="radio" name="index" value="none" checked>
+                        <input class="form-check-input" id="index_none" type="radio" name="index" value="none" {% if form.index.data == 'none' or not form.index.data %}checked{% endif %}>
                         <label class="form-check-label" for="index_none">none</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="index_local" type="radio" name="index" value="local">
+                        <input class="form-check-input" id="index_local" type="radio" name="index" value="local" {% if form.index.data == 'local' %}checked{% endif %}>
                         <label class="form-check-label" for="index_local">local</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="index_global" type="radio" name="index" value="global">
+                        <input class="form-check-input" id="index_global" type="radio" name="index" value="global" {% if form.index.data == 'global' %}checked{% endif %}>
                         <label class="form-check-label" for="index_global">global</label>
                     </div>
                 </div>
@@ -84,12 +84,12 @@
 
                 <div class="col-12 col-md-9">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="membership_open" type="radio" name="membership" value="open" checked>
+                        <input class="form-check-input" id="membership_open" type="radio" name="membership" value="open" {% if form.membership.data == 'open' or not form.membership.data %}checked{% endif %}>
                         <label class="form-check-label" for="membership_open">open</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" id="membership_member_only" type="radio" name="membership" value="member-only">
+                        <input class="form-check-input" id="membership_member_only" type="radio" name="membership" value="member-only" {% if form.membership.data == 'member-only' %}checked{% endif %}>
                         <label class="form-check-label" for="membership_member_only">member-only</label>
                     </div>
                 </div>

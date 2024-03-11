@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot
+from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot, CheckDnsRecords
 
 
 urlpatterns = [
     path('', ConfigRoot.as_view(), name='root'),
     path('hosts/', Hosts.as_view(), name='hosts'),
+    path('check_records/', CheckDnsRecords.as_view(), name='check_records'),
     path('admins/', Admins.as_view(), name='admins'),
     path('ldap/', Ldap.as_view(), name='ldap'),
     path('modules/', Modules.as_view(), name='modules'),

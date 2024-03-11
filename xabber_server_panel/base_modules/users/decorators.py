@@ -40,11 +40,12 @@ def permission_write(func):
             messages.error(request, 'You have no permissions for this request.')
 
             # redirect logic if user has no permissions
+            referer = request.META.get('HTTP_REFERER')
             if request.method == 'POST':
                 return HttpResponseRedirect(request.path)
-            elif 'HTTP_REFERER' in request.META:
+            elif referer:
                 # If there is a referer, redirect to it
-                return HttpResponseRedirect(request.META['HTTP_REFERER'])
+                return HttpResponseRedirect(referer)
             else:
                 return HttpResponseRedirect(reverse('home'))
 
@@ -62,11 +63,12 @@ def permission_admin(func):
             messages.error(request, 'You have no permissions for this request.')
 
             # redirect logic if user has no permissions
+            referer = request.META.get('HTTP_REFERER')
             if request.method == 'POST':
                 return HttpResponseRedirect(request.path)
-            elif 'HTTP_REFERER' in request.META:
+            elif referer:
                 # If there is a referer, redirect to it
-                return HttpResponseRedirect(request.META['HTTP_REFERER'])
+                return HttpResponseRedirect(referer)
             else:
                 return HttpResponseRedirect(reverse('home'))
 

@@ -84,7 +84,7 @@
 
                 <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-1 order-md-0 col-12 col-md-auto" id="search">
                     <form class="w-100 pt-2 pt-md-0" action="{% url 'search' %}" method="GET">
-                        <input class="form-control" type="text" name="text" placeholder="Search for Users, Circles, Groups">
+                        <input class="form-control" type="text" name="search" {% if request.GET.search %}value="{{ request.GET.search }}"{% endif %}  placeholder="Search for Users, Circles, Groups">
                     </form>
                 </div>
 
@@ -198,7 +198,7 @@
                             <div class="modal-dialog modal-dialog-scrollable">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="manage_members_label">Do you really want to delete?</h1>
+                                        <h1 class="modal-title fs-5" id="delete_modal_label">Do you really want to delete?</h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
 
@@ -207,6 +207,26 @@
                                         <a class="btn btn-danger" href="">Delete</a>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="block_user" tabindex="-1" aria-labelledby="block_user_label" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable">
+                                <form class="modal-content" action="" method="GET">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="block_user_label">Reason for blocking</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking"></textarea>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-info">Block</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </main>

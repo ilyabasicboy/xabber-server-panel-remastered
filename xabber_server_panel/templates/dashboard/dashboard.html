@@ -24,7 +24,7 @@
             {% endif %}
         </h5>
 
-        {% if dashboard_write_permissions %}
+        {% if request.user.is_admin %}
             <div class="mb-3 overflow-hidden">
                 <form method="post" action="{% url 'dashboard:dashboard' %}">
                     {% csrf_token %}
