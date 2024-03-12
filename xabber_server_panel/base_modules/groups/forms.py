@@ -1,12 +1,13 @@
 from django import forms
 
-from xabber_server_panel.utils import jid_form_validation, host_form_validation
+from xabber_server_panel.utils import jid_form_validation, host_form_validation, validate_local_part
 
 
 class GroupForm(forms.Form):
 
     localpart = forms.CharField(
-        required=True
+        required=True,
+        validators=[validate_local_part]
     )
 
     host = forms.CharField(

@@ -41,13 +41,16 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         self.api = get_api(request)
 
         if form.is_valid():
-            user = form.save()
+            # create user instance without save in db
+            user = form.save(commit=False)
 
             self.create_user_api(user, form.cleaned_data)
 
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
+                # save user in db success
+                user.save()
                 messages.success(request, f'User "{user.full_jid}" created successfully.')
 
                 return HttpResponseRedirect(

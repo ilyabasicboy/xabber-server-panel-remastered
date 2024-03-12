@@ -95,7 +95,7 @@ class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if not response.get('errors'):
                 messages.success(request, f'Group "{form.cleaned_data.get("localpart")}" created successfully')
 
-            return HttpResponseRedirect(reverse('groups:list'))
+                return HttpResponseRedirect(reverse('groups:list'))
 
         context = {
             'hosts': request.user.get_allowed_hosts(),

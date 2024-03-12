@@ -137,6 +137,16 @@ def host_form_validation(value):
         raise ValidationError("Invalid host format.")
 
 
+def validate_local_part(value):
+    """
+    Custom validator to check if the local part of an email address is valid.
+    """
+    if not re.match(r'^[a-zA-Z0-9._%+-]+$', value):
+        raise ValidationError(
+            'Invalid characters in the local part.'
+        )
+
+
 # =============== OTHER ==============
 
 def get_error_messages(request):

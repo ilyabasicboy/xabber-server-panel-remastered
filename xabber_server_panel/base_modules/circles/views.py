@@ -80,8 +80,9 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         api = get_api(request)
 
         if form.is_valid():
+            # create circle instance
+            circle = form.save(commit=False)
 
-            circle = form.save()
             autoshare = form.cleaned_data.get('autoshare')
             name = form.cleaned_data.get('name')
             # use circle if name is not provided
@@ -111,6 +112,9 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             # check server errors
             error_messages = get_error_messages(request)
             if not error_messages:
+                # save circle in db if success
+                circle.save()
+
                 messages.success(request, f'Circle "{circle.circle}" created successfully.')
                 return HttpResponseRedirect(
                     reverse(

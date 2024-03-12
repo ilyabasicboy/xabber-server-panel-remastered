@@ -49,33 +49,31 @@ def check_users(api, host):
     except:
         registered_users = []
 
-    if registered_users:
+    # Get a list of existing usernames from the User model
+    existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)
 
-        # Get a list of existing usernames from the User model
-        existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)
+    # get registered usernames list
+    registered_usernames = [user['username'] for user in registered_users]
 
-        # get registered usernames list
-        registered_usernames = [user['username'] for user in registered_users]
+    # Filter the user_list to exclude existing usernames
+    unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
 
-        # Filter the user_list to exclude existing usernames
-        unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
+    # create in db unknown users
+    if unknown_users:
+        users_to_create = [
+            User(
+                username=user['username'],
+                host=host,
+                auth_backend=user['backend']
+            )
+            for user in unknown_users
+        ]
+        User.objects.bulk_create(users_to_create)
 
-        # create in db unknown users
-        if unknown_users:
-            users_to_create = [
-                User(
-                    username=user['username'],
-                    host=host,
-                    auth_backend=user['backend']
-                )
-                for user in unknown_users
-            ]
-            User.objects.bulk_create(users_to_create)
-
-        # get unregistered users in db and delete
-        users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
-        if users_to_delete:
-            users_to_delete.delete()
+    # get unregistered users in db and delete
+    users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
+    if users_to_delete:
+        users_to_delete.delete()
 
 
 def block_user(api, user, reason):
