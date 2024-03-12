@@ -41,7 +41,13 @@
                     <label class="col-form-label col-12 col-md-3 {% if form.password.errors %}text-danger{% endif %}">Password *</label>
                     <div class="col-12 col-md-9">
                         <div class="input-group">
-                            <input class="form-control {% if form.password.errors %}is-invalid{% endif %}" type="text" name="password" placeholder="Password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
+                            <div class="password {% if form.password.data %}active{% endif %}">
+                                <input class="password-input form-control {% if form.password.errors %}is-invalid{% endif %}" type="password" name="password" placeholder="Password" {% if form.password.data %}value="{{ form.password.data }}"{% endif %}>
+                                <button class="password-btn" type="button">
+                                    <i class="password-icon bi bi-eye"></i>
+                                    <i class="password-icon bi bi-eye-slash"></i>
+                                </button>
+                            </div>
                             <button class="btn btn-primary generate-password-js" type="button">Generate</button>
                         </div>
                     </div>

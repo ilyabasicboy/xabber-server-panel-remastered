@@ -40,11 +40,15 @@ $(function () {
     });
 
     //Check dns records ajax
-    $('.check-records-js').click(function(e){
+    $('.check-records-js').on('click', function(e) {
         e.preventDefault();
-        let url = $(this).data('url');
-        $.get(url, {}, function(data){
-            console.log(data);
+        let $this = $(this);
+        let url = $this.data('url');
+        $this.find('.spinner-border').removeClass('d-none');
+        $this.attr('disabled', true);
+        $.get(url, {}, function(data) {
+            $this.find('.spinner-border').addClass('d-none');
+            $this.attr('disabled', false);
             $('.host-list-js').html(data);
         });
     });
@@ -155,7 +159,8 @@ $(function () {
         return res;
     };
     $(document).on('click', '.generate-password-js', function() {
-        $(this).prev().val(generatePassword());
+        $(this).parent().find('input').val(generatePassword());
+        $(this).parent().find('input').trigger('change');
         return false;
     });
 
@@ -311,6 +316,29 @@ $(function () {
     $(document).on('click', '[data-block-href]', function() {
         let blockLinkHref = $(this).data('block-href');
         $('#block_user').find('form').attr('action', blockLinkHref);
+    });
+
+    //Show/hidden password
+    let password = $('.password');
+    password.each(function(index, item) {
+        let input = $(item).find('.password-input');
+        let btn = $(item).find('.password-btn');
+        $(input).on('change input', function() {
+            if ($(this).val().length === 0) {
+                $(item).removeClass('active');
+            } else {
+                $(item).addClass('active');
+            }
+        });
+        $(btn).on('click', function() {
+            if (!$(this).hasClass('active-show')) {
+                $(input).prop("type", "text");
+                $(this).addClass('active-show');
+            } else {
+                $(input).prop("type", "password");
+                $(this).removeClass('active-show');
+            }
+        });
     });
 
 });

@@ -90,3 +90,68 @@
 .form-control::placeholder {
     color: var(--bs-tertiary-color);
 }
+
+/*Input password*/
+.input-group:not(.has-validation)> .password >:not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.password {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    border-radius: 0px;
+}
+
+.password.active .password-input {
+    padding-right: calc(1.5em + 0.75rem);
+}
+
+.password-btn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: calc(1.5em + 0.75rem);
+    height: 100%;
+    border-radius: 0px;
+    box-shadow: none;
+    border: none;
+    background-color: transparent;
+    padding: 0px;
+    margin: 0px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.password.active .password-btn {
+    display: flex;
+}
+
+.password-icon {
+    width: calc(.75em + .375rem);
+    height: auto;
+    display: flex;
+}
+
+.password-icon:last-child {
+    display: none;
+}
+
+.password-btn.active-show .password-icon:last-child {
+    display: flex;
+}
+
+.password-btn.active-show .password-icon:first-child {
+    display: none;
+}
+
+.password.active .password-input.is-invalid {
+    padding-right: calc(1.5em + 0.75rem + 1.5em + 0.75rem);
+}
+
+.password.active .password-input.is-invalid + .password-btn {
+    right: calc(1.5em + 0.75rem);
+}
