@@ -78,14 +78,16 @@
             {% if circles_write_permissions %}
                 <div class="fixed-bottom row col-md-9 col-xl-10 m-0 ms-auto py-4 px-0 px-md-4 bg-body border-top shadow">
                     <div class="col-12 p-md-0">
-                        <div class="d-flex flex-wrap mb-n3 me-n3">
-                            <button class="btn btn-primary btn-secondary me-3 mb-3" type="submit" name="save" disabled>
-                                Save
-                            </button>
+                        <div class="container-xxl p-0">
+                            <div class="d-flex flex-wrap mb-n3 me-n3">
+                                <button class="btn btn-primary btn-secondary me-3 mb-3" type="submit" name="save" disabled>
+                                    Save
+                                </button>
 
-                            <a class="btn btn-danger me-3 mb-3" data-delete-href="{% url 'circles:delete' id=circle.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
-                                Delete Circle
-                            </a>
+                                <a class="btn btn-danger me-3 mb-3" data-delete-href="{% url 'circles:delete' id=circle.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                    Delete Circle
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
