@@ -11,6 +11,7 @@ from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.base_modules.config.utils import get_modules
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.mixins import ServerStartedMixin
 
 import importlib
 
@@ -48,7 +49,7 @@ class HomePage(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context, **kwargs)
 
 
-class Search(LoginRequiredMixin, TemplateView):
+class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'search.html'
 

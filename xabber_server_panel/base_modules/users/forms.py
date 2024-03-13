@@ -54,7 +54,13 @@ class UserForm(forms.ModelForm):
         expires_date = cleaned_data.get("expires_date")
         expires_time = cleaned_data.get("expires_time")
 
-        if expires_date and expires_time:
+        if expires_date:
+
+            # set default time if it's not provided
+            if not expires_time:
+                expires_time = '12:00'
+                expires_time = datetime.strptime(expires_time, '%H:%M').time()
+
             # Combine date and time
             expires_datetime = datetime.combine(expires_date, expires_time)
             cleaned_data["expires"] = expires_datetime

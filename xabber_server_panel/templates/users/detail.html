@@ -109,7 +109,7 @@
                         {% endif %}
                     </div>
 
-                    {% if not user.auth_backend_is_ldap %}
+                    {% if request.user.is_admin and not user.auth_backend_is_ldap %}
                         <hr class="border border-2 my-4">
                         <div class="d-flex flex-column mb-4">
                             <h4 class="text-secondary mt-0">

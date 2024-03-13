@@ -2,6 +2,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.shortcuts import HttpResponseRedirect, reverse
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_admin
@@ -36,7 +38,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         if start:
             start_ejabberd()
-            logout(request)
+
+            # logout all users when starting server
+            self._logout_all_users()
+
             next = reverse('dashboard:dashboard')
             return HttpResponseRedirect(
                 reverse(
@@ -53,6 +58,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'started': is_ejabberd_started()
         }
         return self.render_to_response(context)
+
+    def _logout_all_users(self):
+        # Get all active sessions
+        sessions = Session.objects.filter(expire_date__gte=timezone.now())
+
+        # Delete all active sessions
+        sessions.delete()
 
     def get_users_data(self):
         hosts = self.request.user.get_allowed_hosts()

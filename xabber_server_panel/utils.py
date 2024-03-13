@@ -3,6 +3,7 @@ from django.apps import apps
 from collections import OrderedDict
 from django.contrib import messages
 from django.forms import ValidationError
+from django.core.validators import URLValidator
 
 import subprocess
 import time
@@ -145,6 +146,22 @@ def validate_local_part(value):
         raise ValidationError(
             'Invalid characters in the local part.'
         )
+
+
+def validate_link(value):
+    """
+    Custom validator to check if a URL is valid.
+    """
+    url_validator = URLValidator()
+
+    try:
+        # Use Django's built-in URLValidator to validate the URL
+        url_validator(value)
+    except ValidationError:
+        # If validation fails, raise a ValidationError with a custom error message
+        return False
+
+    return True
 
 
 # =============== OTHER ==============

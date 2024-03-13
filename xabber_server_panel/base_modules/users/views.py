@@ -134,7 +134,9 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         password = self.request.POST.get('password')
         confirm_password = self.request.POST.get('confirm_password')
-        if password or confirm_password:
+
+        # change password can only admin
+        if (password or confirm_password) and self.request.user.is_admin:
 
             # Check user auth backend
             if self.user.auth_backend_is_ldap:
@@ -156,19 +158,30 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             else:
                 self.errors += ['Password is incorrect.']
 
-        # set expires if its provided
+        # set expires if it's provided
         # BEFORE CHANGE STATUS!!!
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
         delete_expires = self.request.POST.get('delete_expires')
-        if self.user != self.request.user:
-            if delete_expires:
-                set_expires(self.api, self.user, None)
-            elif expires_date and expires_time:
-                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
-                expires_time = datetime.strptime(expires_time, '%H:%M').time()
-                expires = datetime.combine(expires_date, expires_time)
-                set_expires(self.api, self.user, expires)
+
+        if expires_date or delete_expires:
+            if self.user == self.request.user:
+                self.errors += ['You cant change self expires.']
+            elif self.user.is_admin and not self.request.user.is_admin:
+                self.errors += ['You cant change expires of admin.']
+            else:
+                if delete_expires:
+                    set_expires(self.api, self.user, None)
+                elif expires_date:
+
+                    # set default time if it's not provided
+                    if not expires_time:
+                        expires_time = '12:00'
+
+                    expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+                    expires_time = datetime.strptime(expires_time, '%H:%M').time()
+                    expires = datetime.combine(expires_date, expires_time)
+                    set_expires(self.api, self.user, expires)
 
         status = self.request.POST.get('status')
         if status and self.user.status != status:
@@ -182,16 +195,20 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         if status == 'BLOCKED':
             reason = self.request.POST.get('reason')
-            if self.request.user != self.user:
-                block_user(self.api, self.user, reason)
-            else:
+            if self.request.user == self.user:
                 self.errors += ['You can not block yourself.']
+            elif self.user.is_admin and not self.request.user.is_admin:
+                self.errors += ['You can not block admin.']
+            else:
+                block_user(self.api, self.user, reason)
 
         elif status == 'BANNED' and not self.user.auth_backend_is_ldap:
-            if self.request.user != self.user:
-                ban_user(self.api, self.user)
-            else:
+            if self.request.user == self.user:
                 self.errors += ['You can not ban yourself.']
+            elif self.user.is_admin and not self.request.user.is_admin:
+                self.errors += ['You can not ban admin.']
+            else:
+                ban_user(self.api, self.user)
 
         elif status == 'ACTIVE':
             unblock_user(self.api, self.user)
@@ -211,7 +228,9 @@ class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         reason = self.request.GET.get('reason')
 
         if request.user == user:
-            messages.error(request, 'You can not block yourself')
+            messages.error(request, 'You can not block yourself.')
+        elif user.is_admin and not request.user.is_admin:
+            messages.error(request, 'You can not block admin.')
         else:
             block_user(api, user, reason)
 
@@ -260,6 +279,8 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         if user.auth_backend_is_ldap:
             messages.error(request, 'User auth backend is "ldap". User cant be deleted.')
+        elif user.is_admin and not request.user.is_admin:
+            messages.error(request, 'You can not delete admin.')
         elif user.full_jid != request.user.full_jid:
             user.delete()
             response = api.unregister_user(

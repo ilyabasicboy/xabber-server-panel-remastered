@@ -8,7 +8,7 @@ from datetime import datetime
 
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config
-from xabber_server_panel.utils import reload_ejabberd_config, get_error_messages
+from xabber_server_panel.utils import reload_ejabberd_config, get_error_messages, validate_link
 from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.mixins import ServerStartedMixin
@@ -145,8 +145,13 @@ class RegistrationCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         expires_time = self.request.POST.get('expires_time')
         expires = 0
 
-        if expires_date and expires_time:
+        if expires_date:
             try:
+
+                # set default time if it's not provided
+                if not expires_time:
+                    expires_time = '12:00'
+
                 # combine date and time
                 expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
                 expires_time = datetime.strptime(expires_time, '%H:%M').time()
@@ -226,16 +231,22 @@ class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
+
         expires = 0
 
-        if expires_date and expires_time:
-            try:
+        if expires_date:
+            # try:
                 # combine date and time
                 expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+
+                # check expires time
+                if not expires_time:
+                    expires_time = '12:00'
+
                 expires_time = datetime.strptime(expires_time, '%H:%M').time()
                 expires = int(datetime.combine(expires_date, expires_time).timestamp())
-            except:
-                pass
+            # except:
+            #     pass
 
         api = get_api(request)
 
@@ -314,7 +325,7 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         url = request.POST.get('url')
         all = request.POST.get('all')
 
-        if url:
+        if url and validate_link(url):
             if all:
                 RegistrationSettings.objects.all().update(url=url)
             else:
@@ -325,6 +336,8 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(
                 reverse('registration:list') + f'?host={settings.host.name}'
             )
+        else:
+            messages.error(request, 'Url is incorrect.')
 
         context = {
             'settings': settings
