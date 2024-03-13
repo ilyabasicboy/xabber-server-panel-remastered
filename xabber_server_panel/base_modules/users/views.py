@@ -136,7 +136,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         confirm_password = self.request.POST.get('confirm_password')
 
         # change password can only admin
-        if (password or confirm_password) and self.request.user.is_admin:
+        if (password or confirm_password) and (self.request.user.is_admin or self.request.user == self.user):
 
             # Check user auth backend
             if self.user.auth_backend_is_ldap:

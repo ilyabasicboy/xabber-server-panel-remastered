@@ -45,38 +45,42 @@ def check_users(api, host):
     """
     if is_ejabberd_started():
         try:
-            registered_users = api.get_users({"host": host}).get('users')
+            response = api.get_users({"host": host})
+            registered_users = response.get('users')
         except:
             registered_users = []
+            response = {}
 
-        if registered_users is None:
-            registered_users = []
+        if response and not response.get('errors'):
 
-        # Get a list of existing usernames from the User model
-        existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)
+            if registered_users is None:
+                registered_users = []
 
-        # get registered usernames list
-        registered_usernames = [user['username'] for user in registered_users]
+            # Get a list of existing usernames from the User model
+            existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)
 
-        # Filter the user_list to exclude existing usernames
-        unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
+            # get registered usernames list
+            registered_usernames = [user['username'] for user in registered_users]
 
-        # create in db unknown users
-        if unknown_users:
-            users_to_create = [
-                User(
-                    username=user['username'],
-                    host=host,
-                    auth_backend=user['backend']
-                )
-                for user in unknown_users
-            ]
-            User.objects.bulk_create(users_to_create)
+            # Filter the user_list to exclude existing usernames
+            unknown_users = [user for user in registered_users if user['username'] not in existing_usernames]
 
-        # get unregistered users in db and delete
-        users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
-        if users_to_delete:
-            users_to_delete.delete()
+            # create in db unknown users
+            if unknown_users:
+                users_to_create = [
+                    User(
+                        username=user['username'],
+                        host=host,
+                        auth_backend=user['backend']
+                    )
+                    for user in unknown_users
+                ]
+                User.objects.bulk_create(users_to_create)
+
+            # get unregistered users in db and delete
+            users_to_delete = User.objects.filter(host=host).exclude(username__in=registered_usernames)
+            if users_to_delete:
+                users_to_delete.delete()
 
 
 def block_user(api, user, reason):

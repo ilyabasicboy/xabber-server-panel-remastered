@@ -53,7 +53,7 @@
             {% endif %}
         </div>
 
-        {% if circles_write_permissions %}
+        {% if circles_write_permissions and users_read_permissions %}
             <div class="modal fade reset-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
                     <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
@@ -93,71 +93,73 @@
         {% endif %}
     </div>
 
-    <div class="mt-4 col-12">
-        <div class="table-adaptive">
-            <table class="table table-striped mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Username</th>
-                        <th>Nickname</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if circle.all_users %}
+    {% if circle.all_users or users_read_permissions %}
+        <div class="mt-4 col-12">
+            <div class="table-adaptive">
+                <table class="table table-striped mb-0">
+                    <thead>
                         <tr>
-                            <td class="align-middle d-none d-lg-table-cell">
-                            </td>
-                            <td class="align-middle" data-title="All users">
-                                All ({{ circle.get_members_count }} on {{ circle.host }})
-                            </td>
-                            <td class="align-middle d-none d-lg-table-cell">
-                            </td>
-                            <td class="align-middle d-none d-lg-table-cell">
-                            </td>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Nickname</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endif %}
-                    {% for user in circle.members.all %}
-                        <tr>
-                            <td class="align-middle" data-title="#">
-                                <div class="d-flex">
-                                    <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
-                                        {{ user.get_initials }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle" data-title="Username">
-                                <span class="text-break">
-                                    {{ user.full_jid }}
-                                </span>
-                            </td>
-                            <td class="align-middle" data-title="Nickname">
-                                {{ user.nickname|default:'' }}
-                            </td>
-                            <td class="align-middle" data-title="Actions">
-                                {% if circles_write_permissions %}
+                    </thead>
+                    <tbody>
+                        {% if circle.all_users %}
+                            <tr>
+                                <td class="align-middle d-none d-lg-table-cell">
+                                </td>
+                                <td class="align-middle" data-title="All users">
+                                    All ({{ circle.get_members_count }} on {{ circle.host }})
+                                </td>
+                                <td class="align-middle d-none d-lg-table-cell">
+                                </td>
+                                <td class="align-middle d-none d-lg-table-cell">
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% for user in circle.members.all %}
+                            <tr>
+                                <td class="align-middle" data-title="#">
                                     <div class="d-flex">
-                                        <div class="dropdown">
-                                            <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="bi bi-three-dots-vertical d-flex"></i>
-                                            </div>
-
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
-                                                        Delete
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                        <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
+                                            {{ user.get_initials }}
                                         </div>
                                     </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                </td>
+                                <td class="align-middle" data-title="Username">
+                                    <span class="text-break">
+                                        {{ user.full_jid }}
+                                    </span>
+                                </td>
+                                <td class="align-middle" data-title="Nickname">
+                                    {{ user.nickname|default:'' }}
+                                </td>
+                                <td class="align-middle" data-title="Actions">
+                                    {% if circles_write_permissions %}
+                                        <div class="d-flex">
+                                            <div class="dropdown">
+                                                <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical d-flex"></i>
+                                                </div>
+
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <a class="dropdown-item text-wrap text-danger" href="{% url 'circles:delete_member' circle_id=circle.id member_id=user.id %}">
+                                                            Delete
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

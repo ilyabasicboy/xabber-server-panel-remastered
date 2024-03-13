@@ -109,35 +109,37 @@
                         {% endif %}
                     </div>
 
-                    {% if request.user.is_admin and not user.auth_backend_is_ldap %}
-                        <hr class="border border-2 my-4">
-                        <div class="d-flex flex-column mb-4">
-                            <h4 class="text-secondary mt-0">
-                                Change password
-                            </h4>
+                    {% if request.user.is_admin or user == request.user %}
+                        {% if not user.auth_backend_is_ldap  %}
+                            <hr class="border border-2 my-4">
+                            <div class="d-flex flex-column mb-4">
+                                <h4 class="text-secondary mt-0">
+                                    Change password
+                                </h4>
 
-                            <div class="mb-3">
-                                <label class="form-label">Password *</label>
-                                <div class="password">
-                                    <input class="password-input form-control" type="password" name="password" placeholder="Password">
-                                    <button class="password-btn" type="button">
-                                        <i class="password-icon bi bi-eye"></i>
-                                        <i class="password-icon bi bi-eye-slash"></i>
-                                    </button>
+                                <div class="mb-3">
+                                    <label class="form-label">Password *</label>
+                                    <div class="password">
+                                        <input class="password-input form-control" type="password" name="password" placeholder="Password">
+                                        <button class="password-btn" type="button">
+                                            <i class="password-icon bi bi-eye"></i>
+                                            <i class="password-icon bi bi-eye-slash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="form-label">Confirm password *</label>
+                                    <div class="password">
+                                        <input class="password-input form-control" type="password" name="confirm_password" placeholder="Confirm password">
+                                        <button class="password-btn" type="button">
+                                            <i class="password-icon bi bi-eye"></i>
+                                            <i class="password-icon bi bi-eye-slash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div>
-                                <label class="form-label">Confirm password *</label>
-                                <div class="password">
-                                    <input class="password-input form-control" type="password" name="confirm_password" placeholder="Confirm password">
-                                    <button class="password-btn" type="button">
-                                        <i class="password-icon bi bi-eye"></i>
-                                        <i class="password-icon bi bi-eye-slash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
