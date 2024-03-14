@@ -111,6 +111,27 @@ class RootPage(models.Model):
         return self.module
 
 
+class Module(models.Model):
+
+    name = models.CharField(
+        max_length=30
+    )
+    verbose_name = models.TextField(
+        blank=True,
+        null=True
+    )
+    version = models.CharField(
+        max_length=20
+    )
+    files = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return self.name
+
+
 def check_vhost(vhost):
     return vhost in [obj.name for obj in VirtualHost.objects.all()] or vhost == "global"
 

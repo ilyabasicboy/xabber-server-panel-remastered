@@ -31,7 +31,7 @@
                                 Home page
                             </option>
                             {% for module in modules %}
-                                <option value="{{ module.module }}" {% if rp.0.module == module.module %}selected{% endif %}>
+                                <option value="{{ module.name }}" {% if rp.0.module == module.name %}selected{% endif %}>
                                     {{ module.verbose_name }}
                                 </option>
                             {% endfor %}

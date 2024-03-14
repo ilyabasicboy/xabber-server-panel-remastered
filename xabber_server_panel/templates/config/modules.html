@@ -18,6 +18,7 @@
                     <tr>
                         <th>#</th>
                         <th>Module</th>
+                        <th>Version</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -27,6 +28,9 @@
                             <td data-title="#">{{ forloop.counter }}</td>
                             <td data-title="Module">
                                 {{ module.verbose_name }}
+                            </td>
+                            <td data-title="Version">
+                                {{ module.version }}
                             </td>
                             <td data-title="Actions">
                                 {% if settings_write_permissions %}
@@ -38,7 +42,7 @@
 
                                             <ul class="dropdown-menu dropdown-menu-end">
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:delete_module' module=module.module %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:delete_module' module=module.name %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
                                                     </a>
                                                 </li>

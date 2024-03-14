@@ -8,11 +8,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core import management
 from django.apps import apps
+from importlib import import_module
 
-from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
-from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns
+from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns, check_modules
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
@@ -409,43 +410,41 @@ class Modules(LoginRequiredMixin, TemplateView):
         return self.render_to_response({})
 
     def handle_upload(self):
-        temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
+        self.temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
 
         try:
             # Create temporary dir for unpack
-            os.makedirs(temp_extract_dir, exist_ok=True)
+            os.makedirs(self.temp_extract_dir, exist_ok=True)
 
             # Unpack archieve in temporary dir
             with tarfile.open(fileobj=self.uploaded_file, mode='r:gz') as tar:
-                tar.extractall(temp_extract_dir)
+                tar.extractall(self.temp_extract_dir)
+
+            module_name, version = self.check_version()
 
             # Get nested dir inside 'panel'
-            panel_path = os.path.join(temp_extract_dir, 'panel')
-            if os.path.isdir(panel_path):
+            panel_path = os.path.join(self.temp_extract_dir, 'panel')
+            module_path = os.path.join(panel_path, module_name)
+
+            if os.path.isdir(module_path):
 
                 # Copy module in modules dir
-                for module_dir in os.listdir(panel_path):
-                    app_name = f'modules.{module_dir}'
-                    self.install_module(panel_path, module_dir, app_name)
+                self.install_module(panel_path, module_name)
 
-                # create permissions for new modules
-                management.call_command('update_permissions')
-
-                # Delete temporary dir
-                shutil.rmtree(temp_extract_dir)
-
-                make_xmpp_config()
-                get_app_template_dirs.cache_clear()
-
-                reload_server()
+                # after installation actions
+                self.after_install(module_name, version)
 
                 messages.success(self.request, 'Modules added successfully.')
+            else:
+                raise Exception('Module folder is missed.')
         except Exception as e:
             # Delete temporary dir
-            shutil.rmtree(temp_extract_dir, ignore_errors=True)
+            shutil.rmtree(self.temp_extract_dir, ignore_errors=True)
             messages.error(self.request, e)
 
-    def install_module(self, panel_path, module_dir, app_name):
+    def install_module(self, panel_path, module_dir):
+
+        app_name = f'modules.{module_dir}'
 
         target_path = os.path.join(settings.MODULES_DIR, module_dir)
         module_path = os.path.join(panel_path, module_dir)
@@ -468,6 +467,77 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         if not settings.DEBUG:
             management.call_command('collectstatic', '--noinput', interactive=False)
+
+    def check_version(self):
+
+        # read module spec
+        spec_path = os.path.join(self.temp_extract_dir, 'module.spec')
+        if os.path.exists(spec_path):
+            with open(spec_path, 'r') as file:
+                content = file.read()
+        else:
+            raise Exception('Module spec information is missed.')
+
+        name_match = re.search(r'NAME\s*=\s*([^\n]+)', content)
+        version_match = re.search(r'VERSION\s*=\s*([^\n]+)', content)
+
+        if name_match and version_match:
+            module_name = name_match.group(1).strip().lower()
+            version = version_match.group(1).strip().lower()
+        else:
+            raise Exception('Module spec is incorrect.')
+
+        module = Module.objects.filter(name=module_name).first()
+        if module:
+
+            # check version if module already installed
+            try:
+                installed_version = tuple(map(int, module.version.split('.')))
+                new_version = tuple(map(int, version.split('.')))
+            except ValueError:
+                raise Exception("Invalid version format.")
+
+            if new_version < installed_version:
+                raise Exception("You have a newer module version.")
+            elif new_version == installed_version:
+                raise Exception("You already have this module.")
+
+        return module_name, version
+
+    def after_install(self, module_name, version):
+
+        # get module verbose name
+        try:
+            module_app = import_module('.apps', package=f'modules.{module_name}')
+        except:
+            module_app = None
+
+        verbose_name = ''
+        if module_app:
+            module_config = getattr(module_app, 'ModuleConfig', None)
+
+            if module_config:
+                verbose_name = getattr(module_config, 'verbose_name', module_name)
+
+        # update module info
+        Module.objects.update_or_create(
+            name=module_name,
+            defaults={
+                'version': version,
+                'verbose_name': verbose_name
+            }
+        )
+
+        # create permissions for new modules
+        management.call_command('update_permissions')
+
+        # Delete temporary dir
+        shutil.rmtree(self.temp_extract_dir)
+
+        make_xmpp_config()
+        get_app_template_dirs.cache_clear()
+
+        reload_server()
 
 
 class DeleteModule(LoginRequiredMixin, TemplateView):
@@ -495,6 +565,9 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
             management.call_command('collectstatic', '--noinput', interactive=False)
 
         shutil.rmtree(module_path)
+
+        # delete module info
+        Module.objects.filter(name=module).delete()
 
         settings.INSTALLED_APPS.remove(app_name)
 

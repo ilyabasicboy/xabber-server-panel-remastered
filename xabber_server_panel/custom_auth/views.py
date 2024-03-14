@@ -3,7 +3,6 @@ from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.urls import reverse
 from django.contrib.auth import login
-from django.contrib import messages
 
 from xabber_server_panel.utils import is_ejabberd_started
 

@@ -1,15 +1,13 @@
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
-from asgiref.sync import sync_to_async
 
-from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.utils import reload_ejabberd_config
 from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseXmppOption
 
 import copy
 import os
-import asyncio
 import requests
 from importlib import util, import_module
 
@@ -223,35 +221,13 @@ def get_srv_records(domain):
 
 
 # ========= OTHER ===============
+def check_modules():
 
-def get_modules_data():
+    """ delete old modules objects """
 
-    """ Create list of dicts with modules data """
+    modules = get_modules()
 
-    modules = []
-    if os.path.isdir(settings.MODULES_DIR):
-        modules_dirs = os.listdir(settings.MODULES_DIR)
-        for module_dir in modules_dirs:
-
-            module_data = {
-                'module': module_dir
-            }
-
-            # get apps file to append module verbose_name in data
-            try:
-                module_app = import_module('.apps', package=f'modules.{module_dir}')
-            except:
-                module_app = None
-
-            if module_app:
-                module_config = getattr(module_app, 'ModuleConfig', None)
-
-                if module_config:
-                    verbose_name = getattr(module_config, 'verbose_name', module_dir)
-                    module_data['verbose_name'] = verbose_name
-
-            modules += [module_data]
-    return modules
+    Module.objects.exclude(name__in=modules).delete()
 
 
 def get_modules():

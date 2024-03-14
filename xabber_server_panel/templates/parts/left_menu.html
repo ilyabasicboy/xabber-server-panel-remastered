@@ -79,12 +79,12 @@
         </li>
 
         {% for module in modules %}
-            {% with namespace=module.module|add:':info' %}
-                {% check_user_permissions request.user module.module as module_read_permissions %}
+            {% with namespace=module.name|add:':info' %}
+                {% check_user_permissions request.user module.name as module_read_permissions %}
                 {% if module_read_permissions %}
                     <li class="nav-item">
                         {% url namespace as module_url %}
-                        <a href="{{ module_url }}" class="nav-link text-white {% if module.module in request.path_info %}active{% endif %}">
+                        <a href="{{ module_url }}" class="nav-link text-white {% if module.name in request.path_info %}active{% endif %}">
                             {{ module.verbose_name }}
                         </a>
                     </li>

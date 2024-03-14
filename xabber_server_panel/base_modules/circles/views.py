@@ -421,8 +421,11 @@ class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             return HttpResponseNotFound
 
+        api = get_api(request)
+
         circles = Circle.objects.filter(host=circle.host).exclude(circle=circle.host)
 
+        check_circles(api, circle.host)
         context = {
             'circle': circle,
             'circles': circles,
