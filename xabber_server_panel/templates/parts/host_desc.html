@@ -1,12 +1,12 @@
 <div class="col-12">
     <div class="mb-4">
         <p>
-            To make XMPP work on your server, you need to set up SRV records for domain customdomain.com.
+            To make XMPP work on this server, you need to set up SRV records for <b>{{ host }}</b> domain.
             It will allow XMPP clients to correctly find the location of your server using Domain Name System (DNS).
             You need to add several types of DNS records to make things work:
         </p>
         <ul>
-            <li>A record for subdomain <b>example.com</b> to make server management panel available from the Internet on this address</li>
+            <li>A record for subdomain <b>{{ host }}</b> to make server management panel available from the Internet on this address</li>
             <li>SRV records to help XMPP clients and servers find your server</li>
         </ul>
     </div>

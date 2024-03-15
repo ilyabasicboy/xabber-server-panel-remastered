@@ -8,7 +8,6 @@
         <table class="table table-striped mb-0">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Username</th>
                     <th>Name</th>
                     <th>Created(UTC)</th>
@@ -21,13 +20,6 @@
             <tbody>
                 {% for user in paginated_users %}
                     <tr>
-                        <td data-title="#">
-                            <div class="d-flex">
-                                <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-6">
-                                    <i class="bi bi-person-circle"></i>
-                                </div>
-                            </div>
-                        </td>
                         <td class="align-middle" data-title="Username">
                             <a href="{% url 'users:detail' id=user.id %}">
                                 {{ user.username }}

@@ -35,6 +35,9 @@
                         <td data-title="Members count">
                             <span class="text-body-secondary">
                                 {{ circle.get_members_count }}
+                                {% if circle.all_users %}
+                                    ( all )
+                                {% endif %}
                             </span>
                         </td>
                         <td data-title="Actions">
