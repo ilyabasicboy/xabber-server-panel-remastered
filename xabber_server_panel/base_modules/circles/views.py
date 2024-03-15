@@ -1,6 +1,6 @@
-from django.shortcuts import reverse, loader
+from django.shortcuts import reverse, loader, Http404
 from django.views.generic import TemplateView
-from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -140,7 +140,7 @@ class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         context = {
             'circle': circle,
@@ -154,7 +154,7 @@ class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.update_circle()
 
@@ -227,7 +227,7 @@ class CirclesDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -262,7 +262,7 @@ class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.api = get_api(request)
 
@@ -284,7 +284,7 @@ class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         self.api = get_api(request)
 
@@ -384,12 +384,12 @@ class DeleteMember(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             circle = Circle.objects.get(id=circle_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         try:
             member = User.objects.get(id=member_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -419,7 +419,7 @@ class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -439,7 +439,7 @@ class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             self.circle = Circle.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         circles = Circle.objects.filter(host=self.circle.host).exclude(circle=self.circle.host)
         self.api = get_api(request)

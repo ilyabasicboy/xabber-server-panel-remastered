@@ -51,10 +51,7 @@ def check_users(api, host):
             registered_users = []
             response = {}
 
-        if response and not response.get('errors'):
-
-            if registered_users is None:
-                registered_users = []
+        if response and not response.get('errors') and registered_users is not None:
 
             # Get a list of existing usernames from the User model
             existing_usernames = User.objects.filter(host=host).values_list('username', flat=True)

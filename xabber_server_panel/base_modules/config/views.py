@@ -1,6 +1,6 @@
-from django.shortcuts import reverse, loader, render
+from django.shortcuts import reverse, loader, render, Http404
 from django.views.generic import TemplateView, View
-from django.http import HttpResponseRedirect, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.template.utils import get_app_template_dirs
 from django.conf import settings
 from ldap3 import Server, Connection, ALL
@@ -65,7 +65,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=id)
         except VirtualHost.DoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         if request.user.host == host.name:
             messages.error(request, "You can't delete self host!")
@@ -116,7 +116,7 @@ class DetailHost(LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=id)
         except VirtualHost.DoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         context = {
             'host': host
@@ -553,7 +553,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
             messages.success(request, f'Module "{module}" deleted successfully.')
             return HttpResponseRedirect(reverse('config:modules'))
         else:
-            return HttpResponseNotFound()
+            raise Http404
 
     def hande_delete(self, module_path, module, app_name):
 

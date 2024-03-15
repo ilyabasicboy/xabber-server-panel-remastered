@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
-from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import reverse, loader
+from django.shortcuts import reverse, loader, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from datetime import datetime
@@ -126,7 +126,7 @@ class RegistrationCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         context = {
             'host': host
@@ -139,7 +139,7 @@ class RegistrationCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
@@ -195,7 +195,7 @@ class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -227,7 +227,7 @@ class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
@@ -282,7 +282,7 @@ class RegistrationDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             host = VirtualHost.objects.get(id=vhost_id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         api = get_api(request)
 
@@ -308,7 +308,7 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             settings = RegistrationSettings.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         context = {
             'settings': settings
@@ -320,7 +320,7 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         try:
             settings = RegistrationSettings.objects.get(id=id)
         except ObjectDoesNotExist:
-            return HttpResponseNotFound
+            raise Http404
 
         url = request.POST.get('url')
         all = request.POST.get('all')
