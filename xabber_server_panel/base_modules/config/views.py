@@ -13,6 +13,7 @@ from importlib import import_module
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns, check_modules
 from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
@@ -214,6 +215,11 @@ class Admins(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
+        api = get_api(request)
+
+        for host in VirtualHost.objects.all():
+            check_users(api, host.name)
+
         admins = User.objects.filter(is_admin=True)
 
         # exclude authenticated user because he cant change self status
