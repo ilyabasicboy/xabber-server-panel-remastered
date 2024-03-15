@@ -308,14 +308,19 @@ $(function () {
 
     //Add delete link to modal
     $(document).on('click', '[data-delete-href]', function() {
-        let deleteLinkHref = $(this).data('delete-href');
-        $('#delete_modal').find('a').attr('href', deleteLinkHref);
+        let deleteName = $(this).data('delete-name');
+        let deleteTarget = $(this).data('delete-target');
+        let deleteHref = $(this).data('delete-href');
+        let deleteTitle = deleteName + ' ' + deleteTarget;
+
+        $('#delete_modal .modal-header .modal-title').find('span').text(deleteTitle);
+        $('#delete_modal .modal-footer a').attr('href', deleteHref).find('span').text(deleteName);
     });
 
     //Add block link to form
     $(document).on('click', '[data-block-href]', function() {
-        let blockLinkHref = $(this).data('block-href');
-        $('#block_user').find('form').attr('action', blockLinkHref);
+        let blockHref = $(this).data('block-href');
+        $('#block_user').find('form').attr('action', blockHref);
     });
 
     //Show/hidden password

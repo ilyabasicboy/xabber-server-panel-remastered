@@ -20,24 +20,24 @@
             <tbody>
                 {% for user in paginated_users %}
                     <tr>
-                        <td class="align-middle" data-title="Username">
+                        <td data-title="Username">
                             <a href="{% url 'users:detail' id=user.id %}">
                                 {{ user.username }}
                             </a>
                         </td>
-                        <td class="align-middle" data-title="Name">
+                        <td data-title="Name">
                             {% if user.nickname %}
                                 {{ user.nickname|truncatechars:'15' }}
                             {% else %}
                                 {{ user.full_name|truncatechars:'15' }}
                             {% endif %}
                         </td>
-                        <td class="align-middle" data-title="Created(UTC)">
+                        <td data-title="Created(UTC)">
                             <span class="text-body-secondary">
                                 {{ user.created|date:"m.d.Y H:i" }}
                             </span>
                         </td>
-                        <td class="align-middle" data-title="Expires(UTC)">
+                        <td data-title="Expires(UTC)">
                             <span class="text-body-secondary">
                                 {% if user.expires %}
                                     {{ user.expires|date:"m.d.Y H:i" }}
@@ -46,17 +46,17 @@
                                 {% endif %}
                             </span>
                         </td>
-                        <td class="align-middle" data-title="Auth">
+                        <td data-title="Auth">
                             <span class="text-body-secondary">
                                 {{ user.get_auth_backend_display }}
                             </span>
                         </td>
-                        <td class="align-middle" data-title="Status">
+                        <td data-title="Status">
                             <span class="text-success {% if not user.is_active %}text-danger{% endif %}">
                                 {{ user.status|title }}
                             </span>
                         </td>
-                        <td class="align-middle" data-title="Actions">
+                        <td data-title="Actions">
                             <div class="d-flex">
                                 <div class="dropdown">
                                     <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -73,7 +73,7 @@
                                         {% if user != request.user %}
                                             {% if users_write_permissions and not user.auth_backend_is_ldap %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-delete-name="user" data-delete-target="user" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete user
                                                     </a>
                                                 </li>
