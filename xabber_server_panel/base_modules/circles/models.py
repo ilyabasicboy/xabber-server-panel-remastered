@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.utils import validate_local_part
 
 
 def validate_circle(value):
@@ -21,7 +22,7 @@ class Circle(models.Model):
 
     circle = models.CharField(
         max_length=256,
-        validators=[validate_circle]
+        validators=[validate_local_part]
     )
     host = models.CharField(max_length=256)
     name = models.CharField(

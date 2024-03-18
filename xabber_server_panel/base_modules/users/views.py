@@ -9,7 +9,7 @@ from datetime import datetime
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.utils import get_error_messages
-from xabber_server_panel.base_modules.users.utils import get_user_data_for_api
+from xabber_server_panel.base_modules.users.utils import get_user_data_for_api, get_user_sessions
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.mixins import ServerStartedMixin
@@ -532,6 +532,7 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         # check api errors
         error_messages = get_error_messages(request)
         if not error_messages:
+            self.user.save()
             messages.success(self.request, 'Permissions changed successfully.')
 
         permissions = {
@@ -564,8 +565,6 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         self.user.permissions.set(permission_list)
 
-        self.user.save()
-
         if is_admin:
             self.api.set_admin(
                 {
@@ -590,6 +589,14 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                     "permissions": permissions,
                 }
             )
+
+        # delete user sessions if it's has no permissions
+        if not self.user.is_admin and not self.user.permissions.exists():
+            user_sessions = get_user_sessions(self.user)
+            if user_sessions:
+                for session in user_sessions:
+                    session.delete()
+
 
     def get_permissions_dict(self):
 

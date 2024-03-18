@@ -30,41 +30,24 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         self.api = get_api(request)
 
-        check_hosts(self.api)
-
         start = request.POST.get('start')
         restart = request.POST.get('restart')
         stop = request.POST.get('stop')
 
         if start:
             start_ejabberd()
-
-            # logout all users when starting server
-            self._logout_all_users()
-
-            next = reverse('dashboard:dashboard')
-            return HttpResponseRedirect(
-                reverse(
-                    'custom_auth:login'
-                ) + f'?next={next}'
-            )
         elif restart:
             restart_ejabberd()
         elif stop:
             stop_ejabberd()
+
+        check_hosts(self.api)
 
         context = {
             'data': self.get_users_data(),
             'started': is_ejabberd_started()
         }
         return self.render_to_response(context)
-
-    def _logout_all_users(self):
-        # Get all active sessions
-        sessions = Session.objects.filter(expire_date__gte=timezone.now())
-
-        # Delete all active sessions
-        sessions.delete()
 
     def get_users_data(self):
         hosts = self.request.user.get_allowed_hosts()

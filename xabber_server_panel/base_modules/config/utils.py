@@ -3,7 +3,7 @@ from django.conf import settings
 from django.apps import apps
 
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
-from xabber_server_panel.utils import reload_ejabberd_config
+from xabber_server_panel.utils import reload_ejabberd_config, is_ejabberd_started
 from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseXmppOption
 
 import copy
@@ -243,30 +243,29 @@ def check_hosts(api):
         if it doesn't exist in django db
     """
 
-    try:
-        registered_hosts = api.get_vhosts().get('vhosts')
-    except:
-        registered_hosts = []
+    if is_ejabberd_started():
+        response = api.get_vhosts()
+        registered_hosts = response.get('vhosts')
 
-    if registered_hosts:
+        if response and not response.get('errors') and registered_hosts is not None:
 
-        # Get a list of existing usernames from the User model
-        existing_hosts = VirtualHost.objects.values_list('name', flat=True)
+            # Get a list of existing usernames from the User model
+            existing_hosts = VirtualHost.objects.values_list('name', flat=True)
 
-        # Filter the user_list to exclude existing usernames
-        unknown_hosts = [host for host in registered_hosts if host not in existing_hosts]
+            # Filter the user_list to exclude existing usernames
+            unknown_hosts = [host for host in registered_hosts if host not in existing_hosts]
 
-        # create in db unknown users
-        if unknown_hosts:
-            hosts_to_create = [
-                VirtualHost(
-                    name=host,
-                )
-                for host in unknown_hosts
-            ]
-            VirtualHost.objects.bulk_create(hosts_to_create)
+            # create in db unknown users
+            if unknown_hosts:
+                hosts_to_create = [
+                    VirtualHost(
+                        name=host,
+                    )
+                    for host in unknown_hosts
+                ]
+                VirtualHost.objects.bulk_create(hosts_to_create)
 
-        # get unregistered users in db and delete
-        hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
-        if hosts_to_delete:
-            hosts_to_delete.delete()
+            # get unregistered users in db and delete
+            hosts_to_delete = VirtualHost.objects.exclude(name__in=registered_hosts)
+            if hosts_to_delete:
+                hosts_to_delete.delete()

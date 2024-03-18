@@ -139,7 +139,7 @@ AUTH_USER_MODEL = 'users.User'
 
 # ============ API ============#
 INSTALLED_APPS += ['xabber_server_panel.api']
-CRON_JOB_TOKEN = None
+EJABBERDCTL = None
 
 # ============ DASHBOARD ============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.dashboard']

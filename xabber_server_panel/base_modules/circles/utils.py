@@ -9,16 +9,11 @@ def check_circles(api, host: str) -> None:
     """
 
     if is_ejabberd_started():
-        try:
-            response = api.get_circles({"host": host})
-            registered_circles = response.get('circles')
-        except:
-            registered_circles = []
-            response = {}
 
-        if response and not response.get('errors'):
-            if registered_circles is None:
-                registered_circles = []
+        response = api.get_circles({"host": host})
+        registered_circles = response.get('circles')
+
+        if response and not response.get('errors') and registered_circles is not None:
 
             # Get a list of existing circles from the Circle model
             existing_circles = Circle.objects.values_list('circle', flat=True)

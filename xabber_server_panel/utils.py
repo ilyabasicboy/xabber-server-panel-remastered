@@ -144,7 +144,7 @@ def validate_local_part(value):
     """
     if not re.match(r'^[a-zA-Z0-9._%+-]+$', value):
         raise ValidationError(
-            'Invalid characters in the local part.'
+            'Invalid characters.'
         )
 
 

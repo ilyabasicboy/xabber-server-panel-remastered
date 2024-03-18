@@ -8,6 +8,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from xabber_server_panel.base_modules.config.utils import get_modules
 from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.utils import validate_local_part
 
 
 class UserManager(BaseUserManager):
@@ -88,7 +89,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     username = models.CharField(
         max_length=256,
-        validators=[username_validator],
+        validators=[
+            username_validator,
+            validate_local_part
+        ],
         error_messages={
             'unique': "A user with that username already exists.",
         },

@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.contrib.sessions.models import Session
 
 from .models import CustomPermission, User, get_apps_choices
 from xabber_server_panel.utils import is_ejabberd_started
@@ -44,12 +45,8 @@ def check_users(api, host):
         if it doesn't exist in django db
     """
     if is_ejabberd_started():
-        try:
-            response = api.get_users({"host": host})
-            registered_users = response.get('users')
-        except:
-            registered_users = []
-            response = {}
+        response = api.get_users({"host": host})
+        registered_users = response.get('users')
 
         if response and not response.get('errors') and registered_users is not None:
 
@@ -187,3 +184,13 @@ def get_user_data_for_api(user, password=None):
     if password:
         data['password'] = password
     return data
+
+
+def get_user_sessions(user):
+    sessions = Session.objects.filter(expire_date__gte=timezone.now())
+    user_sessions = []
+    for session in sessions:
+        session_data = session.get_decoded()
+        if '_auth_user_id' in session_data and int(session_data['_auth_user_id']) == user.id:
+            user_sessions.append(session)
+    return user_sessions
