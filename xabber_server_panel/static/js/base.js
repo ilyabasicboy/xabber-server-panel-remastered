@@ -36,6 +36,10 @@ $(function () {
         e.preventDefault();
 
         let url = $(this).parents('.list-js').data('url');
+
+        let loader = '<div class="d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100 bg-body bg-opacity-75 z-3"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        $(this).parents('.list-js').find('.table-adaptive').append(loader);
+
         ajax_send(url, $(this).attr('href'));
     });
 
