@@ -89,6 +89,10 @@
                 </div>
 
                 <div class="ms-auto me-2 me-md-4">
+                    {% include 'parts/host_select.html' %}
+                </div>
+
+                <div class="ms-auto me-2 me-md-4">
                     {% if request.user.is_authenticated %}
                         <div class="dropdown">
                             <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">

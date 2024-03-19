@@ -60,47 +60,35 @@ class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             text = ''
 
         object = request.GET.get('object')
-
-        hosts = request.user.get_allowed_hosts()
+        host = request.current_host
         api = get_api(request)
 
-        context = {
-            'hosts': hosts
-        }
+        context = {}
 
-        if hosts:
-            # get host name
-            host = request.GET.get('host', request.session.get('host'))
-            if not host:
-                host = hosts.first().name
-
-            # set current host in session
-            request.session['host'] = host
-            context['curr_host'] = host
-
+        if host:
             # check circles from server
-            check_circles(api, host)
+            check_circles(api, host.name)
 
             circles = Circle.objects.filter(
-                Q(circle__contains=text, host=host)
-                | Q(name__contains=text, host=host)
-            ).exclude(circle=host).order_by('circle')
+                Q(circle__contains=text, host=host.name)
+                | Q(name__contains=text, host=host.name)
+            ).exclude(circle=host.name).order_by('circle')
             context['circles'] = circles
 
             # check users from server
-            check_users(api, host)
+            check_users(api, host.name)
 
             users = User.objects.filter(
-                Q(username__contains=text, host=host)
-                | Q(first_name__contains=text, host=host)
-                | Q(last_name__contains=text, host=host)
+                Q(username__contains=text, host=host.name)
+                | Q(first_name__contains=text, host=host.name)
+                | Q(last_name__contains=text, host=host.name)
             ).order_by('username')
             context['users'] = users
 
             # get group list
             groups = api.get_groups(
                 {
-                    "host": host
+                    "host": host.name
                 }
             ).get('groups')
 

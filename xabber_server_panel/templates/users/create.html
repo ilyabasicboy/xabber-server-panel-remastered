@@ -20,14 +20,14 @@
                         <div class="input-group">
                             <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" placeholder="Username" {% if form.username.data %}value="{{ form.username.data }}"{% endif %}>
 
-                            {% if hosts %}
-                                <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" name="host">
+                            {% if request.hosts %}
+                                <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host">
 
-                                    {% for host in hosts %}
+                                    {% for host in request.hosts %}
                                         <option value="{{ host.name }}"
                                                 {% if form.host.data %}
                                                     {% if form.host.data == host.name %}selected{% endif %}
-                                                {% elif current_host == host.name %}selected{% endif %}>
+                                                {% elif request.current_host == host %}selected{% endif %}>
                                             @{{ host.name }}
                                         </option>
                                     {% endfor %}

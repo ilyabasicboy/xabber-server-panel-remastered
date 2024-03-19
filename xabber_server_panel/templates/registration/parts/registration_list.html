@@ -5,7 +5,6 @@
 <div class="mb-4 overflow-hidden">
     <form class="check-change-js" method="post">
         {% csrf_token %}
-        <input type="hidden" name="host" value="{{ settings.host.name }}">
 
         <div class="d-flex flex-wrap mb-n3 me-n3">
             <div class="me-3 mb-3">
@@ -89,14 +88,14 @@
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             {% if registration_write_permissions %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap" href="{% url 'registration:change' vhost_id=settings.host.id key=obj.key %}">
+                                                    <a class="dropdown-item text-wrap" href="{% url 'registration:change' key=obj.key %}">
                                                         Change
                                                     </a>
                                                 </li>
                                             {% endif %}
                                             {% if registration_write_permissions %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'registration:delete' vhost_id=settings.host.id key=obj.key %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'registration:delete' key=obj.key %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
                                                     </a>
                                                 </li>
@@ -143,7 +142,7 @@
 
     {% if registration_write_permissions %}
         <div class="mt-4 text-end">
-            <a class="btn btn-primary" href="{% url 'registration:create' vhost_id=settings.host.id %}">
+            <a class="btn btn-primary" href="{% url 'registration:create' %}">
                 Add
             </a>
         </div>

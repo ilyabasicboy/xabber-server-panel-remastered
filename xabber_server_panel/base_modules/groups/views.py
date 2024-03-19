@@ -17,41 +17,29 @@ class GroupList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = request.user.get_allowed_hosts()
         api = get_api(request)
+        host = request.current_host
+        groups = []
 
-        if hosts.exists():
-            host = request.GET.get('host', request.session.get('host'))
+        if host:
+            groups = api.get_groups(
+                {
+                    "host": host.name
+                }
+            ).get('groups')
 
-            if not hosts.filter(name=host):
-                host = hosts.first().name
-
-            # write current host on session
-            request.session['host'] = host
-        else:
-            host = ''
-
-        groups = api.get_groups(
-            {
-                "host": host
-            }
-        ).get('groups')
-
-        # sort groups by localpart
-        if groups:
-            groups = sorted(groups, key=lambda d: d['localpart'])
+            # sort groups by localpart
+            if groups:
+                groups = sorted(groups, key=lambda d: d['localpart'])
 
         context = {
-            'groups': groups,
-            'hosts': hosts,
-            'curr_host': host
+            'groups': groups
         }
 
         if request.is_ajax():
             html = loader.render_to_string('groups/parts/groups_list.html', context, request)
             response_data = {
-                'html': html,
-                'items_count': len(groups),
+                'html': html
             }
             return JsonResponse(response_data)
         return self.render_to_response(context)
@@ -63,12 +51,9 @@ class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, *args, **kwargs):
-        hosts = request.user.get_allowed_hosts()
         form = GroupForm()
 
         context = {
-            'hosts': hosts,
-            'current_host': request.session.get('host'),
             'form': form
         }
         return self.render_to_response(context)
@@ -98,8 +83,6 @@ class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                 return HttpResponseRedirect(reverse('groups:list'))
 
         context = {
-            'hosts': request.user.get_allowed_hosts(),
-            'current_host': request.session.get('host'),
             'form': form
         }
         return self.render_to_response(context)

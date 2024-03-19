@@ -1,9 +1,5 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout
-from django.shortcuts import HttpResponseRedirect, reverse
-from django.contrib.sessions.models import Session
-from django.utils import timezone
 
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_admin
@@ -50,7 +46,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
     def get_users_data(self):
-        hosts = self.request.user.get_allowed_hosts()
+        hosts = self.request.hosts
 
         data = {
             'hosts': [

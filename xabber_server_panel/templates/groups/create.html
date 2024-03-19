@@ -15,10 +15,10 @@
                     <div class="input-group">
                         <input class="form-control {% if form.localpart.errors %}is-invalid{% endif %}" {% if form.localpart.data %}value="{{ form.localpart.data }}"{% endif %} type="text" name="localpart" placeholder="Localpart" required>
 
-                        {% if hosts %}
-                            <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" name="host" required>
-                                {% for host in hosts %}
-                                    <option value="{{ host.name }}" {% if form.host.data %}{% if form.host.data == host.name %}selected{% endif %}{% elif current_host == host.name %}selected{% endif %}>
+                        {% if request.hosts %}
+                            <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host" required>
+                                {% for host in request.hosts %}
+                                    <option value="{{ host.name }}" {% if form.host.data %}{% if form.host.data == host.name %}selected{% endif %}{% elif request.current_host == host %}selected{% endif %}>
                                         @{{ host.name }}
                                     </option>
                                 {% endfor %}

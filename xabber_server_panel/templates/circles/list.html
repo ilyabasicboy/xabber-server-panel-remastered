@@ -10,18 +10,12 @@
                 Circles
             </h2>
             <div class="vr mx-3"></div>
-            <h4 class="mb-0 text-secondary fw-normal items-count-js">
+            <h4 class="mb-0 text-secondary fw-normal">
                 <span>
                     {{ circles.count }}
                 </span> circles
             </h4>
         </div>
-
-        {% if hosts and request.user.is_admin %}
-            <div class="ms-auto col-12 col-md-auto mt-3 mt-md-0">
-                {% include 'parts/host_select.html' %}
-            </div>
-        {% endif %}
     </div>
 
     <div class="mt-4 list-js" data-url="{{ url }}">

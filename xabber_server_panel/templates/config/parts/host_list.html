@@ -1,7 +1,7 @@
 {% load users_tags %}
 
 {% check_user_permissions request.user 'config' as settings_read_permissions %}
-{% if hosts %}
+{% if request.hosts %}
     <table class="table table-striped mb-0">
         <thead>
             <tr>
@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for host in hosts %}
+            {% for host in request.hosts %}
                 <tr>
                     <td class="align-middle" data-title="#">
                         {{ forloop.counter }}

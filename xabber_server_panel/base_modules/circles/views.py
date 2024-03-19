@@ -23,37 +23,25 @@ class CircleList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     @permission_read
     def get(self, request, *args, **kwargs):
 
-        hosts = request.user.get_allowed_hosts()
+        host = request.current_host
         self.circles = Circle.objects.none()
         context = {}
 
-        if hosts.exists():
-            host = request.GET.get('host', request.session.get('host'))
-
-            if not hosts.filter(name=host):
-                host = hosts.first().name
-
-            # write current host on session
-            request.session['host'] = host
-
-            context['curr_host'] = host
-
+        if host:
             # check circles from server
             check_circles(
                 get_api(request),
-                host
+                host.name
             )
 
-            self.circles = Circle.objects.filter(host=host).exclude(circle=host)
+            self.circles = Circle.objects.filter(host=host.name).exclude(circle=host.name)
 
-            context['hosts'] = hosts
             context['circles'] = self.circles.order_by('id')
 
         if request.is_ajax():
             html = loader.render_to_string('circles/parts/circle_list.html', context, request)
             response_data = {
                 'html': html,
-                'items_count': self.circles.count(),
             }
             return JsonResponse(response_data)
         return self.render_to_response(context)
@@ -68,8 +56,6 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         form = CircleForm()
         context = {
             'form': form,
-            'hosts': request.user.get_allowed_hosts(),
-            'current_host': request.session.get('host'),
         }
         return self.render_to_response(context)
 
@@ -125,7 +111,6 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         context = {
             'form': form,
-            'hosts': request.user.get_allowed_hosts(),
         }
         return self.render_to_response(context)
 

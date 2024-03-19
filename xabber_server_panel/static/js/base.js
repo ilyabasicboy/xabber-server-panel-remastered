@@ -4,14 +4,11 @@ $(function () {
     function ajax_send(url, page='', updateChange=false, updateTooltip=false) {
         let ajax_url = url + page;
 
-        //Create the data objec`t with `the host value and query parameters
-        let data = {
-            'host': $('#host').val(),
-        };
+        //Create the data objec`t with query parameters
+        let data = {};
 
         $.get(ajax_url, data, function(data) {
             $('.list-js').html(data['html']);
-            $('.items-count-js span').html(data['items_count']);
             setCurrentUrl();
 
             //Reinit functions
@@ -25,11 +22,7 @@ $(function () {
     };
 
     $('#host').on('change', function() {
-        if ($(this).parents('.check-change-js').length > 0) {
-            ajax_send($(this).data('url'), page='', updateChange=true, updateTooltip=true);
-        } else {
-            ajax_send($(this).data('url'), page='', updateChange=true);
-        }
+        $(this).parents('.form-host-js').trigger('submit');
     });
 
     $('.list-js').on('click', '.pagination a', function(e) {
@@ -61,7 +54,7 @@ $(function () {
     let target, object;
     function search_ajax(url, $target=$('.search-list-js'), object='', page='') {
         let ajax_url = url + page;
-        let query = $('#search-host').data('querystring');
+        let query = $('.search-list-js').data('querystring');
 
         //Parse the query string into an object
         let queryParams = {};
@@ -72,9 +65,8 @@ $(function () {
             }
         });
 
-        //Create the data objec`t with `the host value and query parameters
+        //Create the data objec`t with query parameters
         let data = {
-            'host': $('#search-host').val(),
             'object': object,
             ...queryParams
         };
@@ -86,15 +78,11 @@ $(function () {
         });
     };
 
-    $('#search-host').on('change', function(e) {
-        search_ajax($(this).data('url'));
-    });
-
     function searchPagination() {
         $('.search-pagination-js').on('click', '.pagination a', function(e){
             e.preventDefault();
             search_ajax(
-                $('#search-host').data('url'),
+                $('.search-list-js').data('url'),
                 target=$(this).parents('.search-pagination-js'),
                 object=$(this).parents('.search-pagination-js').data('object'),
                 $(this).attr('href')

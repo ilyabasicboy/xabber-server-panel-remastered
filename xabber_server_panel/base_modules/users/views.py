@@ -27,8 +27,6 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
         context = {
-            'hosts': request.user.get_allowed_hosts(),
-            'current_host': request.session.get('host'),
             'form': UserForm()
         }
 
@@ -63,7 +61,6 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                 )
 
         context = {
-            'hosts': request.user.get_allowed_hosts(),
             'form': form
         }
         return self.render_to_response(context)
@@ -449,35 +446,25 @@ class UserList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = request.user.get_allowed_hosts()
+
+        host = request.current_host
+
         self.users = User.objects.none()
         api = get_api(request)
 
-        context = {
-            'hosts': hosts,
-        }
+        context = {}
 
-        if hosts.exists():
-            host = request.GET.get('host', request.session.get('host'))
+        if host:
+            check_users(api, host.name)
 
-            if not hosts.filter(name=host):
-                host = hosts.first().name
+            self.users = User.objects.filter(host=host.name)
 
-            # write current host on session
-            request.session['host'] = host
-
-            context['curr_host'] = host
-            check_users(api, host)
-
-            self.users = User.objects.filter(host=host)
-
-        context['users'] = self.users.order_by('username')
+            context['users'] = self.users.order_by('username')
 
         if request.is_ajax():
             html = loader.render_to_string('users/parts/user_list.html', context, request)
             response_data = {
                 'html': html,
-                'items_count': self.users.count(),
             }
             return JsonResponse(response_data)
 

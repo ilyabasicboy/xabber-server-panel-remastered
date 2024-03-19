@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot, CheckDnsRecords
+from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot, CheckDnsRecords, ChangeHost
 
 
 urlpatterns = [
@@ -13,5 +13,6 @@ urlpatterns = [
     path('host/create/', CreateHost.as_view(), name='host_create'),
     path('host/delete/<int:id>/', DeleteHost.as_view(), name='host_delete'),
     path('host/detail/<int:id>/', DetailHost.as_view(), name='host_detail'),
+    path('host/change/', ChangeHost.as_view(), name='host_change'),
     path('root_page/', RootPageView.as_view(), name='root_page'),
 ]

@@ -35,12 +35,12 @@
 
     <div class="mb-4">
         <h5 class="mb-0">
-            Add registration key for {{ host.name }}
+            Add registration key for {{ request.current_host.name }}
         </h5>
     </div>
 
     <div class="col-12">
-        <form action="{% url 'registration:create' vhost_id=host.id %}" method="POST">
+        <form action="{% url 'registration:create' %}" method="POST">
             {% csrf_token %}
 
             <div class="row mb-3">

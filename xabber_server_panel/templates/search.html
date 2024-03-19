@@ -10,27 +10,15 @@
                 Search
             </h2>
             <div class="vr mx-3"></div>
-            <h4 class="mb-0 text-secondary fw-normal items-count-js">
+            <h4 class="mb-0 text-secondary fw-normal">
                 <span>
                     {{ request.GET.search|truncatechars:'20' }}
                 </span>
             </h4>
         </div>
-
-        {% if hosts and request.user.is_admin %}
-            <div class="ms-auto col-12 col-md-auto mt-3 mt-md-0">
-                <select class="form-select {% if hosts|length < 2 %}pe-none{% endif %}" id="search-host" name="host" data-url="{{ url }}" role="button" data-querystring="{{ request.META.QUERY_STRING }}">
-                    {% for host in hosts %}
-                        <option value="{{ host.name }}" {% if host.name == curr_host %}selected{% endif %}>
-                            {{ host.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        {% endif %}
     </div>
 
-    <div class="mt-4 search-list-js" data-url="{{ url }}">
+    <div class="mt-4 search-list-js" data-url="{{ url }}" data-querystring="{{ request.META.QUERY_STRING }}">
         {% include 'parts/search_list.html' %}
     </div>
 {% endblock %}

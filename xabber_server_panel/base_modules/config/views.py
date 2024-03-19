@@ -50,11 +50,7 @@ class Hosts(LoginRequiredMixin, TemplateView):
 
         check_hosts(api)
 
-        hosts = VirtualHost.objects.all()
-
-        context = {
-            'hosts': hosts,
-        }
+        context = {}
         return self.render_to_response(context)
 
 
@@ -130,9 +126,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
-        context = {
-            "hosts": VirtualHost.objects.all()
-        }
+        context = {}
         return self.render_to_response(context)
 
     @permission_admin
@@ -204,10 +198,7 @@ class CheckDnsRecords(View):
 
     def get(self, request):
         check_hosts_dns()
-        context = {
-            'hosts': VirtualHost.objects.all()
-        }
-        return render(request, 'config/parts/host_list.html', context)
+        return render(request, 'config/parts/host_list.html')
 
 
 class Admins(LoginRequiredMixin, TemplateView):
@@ -281,31 +272,13 @@ class Ldap(LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-        hosts = request.user.get_allowed_hosts()
-        host_id = request.GET.get('host')
-        session_host = request.session.get('host')
 
-        context = {
-            'hosts': hosts
-        }
+        host = request.current_host
 
-        if hosts:
-            # get host obj
-            host = None
-            if host_id:
-                host = hosts.filter(id=host_id).first()
-            elif session_host:
-                host = hosts.filter(name=session_host).first()
+        context = {}
 
-            if not host:
-                host = hosts.first()
-
-            # write current host on session
-            request.session['host'] = host.name
-            context['curr_host'] = host.name
-
-            ldap_settings = LDAPSettings.objects.filter(host=host).first()
-            context['ldap_settings'] = ldap_settings
+        ldap_settings = LDAPSettings.objects.filter(host=host).first()
+        context['ldap_settings'] = ldap_settings
 
         if request.is_ajax():
             html = loader.render_to_string('config/parts/ldap_fields.html', context, request)
@@ -318,24 +291,10 @@ class Ldap(LoginRequiredMixin, TemplateView):
     @permission_write
     def post(self, request, *args, **kwargs):
         self.form = LDAPSettingsForm(request.POST)
-        hosts = request.user.get_allowed_hosts()
-        host_id = request.POST.get('host')
 
         context = {
-            'hosts': hosts,
             'form': self.form
         }
-
-        if hosts:
-            # get host obj
-            self.host = None
-            if host_id:
-                self.host = hosts.filter(id=host_id).first()
-
-            if not self.host:
-                self.host = hosts.first()
-
-            context['curr_host'] = self.host.name
 
         self.server_list = self.clean_server_list()
         if self.form.is_valid():
@@ -385,7 +344,7 @@ class Ldap(LoginRequiredMixin, TemplateView):
 
         # update settings
         ldap_settings, created = LDAPSettings.objects.update_or_create(
-            host=self.host,
+            host=self.request.current_host,
             defaults=defaults
         )
 
@@ -607,3 +566,23 @@ class RootPageView(LoginRequiredMixin, TemplateView):
         messages.success(request, 'Root page changed successfully.')
 
         return self.render_to_response({})
+
+
+class ChangeHost(View):
+
+    def post(self, request, *args, **kwargs):
+        host_id = request.POST.get('host')
+
+        try:
+            host = VirtualHost.objects.get(id=host_id)
+        except VirtualHost.DoesNotExist:
+            raise Http404
+
+        request.session['host'] = host_id
+
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            # If there is a referer, redirect to it
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('home'))

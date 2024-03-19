@@ -24,36 +24,22 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, *args, **kwargs):
-        hosts = request.user.get_allowed_hosts()
+        host = request.current_host
         api = get_api(request)
 
-        context = {
-            'hosts': hosts,
-        }
+        context = {}
 
-        if hosts.exists():
-            host = request.GET.get('host', request.session.get('host'))
-
-            if not hosts.filter(name=host):
-                host = hosts.first().name
-
-            # write current host on session
-            request.session['host'] = host
-
-            context['curr_host'] = host
-
-            host_obj = hosts.filter(name=host).first()
+        if host:
             settings, created = RegistrationSettings.objects.get_or_create(
-                host=host_obj
+                host=host
             )
 
             keys = api.get_keys(
-                {"host": host}
+                {"host": host.name}
             ).get('keys')
 
             context['settings'] = settings
             context['keys'] = keys
-
 
         if request.is_ajax():
             html = loader.render_to_string('registration/parts/registration_list.html', context, request)
@@ -66,17 +52,12 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, *args, **kwargs):
-        host_name = request.POST.get('host')
-        hosts = VirtualHost.objects.all()
-        self.host = hosts.filter(name=host_name).first()
+        self.host = request.current_host
         self.status = request.POST.get('status', 'disabled')
         self.api = get_api(request)
         self.keys = []
 
-        self.context = {
-            'hosts': hosts,
-            'curr_host': host_name
-        }
+        self.context = {}
 
         if self.host:
             self.update_settings()
@@ -87,7 +68,6 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                 return HttpResponseRedirect(
                     reverse(
                         'registration:create',
-                        kwargs={'vhost_id': self.host.id}
                     )
                 )
 
@@ -121,65 +101,53 @@ class RegistrationCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'registration/create.html'
 
     @permission_admin
-    def get(self, request, vhost_id, *args, **kwargs):
-
-        try:
-            host = VirtualHost.objects.get(id=vhost_id)
-        except ObjectDoesNotExist:
-            raise Http404
-
-        context = {
-            'host': host
-        }
-
+    def get(self, request, *args, **kwargs):
+        context = {}
         return self.render_to_response(context)
 
     @permission_admin
-    def post(self, request, vhost_id, *args, **kwargs):
-        try:
-            host = VirtualHost.objects.get(id=vhost_id)
-        except ObjectDoesNotExist:
-            raise Http404
+    def post(self, request, *args, **kwargs):
+        host = request.current_host
 
-        expires_date = self.request.POST.get('expires_date')
-        expires_time = self.request.POST.get('expires_time')
-        expires = 0
+        if host:
+            expires_date = self.request.POST.get('expires_date')
+            expires_time = self.request.POST.get('expires_time')
+            expires = 0
 
-        if expires_date:
-            try:
+            if expires_date:
+                try:
+                    # set default time if it's not provided
+                    if not expires_time:
+                        expires_time = '12:00'
 
-                # set default time if it's not provided
-                if not expires_time:
-                    expires_time = '12:00'
+                    # combine date and time
+                    expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+                    expires_time = datetime.strptime(expires_time, '%H:%M').time()
+                    expires = int(datetime.combine(expires_date, expires_time).timestamp())
+                except:
+                    pass
 
-                # combine date and time
-                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
-                expires_time = datetime.strptime(expires_time, '%H:%M').time()
-                expires = int(datetime.combine(expires_date, expires_time).timestamp())
-            except:
-                pass
+            api = get_api(request)
 
-        api = get_api(request)
+            description = request.POST.get('description')
 
-        description = request.POST.get('description')
+            response = api.create_key(
+                {
+                    "host": host.name,
+                     "expire": expires,
+                     "description": description
+                }
+            )
 
-        response = api.create_key(
-            {
-                "host": host.name,
-                 "expire": expires,
-                 "description": description
-            }
-        )
+            make_xmpp_config()
+            reload_ejabberd_config()
 
-        make_xmpp_config()
-        reload_ejabberd_config()
-
-        # check api errors
-        if not response.get('errors'):
-            messages.success(request, 'Registration key created successfully.')
+            # check api errors
+            if not response.get('errors'):
+                messages.success(request, 'Registration key created successfully.')
 
         return HttpResponseRedirect(
-            reverse('registration:list') + f'?host={host.name}'
+            reverse('registration:list')
         )
 
 
@@ -190,44 +158,38 @@ class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     template_name = 'registration/change.html'
 
     @permission_admin
-    def get(self, request, vhost_id, key, *args, **kwargs):
-
-        try:
-            host = VirtualHost.objects.get(id=vhost_id)
-        except ObjectDoesNotExist:
-            raise Http404
+    def get(self, request, key, *args, **kwargs):
+        host = request.current_host
 
         api = get_api(request)
 
         context = {
-            'host': host,
             "key": key
         }
 
-        # get key data
-        keys = api.get_keys({"host": host}).get('keys')
-        key_data_list = [obj for obj in keys if obj['key'] == key]
-        key_data = key_data_list[0] if key_data_list else None
+        if host:
+            # get key data
+            keys = api.get_keys({"host": host.name}).get('keys')
+            key_data_list = [obj for obj in keys if obj['key'] == key]
+            key_data = key_data_list[0] if key_data_list else None
 
-        if key_data.get('expire'):
-            # timestamp to datetime
-            expire = datetime.fromtimestamp(key_data.get('expire'))
+            if key_data.get('expire'):
+                # timestamp to datetime
+                expire = datetime.fromtimestamp(key_data.get('expire'))
 
-            expire_date = expire.strftime('%Y-%m-%d')  # Format date as 'YYYY-MM-DD'
-            expire_time = expire.strftime('%H:%M')
+                expire_date = expire.strftime('%Y-%m-%d')  # Format date as 'YYYY-MM-DD'
+                expire_time = expire.strftime('%H:%M')
 
-            context['expire_date'] = expire_date
-            context['expire_time'] = expire_time
-            context['description'] = key_data['description']
+                context['expire_date'] = expire_date
+                context['expire_time'] = expire_time
+                context['description'] = key_data['description']
 
         return self.render_to_response(context)
 
     @permission_admin
-    def post(self, request, vhost_id, key, *args, **kwargs):
-        try:
-            host = VirtualHost.objects.get(id=vhost_id)
-        except ObjectDoesNotExist:
-            raise Http404
+    def post(self, request, key, *args, **kwargs):
+
+        host = request.current_host
 
         expires_date = self.request.POST.get('expires_date')
         expires_time = self.request.POST.get('expires_time')
@@ -235,40 +197,38 @@ class RegistrationChange(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         expires = 0
 
         if expires_date:
-            # try:
-                # combine date and time
-                expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
+            # combine date and time
+            expires_date = datetime.strptime(expires_date, '%Y-%m-%d')
 
-                # check expires time
-                if not expires_time:
-                    expires_time = '12:00'
+            # check expires time
+            if not expires_time:
+                expires_time = '12:00'
 
-                expires_time = datetime.strptime(expires_time, '%H:%M').time()
-                expires = int(datetime.combine(expires_date, expires_time).timestamp())
-            # except:
-            #     pass
+            expires_time = datetime.strptime(expires_time, '%H:%M').time()
+            expires = int(datetime.combine(expires_date, expires_time).timestamp())
 
         api = get_api(request)
 
         description = request.POST.get('description')
 
-        response = api.change_key(
-            {
-                "host": host.name,
-                 "expire": expires,
-                 "description": description
-            },
-            key
-        )
+        if host:
+            response = api.change_key(
+                {
+                    "host": host.name,
+                     "expire": expires,
+                     "description": description
+                },
+                key
+            )
 
-        make_xmpp_config()
-        reload_ejabberd_config()
+            make_xmpp_config()
+            reload_ejabberd_config()
 
-        if not response.get('errors'):
-            messages.success(request, 'Registration key changed successfully.')
+            if not response.get('errors'):
+                messages.success(request, 'Registration key changed successfully.')
 
         return HttpResponseRedirect(
-            reverse('registration:list') + f'?host={host.name}'
+            reverse('registration:list')
         )
 
 
@@ -277,23 +237,21 @@ class RegistrationDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     """ Delete registration key """
 
     @permission_admin
-    def get(self, request, vhost_id, key, *args, **kwargs):
+    def get(self, request, key, *args, **kwargs):
 
-        try:
-            host = VirtualHost.objects.get(id=vhost_id)
-        except ObjectDoesNotExist:
-            raise Http404
+        host = request.current_host
 
         api = get_api(request)
 
-        response = api.delete_key({"host": host.name}, key=key)
+        if host:
+            response = api.delete_key({"host": host.name}, key=key)
 
-        # check api errors
-        if not response.get('errors'):
-            messages.success(request, 'Registration key deleted successfully.')
+            # check api errors
+            if not response.get('errors'):
+                messages.success(request, 'Registration key deleted successfully.')
 
         return HttpResponseRedirect(
-            reverse('registration:list') + f'?host={host.name}'
+            reverse('registration:list')
         )
 
 
@@ -334,7 +292,7 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
             messages.success(request, 'Web client url changed successfully.')
             return HttpResponseRedirect(
-                reverse('registration:list') + f'?host={settings.host.name}'
+                reverse('registration:list')
             )
         else:
             messages.error(request, 'Url is incorrect.')
