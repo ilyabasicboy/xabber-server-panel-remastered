@@ -88,9 +88,11 @@
                     </form>
                 </div>
 
-                <div class="ms-auto me-2 me-md-4">
-                    {% include 'parts/host_select.html' %}
-                </div>
+                {% if request.user.is_admin %}
+                    <div class="ms-auto me-2 me-md-4">
+                        {% include 'parts/host_select.html' %}
+                    </div>
+                {% endif %}
 
                 <div class="ms-auto me-2 me-md-4">
                     {% if request.user.is_authenticated %}
