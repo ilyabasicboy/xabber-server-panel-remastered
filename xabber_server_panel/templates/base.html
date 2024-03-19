@@ -41,7 +41,7 @@
         {% check_user_permissions request.user 'config' as settings_read_permissions %}
 
         <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-body bg-opacity-75">
-            <header class="navbar d-flex justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
+            <header class="navbar d-flex flex-wrap flex-md-nowrap justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
                 <a class="navbar-brand d-flex align-items-center col-md-3 col-xl-2 fs-4 text-white p-0 me-2 me-md-4" href="{% url 'dashboard:dashboard' %}">
                     <img src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
                     <span class="d-none d-md-block ms-2 fs-4">Xabber</span>
@@ -82,19 +82,19 @@
                     </div>
                 {% endif %}
 
-                <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-1 order-md-0 col-12 col-md-auto" id="search">
+                <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-2 order-md-0 col-12 col-md-1" id="search">
                     <form class="w-100 pt-2 pt-md-0" action="{% url 'search' %}" method="GET">
                         <input class="form-control" type="text" name="search" {% if request.GET.search %}value="{{ request.GET.search }}"{% endif %}  placeholder="Search for Users, Circles, Groups">
                     </form>
                 </div>
 
                 {% if request.user.is_admin %}
-                    <div class="ms-auto me-2 me-md-4">
+                    <div class="ms-auto me-0 me-md-4 pt-2 pt-md-0 order-1 order-md-0 col-12 col-md-auto">
                         {% include 'parts/host_select.html' %}
                     </div>
                 {% endif %}
 
-                <div class="ms-auto me-2 me-md-4">
+                <div class="ms-auto me-2 me-md-0">
                     {% if request.user.is_authenticated %}
                         <div class="dropdown">
                             <div class="avatar avatar-48 bg-primary rounded-circle text-white fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">

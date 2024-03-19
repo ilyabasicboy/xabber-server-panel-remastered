@@ -25,12 +25,15 @@ $(function () {
         $(this).parents('.form-host-js').trigger('submit');
     });
 
+    //Loader block
+    let loader = '<div class="d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100 bg-body bg-opacity-75 z-3"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
     $('.list-js').on('click', '.pagination a', function(e) {
         e.preventDefault();
 
         let url = $(this).parents('.list-js').data('url');
 
-        let loader = '<div class="d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100 bg-body bg-opacity-75 z-3"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        //Add Loader
         $(this).parents('.list-js').find('.table-adaptive').append(loader);
 
         ajax_send(url, $(this).attr('href'));
@@ -81,6 +84,10 @@ $(function () {
     function searchPagination() {
         $('.search-pagination-js').on('click', '.pagination a', function(e){
             e.preventDefault();
+
+            //Add Loader
+            $(this).parents('.search-pagination-js').find('.table-adaptive').append(loader);
+
             search_ajax(
                 $('.search-list-js').data('url'),
                 target=$(this).parents('.search-pagination-js'),
