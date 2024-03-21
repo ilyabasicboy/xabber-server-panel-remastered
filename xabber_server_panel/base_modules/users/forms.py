@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 
+from xabber_server_panel.jid_validation.utils import validate_host, validate_localpart
 from xabber_server_panel.base_modules.users.models import User
 
 
@@ -36,19 +37,10 @@ class UserForm(forms.ModelForm):
 
         """
             Customized to:
-             * validate unique together username and host
              * combine expires date and time
         """
 
         cleaned_data = super().clean()
-
-        # validate unique together username and host
-        username = cleaned_data.get("username")
-        host = cleaned_data.get("host")
-
-        if username and host:
-            if User.objects.filter(username=username, host=host).exists():
-                self.add_error('username', "A user with that username and host already exists.")
 
         # combine expires
         expires_date = cleaned_data.get("expires_date")
@@ -66,3 +58,27 @@ class UserForm(forms.ModelForm):
             cleaned_data["expires"] = expires_datetime
 
         return cleaned_data
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+
+        # validate and normalize circle
+        result = validate_localpart(username)
+        if result.get('success'):
+            username = result.get('localpart')
+        else:
+            self.add_error('username', result.get('error_message'))
+
+        return username
+
+    def clean_host(self):
+        host = self.cleaned_data['host']
+
+        # validate and normalize host
+        result = validate_host(host)
+        if result.get('success'):
+            host = result.get('host')
+        else:
+            self.add_error('host', result.get('error_message'))
+
+        return host

@@ -81,7 +81,7 @@ class ApiAuthenticationForm(forms.Form):
     )
 
     def __init__(self, *args, request=None, **kwargs):
-        self.api = EjabberdAPI()
+        self.api = EjabberdAPI(request=request)
         self.request = request
         super(ApiAuthenticationForm, self).__init__(*args, **kwargs)
 
@@ -89,8 +89,7 @@ class ApiAuthenticationForm(forms.Form):
         self.user = authenticate(
             request=self.request,
             username=self.cleaned_data['username'],
-            password=self.cleaned_data['password'],
-            api=self.api,
+            password=self.cleaned_data['password']
         )
         if self.user is None:
             self.add_error(

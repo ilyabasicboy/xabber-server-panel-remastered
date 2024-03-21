@@ -1,5 +1,4 @@
 from django import forms
-from xabber_server_panel.utils import host_form_validation
 
 
 class InstallationForm(forms.Form):
@@ -12,7 +11,6 @@ class InstallationForm(forms.Form):
         max_length=128,
         label='XMPP host',
         widget=forms.TextInput(attrs={'placeholder': 'example.com'}),
-        validators=[host_form_validation]
     )
     username = forms.CharField(
         max_length=100,

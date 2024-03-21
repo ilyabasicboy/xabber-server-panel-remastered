@@ -13,14 +13,14 @@
                 <label class="col-form-label col-12 col-md-3 {% if form.circle.errors %}text-danger{% endif %}">Circle *</label>
                 <div class="col-12 col-md-9">
                     <div class="input-group">
-                        <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.circle.data }}"{% endif %}>
+                        <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.cleaned_data.circle|default:form.circle.data }}"{% endif %}>
 
                         {% if request.hosts %}
                             <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host">
                                 {% for host in request.hosts %}
                                     <option value="{{ host.name }}"
-                                        {% if form.host.data %}
-                                            {% if form.host.data == host.name %}selected{% endif %}
+                                        {% if form.cleaned_data.host %}
+                                            {% if form.cleaned_data.host == host.name %}selected{% endif %}
                                         {% elif request.current_host == host %}selected{% endif %}>
                                         @{{ host.name }}
                                     </option>

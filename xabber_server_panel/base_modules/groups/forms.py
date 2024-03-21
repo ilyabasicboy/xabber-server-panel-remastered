@@ -1,17 +1,15 @@
 from django import forms
 
-from xabber_server_panel.utils import jid_form_validation, host_form_validation, validate_local_part
+from xabber_server_panel.jid_validation.utils import validate_jid, validate_host, validate_localpart
 
 
 class GroupForm(forms.Form):
 
     localpart = forms.CharField(
         required=True,
-        validators=[validate_local_part]
     )
 
     host = forms.CharField(
-        validators=[host_form_validation],
         required=True
     )
 
@@ -21,7 +19,6 @@ class GroupForm(forms.Form):
 
     owner = forms.CharField(
         required=True,
-        validators=[jid_form_validation]
     )
 
     privacy = forms.ChoiceField(
@@ -52,3 +49,38 @@ class GroupForm(forms.Form):
         ]
     )
 
+    def clean_localpart(self):
+        localpart = self.cleaned_data['localpart']
+
+        # validate and normalize localpart
+        result = validate_localpart(localpart)
+        if result.get('success'):
+            localpart = result.get('localpart')
+        else:
+            self.add_error('localpart', result.get('error_message'))
+
+        return localpart
+
+    def clean_host(self):
+        host = self.cleaned_data['host']
+
+        # validate and normalize host
+        result = validate_host(host)
+        if result.get('success'):
+            host = result.get('host')
+        else:
+            self.add_error('host', result.get('error_message'))
+
+        return host
+
+    def clean_owner(self):
+        owner = self.cleaned_data['owner']
+
+        # validate and normalize owner
+        result = validate_jid(owner)
+        if result.get('success'):
+            owner = result.get('full_jid')
+        else:
+            self.add_error('owner', result.get('error_message'))
+
+        return owner

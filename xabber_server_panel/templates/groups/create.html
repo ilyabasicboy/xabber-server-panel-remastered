@@ -13,12 +13,12 @@
                 <label class="col-form-label col-12 col-md-3 {% if form.localpart.errors %}text-danger{% endif %}">Localpart *</label>
                 <div class="col-12 col-md-9">
                     <div class="input-group">
-                        <input class="form-control {% if form.localpart.errors %}is-invalid{% endif %}" {% if form.localpart.data %}value="{{ form.localpart.data }}"{% endif %} type="text" name="localpart" placeholder="Localpart" required>
+                        <input class="form-control {% if form.localpart.errors %}is-invalid{% endif %}" {% if form.localpart.data %}value="{{ form.cleaned_data.localpart|default:form.localpart.data }}"{% endif %} type="text" name="localpart" placeholder="Localpart" required>
 
                         {% if request.hosts %}
                             <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host" required>
                                 {% for host in request.hosts %}
-                                    <option value="{{ host.name }}" {% if form.host.data %}{% if form.host.data == host.name %}selected{% endif %}{% elif request.current_host == host %}selected{% endif %}>
+                                    <option value="{{ host.name }}" {% if form.cleaned_data.host %}{% if form.cleaned_data.host == host.name %}selected{% endif %}{% elif request.current_host == host %}selected{% endif %}>
                                         @{{ host.name }}
                                     </option>
                                 {% endfor %}
@@ -38,7 +38,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.owner.errors %}text-danger{% endif %}">Owner *</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control {% if form.owner.errors %}is-invalid{% endif %}" {% if form.owner.data %}value="{{ form.owner.data }}"{% endif %} type="text" required placeholder="username@example.com" name="owner">
+                    <input class="form-control {% if form.owner.errors %}is-invalid{% endif %}" {% if form.owner.data %}value="{{ form.cleaned_data.owner|default:form.owner.data }}"{% endif %} type="text" required placeholder="username@example.com" name="owner">
                 </div>
             </div>
 

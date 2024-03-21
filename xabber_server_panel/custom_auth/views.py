@@ -31,9 +31,6 @@ class CustomLoginView(TemplateView):
         if form.is_valid():
             login(request, form.user)
 
-            # write user host on session
-            request.session['host'] = form.user.host
-
             if next:
                 return HttpResponseRedirect(next)
             else:

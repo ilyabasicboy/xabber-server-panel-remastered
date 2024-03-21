@@ -59,6 +59,12 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                         }
                     )
                 )
+        else:
+            # add common errors
+            common_error = form.errors.get('__all__')
+            if common_error:
+                messages.error(request, common_error)
+
 
         context = {
             'form': form
@@ -446,9 +452,7 @@ class UserList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, *args, **kwargs):
-
         host = request.current_host
-
         self.users = User.objects.none()
         api = get_api(request)
 

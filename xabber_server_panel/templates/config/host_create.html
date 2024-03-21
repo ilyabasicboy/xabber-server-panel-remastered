@@ -39,9 +39,9 @@
             {% csrf_token %}
 
             <div class="row mb-3">
-                <label class="col-form-label col-12 col-md-3">Virtual host</label>
+                <label class="col-form-label col-12 col-md-3 {% if form.name.errors %}text-danger{% endif %}">Virtual host</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" name="host" placeholder="example.com">
+                    <input class="form-control {% if form.name.errors %}is-invalid{% endif %}" type="text" name="name" placeholder="example.com" {% if form.name.data %}value="{{ form.cleaned_data.name|default:form.name.data }}"{% endif %}>
                 </div>
             </div>
 

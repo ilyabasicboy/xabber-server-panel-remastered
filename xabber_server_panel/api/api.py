@@ -120,8 +120,14 @@ class EjabberdAPI(object):
 
         # fetch token if success
         if not self.errors:
-            self.response.get('token')
-            self.fetch_token(self.response.get('token'))
+            token = self.response.get('token')
+            self.fetch_token(token)
+
+            if self.request:
+                # set token in session
+                # self.request.session.flush()
+                self.request.session['api_token'] = token
+                self.request.session.modified = True
 
         return self.response
 

@@ -6,7 +6,6 @@ from django.contrib import messages
 
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write
 from xabber_server_panel.api.utils import get_api
-from xabber_server_panel.utils import host_is_valid
 from xabber_server_panel.base_modules.groups.forms import GroupForm
 from xabber_server_panel.mixins import ServerStartedMixin
 
@@ -91,14 +90,15 @@ class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 class GroupDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
-    def get(self, request, localpart, host, *args, **kwargs):
+    def get(self, request, localpart, *args, **kwargs):
         api = get_api(request)
+        host = request.current_host
 
-        if localpart and host and host_is_valid(host):
+        if localpart and host:
             response = api.delete_group(
                 {
                     'localpart': localpart,
-                    'host': host
+                    'host': host.name
                 }
             )
 

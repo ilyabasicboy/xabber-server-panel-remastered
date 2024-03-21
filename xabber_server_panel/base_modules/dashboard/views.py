@@ -1,10 +1,15 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.shortcuts import reverse
 
 from xabber_server_panel.utils import is_ejabberd_started, start_ejabberd, restart_ejabberd, stop_ejabberd
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_admin
 from xabber_server_panel.base_modules.config.utils import check_hosts
 from xabber_server_panel.api.utils import get_api
+from xabber_server_panel.custom_auth.exceptions import UnauthorizedException
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -24,6 +29,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, *args, **kwargs):
+
         self.api = get_api(request)
 
         start = request.POST.get('start')
@@ -31,14 +37,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         stop = request.POST.get('stop')
 
         if start:
-            start_ejabberd()
+            try:
+                self.start_server()
+            except UnauthorizedException:
+                # stop server and logout if user has no permissions
+                stop_ejabberd()
+                logout(self.request)
+                return HttpResponseRedirect(reverse('custom_auth:login'))
         elif restart:
             restart_ejabberd()
         elif stop:
             stop_ejabberd()
 
         check_hosts(self.api)
-
         context = {
             'data': self.get_users_data(),
             'started': is_ejabberd_started()
@@ -70,3 +81,24 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         data['online'] = online_count
 
         return data
+
+    def start_server(self):
+        """
+            Start server logic:
+                * check password
+                * set token after server start
+        """
+
+        password = self.request.POST.get('password')
+
+        if self.request.user.check_password(password):
+            start_ejabberd()
+
+            data = {
+                'username': self.request.user.full_jid,
+                'password': password
+            }
+
+            self.api.login(data)
+        else:
+            messages.error(self.request, 'Wrong password')

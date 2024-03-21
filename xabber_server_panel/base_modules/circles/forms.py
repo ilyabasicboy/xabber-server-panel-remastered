@@ -1,7 +1,6 @@
 from django import forms
-from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.jid_validation.utils import validate_host, validate_localpart
 
 from .models import Circle
 
@@ -38,21 +37,27 @@ class CircleForm(forms.ModelForm):
 
         return instance
 
-    def clean(self):
+    def clean_circle(self):
 
-        """
-            Customized to:
-             * validate unique together circle and host
-        """
+        circle = self.cleaned_data['circle']
 
-        cleaned_data = super().clean()
+        # validate and normalize circle
+        result = validate_localpart(circle)
+        if result.get('success'):
+            circle = result.get('localpart')
+        else:
+            self.add_error('circle', result.get('error_message'))
 
-        # validate unique together username and host
-        circle = cleaned_data.get("circle")
-        host = cleaned_data.get("host")
+        return circle
 
-        if circle and host:
-            if Circle.objects.filter(circle=circle, host=host).exists():
-                self.add_error('circle', "A circle with that circle and host already exists.")
+    def clean_host(self):
+        host = self.cleaned_data['host']
 
-        return cleaned_data
+        # validate and normalize host
+        result = validate_host(host)
+        if result.get('success'):
+            host = result.get('host')
+        else:
+            self.add_error('host', result.get('error_message'))
+
+        return host

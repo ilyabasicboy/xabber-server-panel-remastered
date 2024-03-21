@@ -50,7 +50,7 @@
 
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'circles:delete' id=circle.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'circles:delete' id=circle.id %}" data-delete-name="circle" data-delete-target="{{ circle.circle }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                      Delete circle
                                                 </a>
                                             </li>

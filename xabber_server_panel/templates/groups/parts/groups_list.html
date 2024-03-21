@@ -33,7 +33,6 @@
                         <td data-title="Members">
                             {{ group.user_count }}
                         </td>
-
                         <td data-title="Actions">
                             {% if groups_write_permissions %}
                                 <div class="d-flex">
@@ -44,7 +43,7 @@
 
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'groups:delete' localpart=group.localpart host=group.host %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'groups:delete' localpart=group.localpart %}" data-delete-name="group" data-delete-target="{{ group.localpart }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                      Delete group
                                                 </a>
                                             </li>

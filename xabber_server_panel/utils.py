@@ -11,7 +11,6 @@ import os
 import re
 import random
 import string
-from importlib import import_module
 
 
 # ========== XABBER SERVER =============
@@ -110,44 +109,6 @@ def reload_server():
 
 
 # ============ VALIDATORS =============
-
-def validate_jid(jid):
-    # Regular expression for validating JID without resource
-    pattern = r'^[^@<>{}"\'\\]+@[^@<>{}"\'\\]+\.[^@<>{}"\'\\]+$'
-    if re.match(pattern, jid):
-        return True
-    else:
-        return False
-
-
-def jid_form_validation(value):
-    # Define a regular expression for the jid format: 'user@example.com'
-    if not validate_jid(value):
-        raise ValidationError("Invalid jid format.")
-
-
-def host_is_valid(host_name):
-    # Define a regular expression for the host format: 'example.com'
-    pattern = re.compile(r'^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-    return bool(pattern.match(host_name))
-
-
-def host_form_validation(value):
-    # Define a regular expression for the host format: 'example.com'
-    if not host_is_valid(value):
-        raise ValidationError("Invalid host format.")
-
-
-def validate_local_part(value):
-    """
-    Custom validator to check if the local part of an email address is valid.
-    """
-    if not re.match(r'^[a-zA-Z0-9._%+-]+$', value):
-        raise ValidationError(
-            'Invalid characters.'
-        )
-
-
 def validate_link(value):
     """
     Custom validator to check if a URL is valid.

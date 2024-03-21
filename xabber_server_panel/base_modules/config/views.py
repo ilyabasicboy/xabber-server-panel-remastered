@@ -15,13 +15,13 @@ from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.utils import check_users
 from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns, check_modules
-from xabber_server_panel.utils import host_is_valid, get_system_group_suffix, update_app_list, reload_server
+from xabber_server_panel.utils import get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages, restart_ejabberd, is_ejabberd_started
 
 from .models import LDAPSettings, LDAPServer, RootPage
-from .forms import LDAPSettingsForm
+from .forms import LDAPSettingsForm, VirtualHostForm
 
 import tarfile
 import shutil
@@ -131,42 +131,39 @@ class CreateHost(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, *args, **kwargs):
-        host = request.POST.get('host')
         self.api = get_api(request)
 
-        # check virtualhost already exists
-        vh_check = VirtualHost.objects.filter(name=host).exists()
+        form = VirtualHostForm(request.POST)
 
-        if host_is_valid(host) and not vh_check:
+        if form.is_valid():
+            host = form.save()
 
             # check srv records
-            check_dns = False
-            records = get_srv_records(host)
+            records = get_srv_records(host.name)
             if not 'error' in records:
-                check_dns = True
-
-            VirtualHost.objects.create(
-                name=host,
-                check_dns=check_dns
-            )
+                host.check_dns = True
 
             # update config after creating new host
             update_ejabberd_config()
 
             # create groups after update config
-            self.create_everybody_group(request, host)
+            self.create_everybody_group(request, host.name)
 
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, f'Virtual host "{host}" created successfully.')
+                messages.success(request, f'Virtual host "{host.name}" created successfully.')
 
             return HttpResponseRedirect(
                 reverse('config:hosts')
             )
+        else:
+            # add common errors
+            common_error = form.errors.get('__all__')
+            if common_error:
+                messages.error(request, common_error)
 
-        messages.error(request, f'Host "{host}" is invalid or already exists.')
-        return self.render_to_response({})
+        return self.render_to_response({'form': form})
 
     def create_everybody_group(self, request, host):
 

@@ -50,7 +50,7 @@
                                     </li>
                                     {% if settings_write_permissions %}
                                         <li>
-                                            <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                            <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-delete-name="host" data-delete-target="{{ host.name }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                  Delete
                                             </a>
                                         </li>

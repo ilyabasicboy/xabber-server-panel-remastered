@@ -10,17 +10,21 @@ class VirtualHostMiddleware(MiddlewareMixin):
         if request.user.is_authenticated:
             hosts = VirtualHost.objects.all()
 
-            if hosts:
-                # set host list
-                if not request.user.is_admin:
-                    hosts = hosts.filter(name=request.user.host)
+            # set host list
+            if not request.user.is_admin:
+                hosts = hosts.filter(name=request.user.host)
 
-                request.hosts = hosts
+            request.hosts = hosts
 
-                # set current host
-                session_host = request.session.get("host")
+            # set current host
+            session_host_id = request.session.get("host")
+            try:
+                session_host_id = int(session_host_id)
+                session_host = VirtualHost.objects.get(id=session_host_id)
+                current_host = session_host
+            except:
+                current_host = hosts.first()
+                if hosts:
+                    request.session['host'] = hosts.first().id
 
-                try:
-                    request.current_host = VirtualHost.objects.filter(id=session_host).first()
-                except:
-                    request.current_host = hosts.first()
+            request.current_host = current_host

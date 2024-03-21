@@ -108,6 +108,11 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                         kwargs={'id': circle.id}
                     )
                 )
+        else:
+            # add common errors
+            common_error = form.errors.get('__all__')
+            if common_error:
+                messages.error(request, common_error)
 
         context = {
             'form': form,

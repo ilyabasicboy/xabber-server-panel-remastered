@@ -8,7 +8,7 @@ class CustomAuthBackend(object):
          Also backend writes api token in user.token field if ejabberd server is started.
     """
 
-    def authenticate(self, request, username, password, api=None, **kwargs):
+    def authenticate(self, request, username, password, **kwargs):
         username, host = username.split('@')
         try:
             user = User.objects.get(
@@ -20,14 +20,6 @@ class CustomAuthBackend(object):
 
         # check permissions
         if (user.is_admin or user.has_any_permissions) and user.check_password(password) and user.is_active:
-
-            # set token in session
-            if api and api.token and request:
-                request.session.flush()
-
-                request.session['api_token'] = api.token
-                request.session.modified = True
-
             return user
         return None
 

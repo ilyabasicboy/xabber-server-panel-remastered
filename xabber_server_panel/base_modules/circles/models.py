@@ -1,18 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 
 from xabber_server_panel.base_modules.users.models import User
-from xabber_server_panel.utils import validate_local_part
-
-
-def validate_circle(value):
-    # Specify the characters to be excluded
-    excluded_characters = "!@#$%^&*()_+={}[]|\:;<>,.?/~`"
-
-    # Check if any excluded character is present in the value
-    if any(char in excluded_characters for char in value):
-        raise ValidationError("Invalid characters in the field.")
 
 
 class Circle(models.Model):
@@ -22,9 +11,10 @@ class Circle(models.Model):
 
     circle = models.CharField(
         max_length=256,
-        validators=[validate_local_part]
     )
-    host = models.CharField(max_length=256)
+    host = models.CharField(
+        max_length=256,
+    )
     name = models.CharField(
         max_length=100,
         blank=True,
