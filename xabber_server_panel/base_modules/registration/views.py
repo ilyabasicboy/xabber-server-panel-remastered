@@ -33,13 +33,13 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             settings, created = RegistrationSettings.objects.get_or_create(
                 host=host
             )
-
-            keys = api.get_keys(
-                {"host": host.name}
-            ).get('keys')
-
             context['settings'] = settings
-            context['keys'] = keys
+
+            if settings.status == 'link':
+                keys = api.get_keys(
+                    {"host": host.name}
+                ).get('keys')
+                context['keys'] = keys
 
         if request.is_ajax():
             html = loader.render_to_string('registration/parts/registration_list.html', context, request)

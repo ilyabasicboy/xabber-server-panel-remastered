@@ -20,11 +20,13 @@ class VirtualHostMiddleware(MiddlewareMixin):
             session_host_id = request.session.get("host")
             try:
                 session_host_id = int(session_host_id)
-                session_host = VirtualHost.objects.get(id=session_host_id)
-                current_host = session_host
+                session_host = hosts.filter(id=session_host_id).first()
             except:
-                current_host = hosts.first()
+                session_host = None
+
+            if session_host:
+                request.current_host = session_host
+            else:
+                request.current_host = hosts.first()
                 if hosts:
                     request.session['host'] = hosts.first().id
-
-            request.current_host = current_host

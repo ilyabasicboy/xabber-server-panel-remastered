@@ -90,30 +90,30 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
-            raise Http404
+        host = request.current_host
 
-        circles = Circle.objects.filter(host=user.host)
+        try:
+            user = User.objects.get(id=id, host=host.name)
+        except:
+            raise Http404
 
         context = {
             'user': user,
-            'circles': circles,
         }
         return self.render_to_response(context)
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            self.user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            self.user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         self.api = get_api(request)
 
         self.errors = []
-        self.circles = Circle.objects.filter(host=self.user.host)
 
         # update user params
         self.update_user()
@@ -129,7 +129,6 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         context = {
             'user': self.user,
-            'circles': self.circles
         }
         return self.render_to_response(context)
 
@@ -221,9 +220,11 @@ class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         api = get_api(request)
@@ -250,9 +251,11 @@ class UserUnBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         api = get_api(request)
@@ -272,10 +275,11 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
 
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         api = get_api(request)
@@ -315,9 +319,11 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         context = {
@@ -327,9 +333,11 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            self.user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            self.user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         self.api = get_api(request)
@@ -366,9 +374,11 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         api = get_api(request)
@@ -385,9 +395,11 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            self.user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            self.user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         self.circles = Circle.objects.filter(host=self.user.host).exclude(circle=self.user.host)
@@ -480,9 +492,11 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         # check if user change himself
@@ -506,9 +520,11 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, id, *args, **kwargs):
+        host = request.current_host
+
         try:
-            self.user = User.objects.get(id=id)
-        except ObjectDoesNotExist:
+            self.user = User.objects.get(id=id, host=host.name)
+        except:
             raise Http404
 
         # check if user change himself
