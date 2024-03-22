@@ -30,7 +30,7 @@
                     {% csrf_token %}
 
                     <div class="d-flex flex-wrap mb-n3 me-n3">
-                        <a class="btn btn-success me-3 mb-3" data-bs-toggle="modal" data-bs-target="#start_server" type="button" {% if started %}disabled{% endif %}>
+                        <a class="btn btn-success me-3 mb-3 {% if started %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#start_server" role="button">
                              Start server
                         </a>
                         <button class="btn btn-primary me-3 mb-3" name="restart" value="restart" {% if not started %}disabled{% endif %}>
