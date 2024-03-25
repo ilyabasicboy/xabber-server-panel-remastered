@@ -140,7 +140,6 @@ AUTH_USER_MODEL = 'users.User'
 
 # ============ API ============#
 INSTALLED_APPS += ['xabber_server_panel.api']
-EJABBERDCTL = None
 
 # ============ DASHBOARD ============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.dashboard']
@@ -157,6 +156,7 @@ INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 # ============ CONFIG ===============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
 DNS_SERVICE = 'https://dns.google/resolve'
+MODULE_SERVER_FILES_DIR = ''
 
 # ============ INSTALLATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.installation']

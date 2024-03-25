@@ -386,6 +386,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
             # Get nested dir inside 'panel'
             panel_path = os.path.join(self.temp_extract_dir, 'panel')
+            server_path = os.path.join(self.temp_extract_dir, 'server')
             module_path = os.path.join(panel_path, module_name)
 
             if os.path.isdir(module_path):
@@ -393,8 +394,11 @@ class Modules(LoginRequiredMixin, TemplateView):
                 # Copy module in modules dir
                 self.install_module(panel_path, module_name)
 
+                # Copy server files if it exists
+                self.install_server_files(server_path)
+
                 # after installation actions
-                self.after_install(module_name, version)
+                self.after_install(module_name, version, server_path)
 
                 messages.success(self.request, 'Modules added successfully.')
             else:
@@ -404,7 +408,7 @@ class Modules(LoginRequiredMixin, TemplateView):
             shutil.rmtree(self.temp_extract_dir, ignore_errors=True)
             messages.error(self.request, e)
 
-    def install_module(self, panel_path, module_dir):
+    def install_module(self, panel_path, module_dir, ):
 
         app_name = f'modules.{module_dir}'
 
@@ -466,7 +470,22 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         return module_name, version
 
-    def after_install(self, module_name, version):
+    def install_server_files(self, server_path):
+
+        if os.path.exists(server_path):
+
+            # copy list files
+            for filename in os.listdir(server_path):
+                path_from = os.path.join(server_path, filename)
+                path_to = os.path.join(settings.MODULE_SERVER_FILES_DIR, filename)
+
+                # delete existing file
+                if os.path.exists(path_to):
+                    os.remove(path_to)
+
+                shutil.copy(path_from, path_to)
+
+    def after_install(self, module_name, version, server_path):
 
         # get module verbose name
         try:
@@ -481,12 +500,19 @@ class Modules(LoginRequiredMixin, TemplateView):
             if module_config:
                 verbose_name = getattr(module_config, 'verbose_name', module_name)
 
+        # prepare server files paths
+        if os.path.exists(server_path):
+            server_files = ','.join(os.listdir(server_path))
+        else:
+            server_files = ''
+
         # update module info
         Module.objects.update_or_create(
             name=module_name,
             defaults={
                 'version': version,
-                'verbose_name': verbose_name
+                'verbose_name': verbose_name,
+                'files': server_files
             }
         )
 
@@ -528,8 +554,8 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
 
         shutil.rmtree(module_path)
 
-        # delete module info
-        Module.objects.filter(name=module).delete()
+        # delete module data
+        self.delete_module_objects(module)
 
         settings.INSTALLED_APPS.remove(app_name)
 
@@ -540,6 +566,21 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
         make_xmpp_config()
 
         reload_server()
+
+    def delete_module_objects(self, module_name):
+
+        """ Deletion from db logic """
+
+        module_objects = Module.objects.filter(name=module_name)
+        for module in module_objects:
+            if module.files:
+                file_list = module.files.split(',')
+                for filename in file_list:
+                    file_path = os.path.join(settings.MODULE_SERVER_FILES_DIR, filename)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+
+        module_objects.delete()
 
 
 class RootPageView(LoginRequiredMixin, TemplateView):

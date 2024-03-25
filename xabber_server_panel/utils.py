@@ -8,7 +8,6 @@ from django.core.validators import URLValidator
 import subprocess
 import time
 import os
-import re
 import random
 import string
 
