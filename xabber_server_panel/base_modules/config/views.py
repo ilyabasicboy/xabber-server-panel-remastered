@@ -500,7 +500,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
             if module_config:
                 verbose_name = getattr(module_config, 'verbose_name', module_name)
-                root_page = getattr(module_config, 'ROOT_PAGE', False)
+                root_page = getattr(module_config, 'root_page', False)
 
         # prepare server files paths
         if os.path.exists(server_path):
