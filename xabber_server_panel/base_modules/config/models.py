@@ -130,13 +130,16 @@ class Module(models.Model):
         blank=True,
         null=True
     )
+    root_page = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         return self.name
 
 
 def check_vhost(vhost):
-    return vhost in [obj.name for obj in VirtualHost.objects.all()] or vhost == "global"
+    return VirtualHost.objects.filter(name=vhost).exists() or vhost == "global"
 
 
 class BaseXmppModule(models.Model):
