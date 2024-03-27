@@ -126,11 +126,12 @@ class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            circle = Circle.objects.get(id=id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         context = {
@@ -141,11 +142,12 @@ class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            self.circle = Circle.objects.get(id=id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if self.circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.update_circle()
@@ -215,11 +217,12 @@ class CirclesDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            circle = Circle.objects.get(id=id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -251,11 +254,12 @@ class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            self.circle = Circle.objects.get(id=id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if self.circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.api = get_api(request)
@@ -274,11 +278,12 @@ class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            self.circle = Circle.objects.get(id=id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if self.circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.api = get_api(request)
@@ -375,11 +380,12 @@ class DeleteMember(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, circle_id, member_id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            circle = Circle.objects.get(id=circle_id, host=host.name)
-        except:
+            circle = Circle.objects.get(id=circle_id)
+        except Circle.DoesNotExist:
+            raise Http404
+
+        if circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         try:
@@ -411,11 +417,12 @@ class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            circle = Circle.objects.get(id=id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -432,11 +439,12 @@ class CircleShared(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.circle = Circle.objects.get(id=id, host=host.name)
-        except:
+            self.circle = Circle.objects.get(id=id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if self.circle.host not in request.user.get_allowed_hosts():
             raise Http404
 
         circles = Circle.objects.filter(host=self.circle.host).exclude(circle=self.circle.host)

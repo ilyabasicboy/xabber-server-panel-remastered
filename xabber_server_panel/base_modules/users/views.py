@@ -90,11 +90,12 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         context = {
@@ -104,11 +105,12 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.user = User.objects.get(id=id, host=host.name)
-        except:
+            self.user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if self.user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.api = get_api(request)
@@ -220,11 +222,12 @@ class UserBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -251,11 +254,12 @@ class UserUnBlock(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -275,11 +279,12 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -319,11 +324,12 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         context = {
@@ -333,11 +339,12 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.user = User.objects.get(id=id, host=host.name)
-        except:
+            self.user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if self.user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.api = get_api(request)
@@ -374,11 +381,12 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_read
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         api = get_api(request)
@@ -395,11 +403,12 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_write
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.user = User.objects.get(id=id, host=host.name)
-        except:
+            self.user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if self.user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         self.circles = Circle.objects.filter(host=self.user.host).exclude(circle=self.user.host)
@@ -492,11 +501,12 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            user = User.objects.get(id=id, host=host.name)
-        except:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         # check if user change himself
@@ -520,11 +530,12 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, id, *args, **kwargs):
-        host = request.current_host
-
         try:
-            self.user = User.objects.get(id=id, host=host.name)
-        except:
+            self.user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if self.user.host not in request.user.get_allowed_hosts():
             raise Http404
 
         # check if user change himself
@@ -603,7 +614,6 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if user_sessions:
                 for session in user_sessions:
                     session.delete()
-
 
     def get_permissions_dict(self):
 

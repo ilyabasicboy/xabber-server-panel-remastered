@@ -12,6 +12,7 @@ from xabber_server_panel.base_modules.config.utils import make_xmpp_config, upda
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.users.forms import UserForm
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
 
@@ -147,33 +148,29 @@ def create_config(data):
 
 
 def create_admin(data):
-
-    # delete spaces
-    password = data.get('password', '').strip()
-
+    data['is_admin'] = True
     # create user in db
-    user = User(
-        username=data['username'],
-        host=data['host'],
-        is_admin=True
-    )
-    user.password = make_password(password)
-    user.save()
-
-    # create user on server
-    cmd_create_admin = [
-        settings.EJABBERDCTL,
-        'register',
-        data['username'],
-        data['host'],
-        password
-    ]
-    cmd = subprocess.Popen(cmd_create_admin,
-                           stdin=subprocess.PIPE,
-                           # stdout=open('/dev/null', 'w'),
-                           stderr=subprocess.STDOUT)
-    cmd.communicate()
-    return cmd.returncode == 0
+    form = UserForm(data)
+    if form.is_valid():
+        # create user on server
+        cmd_create_admin = [
+            settings.EJABBERDCTL,
+            'register',
+            data['username'],
+            data['host'],
+            form.cleaned_data['password']
+        ]
+        cmd = subprocess.Popen(
+            cmd_create_admin,
+            stdin=subprocess.PIPE,
+            # stdout=open('/dev/null', 'w'),
+            stderr=subprocess.STDOUT
+        )
+        cmd.communicate()
+        if cmd.returncode == 0:
+            form.save()
+            return True
+    return False
 
 
 def set_created_user_as_admin(data):

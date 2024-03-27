@@ -1,6 +1,7 @@
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
+from django.urls import reverse, resolve, NoReverseMatch
 
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.utils import reload_ejabberd_config, is_ejabberd_started
@@ -234,6 +235,53 @@ def get_modules():
     if os.path.isdir(settings.MODULES_DIR):
         return os.listdir(settings.MODULES_DIR)
     return []
+
+
+def get_create_views():
+
+    """ Loop over installed modules and return list of urls to create objects """
+
+    modules = get_modules()
+    create_data_list = []
+    for module in modules:
+
+        # get apps file to append module verbose_name in data
+        try:
+            module_app = import_module('.apps', package=f'modules.{module}')
+        except:
+            module_app = None
+
+        if module_app:
+            module_config = getattr(module_app, 'ModuleConfig', None)
+
+            if module_config:
+                create_views_names = getattr(module_config, 'create_views_names', [])
+                if create_views_names and isinstance(create_views_names, list):
+                    for name in create_views_names:
+                        try:
+                            url = reverse(f'{module}:{name}')
+                        except NoReverseMatch:
+                            continue
+
+                        resolver_match = resolve(url)
+                        if resolver_match:
+                            # Check if the resolved view is a class-based view
+                            if hasattr(resolver_match.func, 'view_class'):
+                                # If it's a class-based view, get the view class
+                                view = resolver_match.func.view_class
+                            else:
+                                # If it's a function-based view, get the view function
+                                view = resolver_match.func
+
+                            create_data_list += [
+                                {
+                                    'url': url,
+                                    'title': getattr(view, 'create_title', ''),
+                                    'subtitle': getattr(view, 'create_subtitle', ''),
+                                }
+                            ]
+
+    return create_data_list
 
 
 def check_hosts(api):

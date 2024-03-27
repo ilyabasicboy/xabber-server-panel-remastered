@@ -136,12 +136,14 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         form = VirtualHostForm(request.POST)
 
         if form.is_valid():
-            host = form.save()
+            host = form.save(commit=False)
 
             # check srv records
             records = get_srv_records(host.name)
             if not 'error' in records:
                 host.check_dns = True
+
+            host.save()
 
             # update config after creating new host
             update_ejabberd_config()

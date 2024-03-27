@@ -5,6 +5,14 @@
     Server settings
 {% endblock %}
 
+{% block host_select %}
+    {% if request.user.is_admin %}
+        <div class="ms-auto me-0 me-md-4 pt-2 pt-md-0 order-1 order-md-0 col-12 col-md-auto">
+            {% include 'parts/host_select.html' %}
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     {% url 'config:tabs' as url %}
     <div class="mb-4 col-12">

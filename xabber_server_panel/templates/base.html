@@ -78,6 +78,18 @@
                                     </a>
                                 </li>
                             {% endif %}
+
+                            {% get_create_views_data as create_data_list %}
+                            {% if create_data_list %}
+                                {% for create_data in create_data_list %}
+                                    <li>
+                                        <a class="dropdown-item text-wrap" href="{{ create_data.url }}">
+                                            <b>{{ create_data.title }}</b><br>
+                                            {{ create_data.subtitle }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
                         </ul>
                     </div>
                 {% endif %}
@@ -88,11 +100,7 @@
                     </form>
                 </div>
 
-                {% if request.user.is_admin %}
-                    <div class="ms-auto me-0 me-md-4 pt-2 pt-md-0 order-1 order-md-0 col-12 col-md-auto">
-                        {% include 'parts/host_select.html' %}
-                    </div>
-                {% endif %}
+                {% block host_select %}{% endblock %}
 
                 <div class="ms-auto me-2 me-md-0">
                     {% if request.user.is_authenticated %}

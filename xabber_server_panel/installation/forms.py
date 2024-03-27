@@ -1,5 +1,8 @@
 from django import forms
 
+from xabber_server_panel.jid_validation.utils import validate_host, validate_localpart
+from django.contrib.auth.validators import UnicodeUsernameValidator
+
 
 class InstallationForm(forms.Form):
 
@@ -15,7 +18,8 @@ class InstallationForm(forms.Form):
     username = forms.CharField(
         max_length=100,
         label='Username',
-        widget=forms.TextInput(attrs={'placeholder': 'admin'})
+        widget=forms.TextInput(attrs={'placeholder': 'admin'}),
+        validators=[UnicodeUsernameValidator()]
     )
     password = forms.CharField(
         max_length=100,
@@ -49,10 +53,25 @@ class InstallationForm(forms.Form):
 
     def validate_1_step(self):
         self._validate_field('host')
+        host = self.data.get('host', '')
+
+        # validate and normalize host
+        result = validate_host(host)
+        if not result.get('success'):
+            self.step_errors['host'] = result.get('error_message')
+
         return not self.step_1_errors()
 
     def validate_2_step(self):
         self._validate_field('username')
+
+        username = self.data.get('username')
+
+        # validate username
+        result = validate_localpart(username)
+        if not result.get('success'):
+            self.step_errors['username'] = result.get('error_message')
+
         self._validate_field('password')
         return not self.step_2_errors()
 
@@ -83,3 +102,27 @@ class InstallationForm(forms.Form):
 
     def step_3_errors(self):
         return any(field in self.step_errors.keys() for field in ['server_name', 'db_name', 'db_user'])
+
+    def clean_host(self):
+        host = self.cleaned_data['host']
+
+        # validate and normalize host
+        result = validate_host(host)
+        if result.get('success'):
+            host = result.get('host')
+        else:
+            self.add_error('host', result.get('error_message'))
+
+        return host
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+
+        # validate and normalize circle
+        result = validate_localpart(username)
+        if result.get('success'):
+            username = result.get('localpart')
+        else:
+            self.add_error('username', result.get('error_message'))
+
+        return username

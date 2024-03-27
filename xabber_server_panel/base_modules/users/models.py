@@ -177,7 +177,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         hosts = VirtualHost.objects.all()
         if not self.is_admin:
             hosts = hosts.filter(name=self.host)
-        return hosts
+        return hosts.values_list('name', flat=True)
 
 
 def get_apps_choices():
