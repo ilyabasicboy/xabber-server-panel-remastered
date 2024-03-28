@@ -34,13 +34,13 @@
                         </td>
                         <td data-title="Created(UTC)">
                             <span class="text-body-secondary">
-                                {{ user.created|date:"m.d.Y H:i" }}
+                                {{ user.created|date:"d.m.Y H:i" }}
                             </span>
                         </td>
                         <td data-title="Expires(UTC)">
                             <span class="text-body-secondary">
                                 {% if user.expires %}
-                                    {{ user.expires|date:"m.d.Y H:i" }}
+                                    {{ user.expires|date:"d.m.Y H:i" }}
                                 {% else %}
                                     Never
                                 {% endif %}

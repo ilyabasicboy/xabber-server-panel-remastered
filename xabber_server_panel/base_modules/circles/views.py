@@ -101,7 +101,7 @@ class CircleCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                 # save circle in db if success
                 circle.save()
 
-                messages.success(request, f'Circle "{circle.circle}" created successfully.')
+                messages.success(request, 'Circle "%s" created successfully.' % circle.circle)
                 return HttpResponseRedirect(
                     reverse(
                         'circles:detail',
@@ -155,7 +155,7 @@ class CircleDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         # check server errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(request, f'Circle "{self.circle.circle}" changed successfully.')
+            messages.success(request, 'Circle "%s" changed successfully.' % self.circle.circle)
 
         context = {
             'circle': self.circle,
@@ -237,7 +237,7 @@ class CirclesDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         # check server errors
         if not response.get('errors'):
-            messages.success(request, f'Circle "{circle.circle}" deleted successfully.')
+            messages.success(request, 'Circle "%s" deleted successfully.' % circle.circle)
 
         # redirect to previous url or circles list
         circle_detail_url = reverse('circles:detail', kwargs={'id': id})

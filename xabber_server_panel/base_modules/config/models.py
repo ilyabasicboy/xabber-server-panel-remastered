@@ -89,7 +89,7 @@ class LDAPSettings(models.Model):
     )
 
     def __str__(self):
-        return f'LDAP Settings {self.host.name}'
+        return 'LDAP Settings %s' % self.host.name
 
 
 class LDAPServer(models.Model):

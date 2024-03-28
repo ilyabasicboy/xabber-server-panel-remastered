@@ -27,6 +27,6 @@ class Command(BaseCommand):
 
         if form.is_valid():
             form.save()
-            print(f'Admin "{username}" created successfully!')
+            print('Admin "%s" created successfully!' % username)
         else:
             print(form.errors)

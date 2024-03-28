@@ -247,7 +247,7 @@ def get_create_views():
 
         # get apps file to append module verbose_name in data
         try:
-            module_app = import_module('.apps', package=f'modules.{module}')
+            module_app = import_module('.apps', package='modules.%s' % module)
         except:
             module_app = None
 
@@ -259,7 +259,7 @@ def get_create_views():
                 if create_views_names and isinstance(create_views_names, list):
                     for name in create_views_names:
                         try:
-                            url = reverse(f'{module}:{name}')
+                            url = reverse('%s:%s' % (module, name))
                         except NoReverseMatch:
                             continue
 

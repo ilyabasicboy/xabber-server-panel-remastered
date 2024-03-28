@@ -77,7 +77,7 @@ class GroupCreate(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
             # Check api errors
             if not response.get('errors'):
-                messages.success(request, f'Group "{form.cleaned_data.get("localpart")}" created successfully')
+                messages.success(request, 'Group "%s" created successfully' % form.cleaned_data.get("localpart"))
 
                 return HttpResponseRedirect(reverse('groups:list'))
 
@@ -103,7 +103,7 @@ class GroupDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             )
 
             if not response.get('errors'):
-                messages.success(request, f'Group "{localpart}" deleted successfully')
+                messages.success(request, 'Group "%s" deleted successfully' % localpart)
 
         # redirect to previous url or groups list
         referer = request.META.get('HTTP_REFERER')

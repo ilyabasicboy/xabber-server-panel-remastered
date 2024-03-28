@@ -131,6 +131,8 @@ def create_config(data):
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
     data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
+    data['WEBHOOKS_SECRET'] = settings.WEBHOOKS_SECRET
+    data['PANEL_ADDRESS'] = settings.PANEL_ADDRESS
 
     # Create add config
     add_config = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)

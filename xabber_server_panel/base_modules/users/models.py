@@ -158,7 +158,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         if self.first_name and self.last_name:
-            return f'{self.first_name} {self.last_name}'
+            return '%s %s' % (self.first_name, self.last_name)
         elif self.first_name:
             return self.first_name
         elif self.last_name:
@@ -211,4 +211,4 @@ class CustomPermission(models.Model):
     )
 
     def __str__(self):
-        return f'{self.app} - {self.get_permission_display()}'
+        return '%s - %s' % (self.app, self.get_permission_display())

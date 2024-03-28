@@ -24,7 +24,7 @@ class Command(BaseCommand):
         form = VirtualHostForm(data)
         if form.is_valid():
             host = form.save()
-            print(f'Host "{host}" created successfully!')
+            print('Host "%s" created successfully!' % host)
 
         else:
             print(form.errors)

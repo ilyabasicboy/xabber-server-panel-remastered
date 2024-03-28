@@ -39,7 +39,7 @@ class EjabberdAPI(object):
             if error not in self.errors:
                 self.errors += [error]
         except requests.exceptions.RequestException as e:
-            error = f'Request error: {e}'
+            error = 'Request error: %s' % e
             if error not in self.errors:
                 self.errors += [error]
         except Exception as e:

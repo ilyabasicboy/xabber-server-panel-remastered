@@ -26,7 +26,7 @@ class Root(TemplateView):
 
         if rp and rp.module:
             if rp.module != 'home' and rp.module in modules:
-                module = f'modules.{rp.module}'
+                module = 'modules.%s' % rp.module
 
                 # return current root module view
                 try:

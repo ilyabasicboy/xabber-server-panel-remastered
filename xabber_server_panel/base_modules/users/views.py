@@ -49,7 +49,7 @@ class CreateUser(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if not error_messages:
                 # save user in db success
                 user.save()
-                messages.success(request, f'User "{user.full_jid}" created successfully.')
+                messages.success(request, 'User "%s" created successfully.' % user.full_jid)
 
                 return HttpResponseRedirect(
                     reverse(
@@ -127,7 +127,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, f'User "{self.user.full_jid}" changed successfully.')
+                messages.success(request, 'User "%s" changed successfully.' % self.user.full_jid)
 
         context = {
             'user': self.user,
@@ -304,7 +304,7 @@ class UserDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
             # check api errors
             if not response.get('errors'):
-                messages.success(request, f'User "{user.full_jid}" deleted successfully.')
+                messages.success(request, 'User "%s" deleted successfully.' % user.full_jid)
         else:
             messages.error(request, 'You can not delete yourself.')
 
@@ -372,7 +372,7 @@ class UserVcard(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         # check api errors
         if not response.get('errors'):
-            messages.success(self.request, f'User "{self.user.full_jid}" changed successfully.')
+            messages.success(self.request, 'User "%s" changed successfully.' % self.user.full_jid)
 
 
 class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
@@ -420,7 +420,7 @@ class UserCircles(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         # check api errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(self.request, f'User "{self.user.full_jid}" changed successfully.')
+            messages.success(self.request, 'User "%s" changed successfully.' % self.user.full_jid)
 
         context = {
             'user': self.user,
@@ -574,7 +574,7 @@ class UserPermissions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         permission_id_list = []
 
         for app in get_apps_choices():
-            app_permission_id_list = self.request.POST.getlist(f'permissions_{app[0]}', [])
+            app_permission_id_list = self.request.POST.getlist('permissions_%s' % app[0], [])
             permission_id_list += app_permission_id_list
 
         permission_list = CustomPermission.objects.filter(id__in=permission_id_list)

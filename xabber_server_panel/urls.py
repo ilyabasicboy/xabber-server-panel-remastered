@@ -16,4 +16,4 @@ urlpatterns = [
 ]
 
 for module in get_modules():
-    urlpatterns += [path(f'modules/{module}/', include((f'modules.{module}.urls', module), namespace=module))]
+    urlpatterns += [path('modules/%s/' % module, include(('modules.%s.urls' % module, module), namespace=module))]

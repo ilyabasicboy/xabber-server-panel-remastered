@@ -166,6 +166,8 @@ INSTALLED_APPS += ['xabber_server_panel.webhooks']
 WEBHOOKS_SIGNATURE_HEADER = 'x-xmpp-server-signature'
 WEBHOOKS_SECRET = None
 
+# ============ PANEL SETTINGS ===============#
+PANEL_ADDRESS = ''
 
 # external modules
 if os.path.exists(MODULES_DIR):

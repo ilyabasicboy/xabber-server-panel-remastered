@@ -95,7 +95,7 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         # check api errors
         error_messages = get_error_messages(request)
         if not error_messages:
-            messages.success(request, f'Host "{host.name}" deleted successfully.')
+            messages.success(request, 'Host "%s" deleted successfully.' % host.name)
 
         host.delete()
         update_ejabberd_config()
@@ -154,7 +154,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             # check api errors
             error_messages = get_error_messages(request)
             if not error_messages:
-                messages.success(request, f'Virtual host "{host.name}" created successfully.')
+                messages.success(request, 'Virtual host "%s" created successfully.' % host.name)
 
             return HttpResponseRedirect(
                 reverse('config:hosts')
@@ -306,7 +306,7 @@ class Ldap(LoginRequiredMixin, TemplateView):
             messages.success(request, 'Ldap settings changed successfully.')
         else:
             for error in self.form.errors.values():
-                messages.error(request, f'{error}')
+                messages.error(request, '%s' % error)
 
         return self.render_to_response(context)
 
@@ -412,7 +412,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
     def install_module(self, panel_path, module_dir, ):
 
-        app_name = f'modules.{module_dir}'
+        app_name = 'modules.%s' % module_dir
 
         target_path = os.path.join(settings.MODULES_DIR, module_dir)
         module_path = os.path.join(panel_path, module_dir)
@@ -491,7 +491,7 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         # get module verbose name
         try:
-            module_app = import_module('.apps', package=f'modules.{module_name}')
+            module_app = import_module('.apps', package='modules.%s' % module_name)
         except:
             module_app = None
 
@@ -538,12 +538,12 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
     @permission_admin
     def get(self, request, module, *args, **kwargs):
         module_path = os.path.join(settings.MODULES_DIR, module)
-        app_name = f'modules.{module}'
+        app_name = 'modules.%s' % module
 
         if os.path.isdir(module_path) and apps.is_installed(app_name):
             self.hande_delete(module_path, module, app_name)
 
-            messages.success(request, f'Module "{module}" deleted successfully.')
+            messages.success(request, 'Module "%s" deleted successfully.' % module)
             return HttpResponseRedirect(reverse('config:modules'))
         else:
             raise Http404
