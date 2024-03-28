@@ -3,18 +3,24 @@ import subprocess
 import psycopg2
 from psycopg2 import sql
 import json
+import string
+import secrets
 
 from django.template.loader import get_template
-from django.contrib.auth.hashers import make_password
 from django.conf import settings
 
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost
-from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.forms import UserForm
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
+
+
+def generate_secret(length=32):
+    alphabet = string.ascii_letters + string.digits
+    secret = ''.join(secrets.choice(alphabet) for i in range(length))
+    return secret
 
 
 def database_exists(data):
@@ -127,11 +133,12 @@ def create_vhost(data):
 
 
 def create_config(data):
+
     data['PROJECT_DIR'] = settings.PROJECT_DIR
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
     data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
-    data['WEBHOOKS_SECRET'] = settings.WEBHOOKS_SECRET
+    data['WEBHOOKS_SECRET'] = data.get('webhooks_secret')
     data['PANEL_ADDRESS'] = settings.PANEL_ADDRESS
 
     # Create add config
@@ -279,7 +286,8 @@ def start_installation_process(data):
     return True, None
 
 
-def install_cmd(request, data):
+def install_cmd(request, data, webhooks_secret=None):
+    data['webhooks_secret'] = webhooks_secret
     success, error_message = start_installation_process(data)
     if not success:
         if is_ejabberd_started():

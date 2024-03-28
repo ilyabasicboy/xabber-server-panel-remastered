@@ -24,29 +24,47 @@ def webhook_received_handler(sender, **kwargs):
           "host": "domain.com"
         }
     """
+    path = kwargs.get('path', '')
 
-    path = kwargs.get('path')
+    # Checking if the path matches the expected webhook path
     if path.rstrip('/') != 'xmppserver':
         return
+
     request = kwargs.get('request')
+
+    # Checking the signature of the request
     if not check_signature(request):
         raise WebHookResponse(response=HttpResponse('Unauthorized', status=401))
+
     try:
+        # Attempting to parse JSON from request body
         _json = json.loads(request.body)
-    except:
+    except json.JSONDecodeError:
         raise WebHookResponse(response=HttpResponse(status=400))
-    if _json.get('target') == 'user':
-        if _json.get('action') == 'create' and _json.get('username') and _json.get('host'):
-            if User.objects.filter(username=_json.get('username'), host=_json.get('host')).exists():
+
+    # Extracting relevant data from the JSON payload
+    target = _json.get('target')
+    action = _json.get('action')
+    username = _json.get('username')
+    host = _json.get('host')
+
+    if target == 'user':
+        if action == 'create' and username and host:
+            # Checking if the user already exists
+            if User.objects.filter(username=username, host=host).exists():
                 raise WebHookResponse(response=HttpResponse(status=201))
-            new_user = User(username=_json.get('username'), host=_json.get('host'))
+
+            # Creating a new user
+            new_user = User(username=username, host=host)
             if settings.DEFAULT_ACCOUNT_LIFETIME > 0:
+                # Setting expiration date if applicable
                 expires = timezone.now() + timedelta(days=settings.DEFAULT_ACCOUNT_LIFETIME)
                 new_user.expires = expires
             new_user.save()
+
             raise WebHookResponse(response=HttpResponse(status=201))
 
-        if _json.get('action') == 'remove' and _json.get('username') and _json.get('host'):
-            User.objects.filter(username=_json.get('username'), host=_json.get('host')).delete()
+        elif action == 'remove' and username and host:
+            # Removing the user
+            User.objects.filter(username=username, host=host).delete()
             raise WebHookResponse(response=HttpResponse(status=201))
-    return

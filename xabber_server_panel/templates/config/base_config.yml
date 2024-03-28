@@ -218,7 +218,7 @@ modules:
     url: "https://xabber.@HOST@:5443/iq"
   mod_webhooks:
     secret: "{{ WEBHOOKS_SECRET }}"
-    url: "{{ PANEL_ADDRESS }}/webhooks/"
+    url: "{{ PANEL_ADDRESS|default:'https://xabber.'|add:host }}/webhooks/"
 
 
 allow_contrib_modules: true

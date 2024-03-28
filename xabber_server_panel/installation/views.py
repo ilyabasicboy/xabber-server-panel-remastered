@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.contrib.auth import login
+from django.conf import settings
 
 from xabber_server_panel.utils import server_installed
 from xabber_server_panel.base_modules.config.models import VirtualHost
@@ -11,7 +12,10 @@ from xabber_server_panel.base_modules.config.utils import check_hosts_dns
 from xabber_server_panel.custom_auth.forms import ApiAuthenticationForm
 
 from .forms import InstallationForm
-from .utils import install_cmd, create_circles, load_predefined_config
+from .utils import install_cmd, create_circles, load_predefined_config, generate_secret
+
+import os
+import subprocess
 
 
 class Steps(TemplateView):
@@ -62,9 +66,12 @@ class Steps(TemplateView):
         elif self.step == '3':
             # full clean if form filled
             if self.form.validate_1_step() and self.form.validate_2_step() and self.form.validate_3_step():
+
+                # generate webhook secret
+                webhooks_secret = generate_secret()
                 try:
                     self.form.full_clean()
-                    success, message = install_cmd(self.request, data=self.form.cleaned_data)
+                    success, message = install_cmd(self.request, data=self.form.cleaned_data, webhooks_secret=webhooks_secret)
                 except Exception as e:
                     success, message = False, e
                     print(e)
@@ -79,6 +86,10 @@ class Steps(TemplateView):
                 create_circles(self.form.cleaned_data)
                 self._login_admin()
                 check_hosts_dns()
+
+                # write webhook secret in settings
+                subprocess.run(['sed', '-i', "s/WEBHOOKS_SECRET.*/WEBHOOKS_SECRET = '%s'/" % webhooks_secret,
+                                os.path.join(settings.PROJECT_ROOT, 'generic_settings.py')])
                 return HttpResponseRedirect(reverse('installation:success'))
 
             # additional errors check
@@ -142,8 +153,11 @@ class Quick(TemplateView):
             return self.render_to_response(context)
 
         if self.form.is_valid():
+            # generate webhook secret
+            webhooks_secret = generate_secret()
+
             try:
-                success, message = install_cmd(request, data=self.form.cleaned_data)
+                success, message = install_cmd(request, data=self.form.cleaned_data, webhooks_secret=webhooks_secret)
             except Exception as e:
                 success, message = False, e
                 print(e)
@@ -157,6 +171,10 @@ class Quick(TemplateView):
             create_circles(self.form.cleaned_data)
             self._login_admin()
             check_hosts_dns()
+
+            # write webhook secret in settings
+            subprocess.run(['sed', '-i', "s/WEBHOOKS_SECRET.*/WEBHOOKS_SECRET = '%s'/" % webhooks_secret,
+                            os.path.join(settings.PROJECT_ROOT, 'generic_settings.py')])
             return HttpResponseRedirect(reverse('installation:success'))
 
         return self.render_to_response(context)

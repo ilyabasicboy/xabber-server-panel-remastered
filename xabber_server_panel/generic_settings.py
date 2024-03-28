@@ -164,7 +164,7 @@ INSTALLED_APPS += ['xabber_server_panel.installation']
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']
 WEBHOOKS_SIGNATURE_HEADER = 'x-xmpp-server-signature'
-WEBHOOKS_SECRET = None
+WEBHOOKS_SECRET = 'nXUNVeFmlXEctcPHLR18mUYHENeTy4Pj'
 
 # ============ PANEL SETTINGS ===============#
 PANEL_ADDRESS = ''
