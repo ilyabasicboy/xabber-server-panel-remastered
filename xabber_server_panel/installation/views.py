@@ -12,7 +12,7 @@ from xabber_server_panel.base_modules.config.utils import check_hosts_dns
 from xabber_server_panel.custom_auth.forms import ApiAuthenticationForm
 
 from .forms import InstallationForm
-from .utils import install_cmd, create_circles, load_predefined_config, generate_secret
+from .utils import install_cmd, create_circles, load_predefined_config
 
 import os
 import subprocess
@@ -67,11 +67,10 @@ class Steps(TemplateView):
             # full clean if form filled
             if self.form.validate_1_step() and self.form.validate_2_step() and self.form.validate_3_step():
 
-                # generate webhook secret
-                webhooks_secret = generate_secret()
+
                 try:
                     self.form.full_clean()
-                    success, message = install_cmd(self.request, data=self.form.cleaned_data, webhooks_secret=webhooks_secret)
+                    success, message = install_cmd(self.request, data=self.form.cleaned_data)
                 except Exception as e:
                     success, message = False, e
                     print(e)
@@ -83,13 +82,7 @@ class Steps(TemplateView):
                         'step': '4'
                     })
 
-                create_circles(self.form.cleaned_data)
-                self._login_admin()
-                check_hosts_dns()
-
-                # write webhook secret in settings
-                subprocess.run(['sed', '-i', "s/WEBHOOKS_SECRET.*/WEBHOOKS_SECRET = '%s'/" % webhooks_secret,
-                                os.path.join(settings.PROJECT_ROOT, 'generic_settings.py')])
+                self.after_install()
                 return HttpResponseRedirect(reverse('installation:success'))
 
             # additional errors check
@@ -103,6 +96,11 @@ class Steps(TemplateView):
 
         context['form'] = self.form
         return self.render_to_response(context)
+
+    def after_install(self):
+        create_circles(self.form.cleaned_data)
+        self._login_admin()
+        check_hosts_dns()
 
     def _login_admin(self):
         data = {
@@ -153,11 +151,8 @@ class Quick(TemplateView):
             return self.render_to_response(context)
 
         if self.form.is_valid():
-            # generate webhook secret
-            webhooks_secret = generate_secret()
-
             try:
-                success, message = install_cmd(request, data=self.form.cleaned_data, webhooks_secret=webhooks_secret)
+                success, message = install_cmd(request, data=self.form.cleaned_data)
             except Exception as e:
                 success, message = False, e
                 print(e)
@@ -168,16 +163,15 @@ class Quick(TemplateView):
                     "installation_error": message
                 })
 
-            create_circles(self.form.cleaned_data)
-            self._login_admin()
-            check_hosts_dns()
-
-            # write webhook secret in settings
-            subprocess.run(['sed', '-i', "s/WEBHOOKS_SECRET.*/WEBHOOKS_SECRET = '%s'/" % webhooks_secret,
-                            os.path.join(settings.PROJECT_ROOT, 'generic_settings.py')])
+            self.after_install()
             return HttpResponseRedirect(reverse('installation:success'))
 
         return self.render_to_response(context)
+
+    def after_install(self):
+        create_circles(self.form.cleaned_data)
+        self._login_admin()
+        check_hosts_dns()
 
     def _login_admin(self):
         data = {

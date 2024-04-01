@@ -11,7 +11,7 @@ from django.conf import settings
 
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config
 from xabber_server_panel.base_modules.circles.models import Circle
-from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings
 from xabber_server_panel.base_modules.users.forms import UserForm
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
@@ -124,12 +124,34 @@ def migrate_db(data):
 
 def create_vhost(data):
     try:
-        VirtualHost.objects.create(
+        VirtualHost.objects.get_or_create(
             name=data['host']
         )
         return True
     except:
         return False
+
+
+def generate_webhooks_secret(data):
+    # generate webhook secret
+    webhooks_secret = generate_secret()
+    module_settings = ModuleSettings(
+        host=data['host'],
+        module='mod_webhooks'
+    )
+
+    if settings.PANEL_ADDRESS:
+        webhooks_url = settings.PANEL_ADDRESS
+    else:
+        webhooks_url = "https://xabber.%s/webhooks/" % data['host']
+
+    module_settings.set_options(
+        {
+            'secret': webhooks_secret,
+            'url': webhooks_url
+        }
+    )
+    module_settings.save()
 
 
 def create_config(data):
@@ -138,7 +160,6 @@ def create_config(data):
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
     data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
-    data['WEBHOOKS_SECRET'] = data.get('webhooks_secret')
     data['PANEL_ADDRESS'] = settings.PANEL_ADDRESS
 
     # Create add config
@@ -247,6 +268,9 @@ def start_installation_process(data):
         return False, msg
     print('Successfully host created')
 
+    generate_webhooks_secret(data)
+    print('Webhooks secret successfully created.')
+
     create_config(data)
     print("Successfully create config for ejabberd.")
 
@@ -286,8 +310,7 @@ def start_installation_process(data):
     return True, None
 
 
-def install_cmd(request, data, webhooks_secret=None):
-    data['webhooks_secret'] = webhooks_secret
+def install_cmd(request, data):
     success, error_message = start_installation_process(data)
     if not success:
         if is_ejabberd_started():

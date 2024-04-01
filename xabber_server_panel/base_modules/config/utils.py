@@ -26,7 +26,11 @@ def get_value(key, value, level):
     if isinstance(value, list):
         result += "{}:\n".format(key)
         for el in value:
-            result += shift + "  - {}\n".format(el)
+            if isinstance(el, dict):
+                for key, value in el.items():
+                    result += shift + "  - \"%s\" : \"%s\"\n" % (key, value)
+            else:
+                result += shift + "  - {}\n".format(el)
 
     # Handle dictionaries
     elif isinstance(value, dict):
@@ -51,7 +55,6 @@ def get_modules_config():
 
     # loop over all apps and check xmpp_server_config
     for app in apps.app_configs.values():
-
         # Check if the module exists before attempting to import it
         module_spec = util.find_spec(".config", package=app.name)
         if module_spec:

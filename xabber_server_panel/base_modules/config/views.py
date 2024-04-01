@@ -497,12 +497,14 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         verbose_name = ''
         root_page = False
+        global_module = False
         if module_app:
             module_config = getattr(module_app, 'ModuleConfig', None)
 
             if module_config:
                 verbose_name = getattr(module_config, 'verbose_name', module_name)
                 root_page = getattr(module_config, 'root_page', False)
+                global_module = getattr(module_config, 'global_module', False)
 
         # prepare server files paths
         if os.path.exists(server_path):
@@ -517,7 +519,8 @@ class Modules(LoginRequiredMixin, TemplateView):
                 'version': version,
                 'verbose_name': verbose_name,
                 'files': server_files,
-                'root_page': root_page
+                'root_page': root_page,
+                'global_module': global_module
             }
         )
 

@@ -1,22 +1,9 @@
 from django.db import models
-from xabber_server_panel.base_modules.config.models import VirtualHost
 
 
-class RegistrationSettings(models.Model):
-    STATUS_CHOICES = [
-        ('disabled', 'disabled'),
-        ('link', 'link'),
-        ('public', 'public'),
-    ]
-
-    host = models.ForeignKey(
-        VirtualHost,
-        on_delete=models.CASCADE
-    )
-    status = models.CharField(
-        default='disabled',
-        max_length=50,
-        choices=STATUS_CHOICES
+class RegistrationUrl(models.Model):
+    host = models.CharField(
+        max_length=255
     )
     url = models.CharField(
         max_length=150,
@@ -25,4 +12,4 @@ class RegistrationSettings(models.Model):
     )
 
     def __str__(self):
-        return self.host.name
+        return self.host

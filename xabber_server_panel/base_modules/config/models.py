@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 
 class VirtualHost(models.Model):
@@ -133,9 +134,30 @@ class Module(models.Model):
     root_page = models.BooleanField(
         default=False
     )
+    global_module = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         return self.name
+
+
+class ModuleSettings(models.Model):
+
+    host = models.CharField(
+        max_length=255,
+    )
+    module = models.CharField(
+        max_length=255
+    )
+    options = models.TextField()
+
+    def set_options(self, options_dict):
+        self.options = json.dumps(options_dict)
+
+    def get_options(self):
+        return json.loads(self.options)
+
 
 
 def check_vhost(vhost):

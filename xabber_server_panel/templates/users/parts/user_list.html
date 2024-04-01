@@ -21,6 +21,7 @@
                 {% for user in paginated_users %}
                     <tr>
                         <td data-title="Username">
+                            {% if user.is_admin %}*{% endif %}
                             <a href="{% url 'users:detail' id=user.id %}">
                                 {{ user.username }}
                             </a>

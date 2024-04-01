@@ -28,7 +28,7 @@
             <div class="vr mx-3"></div>
 
             <h6 class="mb-0 text-body-tertiary">
-                {{ settings.host }}
+                {{ registration_url.host }}
             </h6>
         </div>
     </div>
@@ -37,13 +37,13 @@
         <h5 class="mb-0">
             Current URL:
             <span class="current-url-js">
-                {{ settings.url|default:'' }}
+                {{ registration_url.url|default:'' }}
             </span>
         </h5>
     </div>
 
     <div class="col-12">
-        <form class="check-change-js" action="{% url 'registration:url' id=settings.id %}" method="POST">
+        <form class="check-change-js" action="{% url 'registration:url' %}" method="POST">
             {% csrf_token %}
 
             <div class="mb-3">

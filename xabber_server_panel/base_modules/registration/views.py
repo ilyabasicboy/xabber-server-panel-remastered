@@ -6,14 +6,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from datetime import datetime
 
-from xabber_server_panel.base_modules.config.models import VirtualHost
+from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config
 from xabber_server_panel.utils import reload_ejabberd_config, get_error_messages, validate_link
 from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.mixins import ServerStartedMixin
 
-from .models import RegistrationSettings
+from .models import RegistrationUrl
+
+import json
 
 
 class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
@@ -30,16 +32,27 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         context = {}
 
         if host:
-            settings, created = RegistrationSettings.objects.get_or_create(
-                host=host
-            )
-            context['settings'] = settings
+            mod_register = ModuleSettings.objects.filter(
+                host=host.name,
+                module='mod_register',
+            ).first()
+            context['mod_register'] = mod_register
 
-            if settings.status == 'link':
+            mod_registration_keys = ModuleSettings.objects.filter(
+                host=host.name,
+                module='mod_registration_keys',
+            ).first()
+            context['mod_registration_keys'] = mod_registration_keys
+
+            # get keys list if mod registration keys is enabled
+            if mod_registration_keys:
                 keys = api.get_keys(
                     {"host": host.name}
                 ).get('keys')
                 context['keys'] = keys
+
+            url = RegistrationUrl.objects.filter(host=host.name).first()
+            context['registration_url'] = url
 
         if request.is_ajax():
             html = loader.render_to_string('registration/parts/registration_list.html', context, request)
@@ -61,6 +74,10 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         if self.host:
             self.update_settings()
+
+            url = RegistrationUrl.objects.filter(host=self.host.name).first()
+            self.context['registration_url'] = url
+
             make_xmpp_config()
             reload_ejabberd_config()
 
@@ -79,15 +96,42 @@ class RegistrationList(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         return self.render_to_response(self.context)
 
     def update_settings(self):
-        settings, created = RegistrationSettings.objects.update_or_create(
-            host=self.host,
-            defaults={
-                'status': self.status
-            }
-        )
-        self.context['settings'] = settings
+        if self.status == 'disabled':
+            # delete registration settings
+            ModuleSettings.objects.filter(
+                host=self.host.name,
+                module='mod_register',
+            ).delete()
+            ModuleSettings.objects.filter(
+                host=self.host.name,
+                module='mod_registration_keys',
+            ).delete()
+        else:
+            # create mod register setting
+            mod_register, created = ModuleSettings.objects.update_or_create(
+                host=self.host.name,
+                module='mod_register',
+                defaults={
+                    'options': json.dumps(
+                        {
+                            "password_strength": 32,
+                            "access": "register"
+                        }
+                    )
+                }
+            )
+            self.context['mod_register'] = mod_register
 
         if self.status == 'link':
+            mod_registration_keys, created = ModuleSettings.objects.update_or_create(
+                host=self.host.name,
+                module='mod_registration_keys',
+                defaults={
+                    'options': json.dumps({})
+                }
+            )
+            self.context['mod_registration_keys'] = mod_registration_keys
+
             self.keys = self.api.get_keys(
                 {"host": self.host.name}
             ).get('keys')
@@ -255,40 +299,49 @@ class RegistrationDelete(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         )
 
 
-class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
+class RegistrationUrlView(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     """ Change web client url"""
 
     template_name = 'registration/url.html'
 
     @permission_admin
-    def get(self, request, id, *args, **kwargs):
-        try:
-            settings = RegistrationSettings.objects.get(id=id)
-        except ObjectDoesNotExist:
-            raise Http404
+    def get(self, request, *args, **kwargs):
+        host = request.current_host
 
-        context = {
-            'settings': settings
-        }
+        context = {}
+
+        if host:
+            registration_url = RegistrationUrl.objects.filter(host=host.name).first()
+            context['registration_url'] = registration_url
+
         return self.render_to_response(context)
 
     @permission_admin
-    def post(self, request, id, *args, **kwargs):
-        try:
-            settings = RegistrationSettings.objects.get(id=id)
-        except ObjectDoesNotExist:
-            raise Http404
-
+    def post(self, request, *args, **kwargs):
+        host = request.current_host
         url = request.POST.get('url')
         all = request.POST.get('all')
 
+        context = {}
+
         if url and validate_link(url):
             if all:
-                RegistrationSettings.objects.all().update(url=url)
+                for host in request.hosts:
+                    RegistrationUrl.objects.update_or_create(
+                        host=host.name,
+                        defaults={
+                            'url': url
+                        }
+                    )
             else:
-                settings.url = url
-                settings.save()
+                if host:
+                    RegistrationUrl.objects.update_or_create(
+                        host=host.name,
+                        defaults={
+                            'url': url
+                        }
+                    )
 
             messages.success(request, 'Web client url changed successfully.')
             return HttpResponseRedirect(
@@ -297,7 +350,8 @@ class RegistrationUrl(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         else:
             messages.error(request, 'Url is incorrect.')
 
-        context = {
-            'settings': settings
-        }
+        if host:
+            registration_url = RegistrationUrl.objects.filter(host=host.name).first()
+            context['registration_url'] = registration_url
+
         return self.render_to_response(context)

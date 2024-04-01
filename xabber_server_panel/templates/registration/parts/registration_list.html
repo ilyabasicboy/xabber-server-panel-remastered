@@ -13,8 +13,8 @@
             <div class="me-3 mb-3">
                 <select class="form-select" name="status">
                     <option value="disabled">disabled</option>
-                    <option value="link" {% if settings.status == 'link' %}selected{% endif %}>link</option>
-                    <option value="public" {% if settings.status == 'public' %}selected{% endif %}>public</option>
+                    <option value="link" {% if mod_registration_keys %}selected{% endif %}>link</option>
+                    <option value="public" {% if mod_register and not mod_registration_keys %}selected{% endif %}>public</option>
                 </select>
             </div>
             {% if registration_write_permissions %}
@@ -28,19 +28,19 @@
     </form>
 </div>
 
-{% if settings.status == 'link' %}
+{% if mod_registration_keys %}
     <div class="mb-4 overflow-hidden">
         <div class="d-flex flex-wrap align-items-center mb-n3 me-n3">
             <span class="me-3 mb-3">
                 Web client url:
             </span>
 
-            <a class="me-3 mb-3 current-url-js" href="{{ settings.url|default:'' }}">
-                {{ settings.url|default:'' }}
+            <a class="me-3 mb-3 current-url-js" href="{{ registration_url.url|default:'' }}">
+                {{ registration_url.url|default:'' }}
             </a>
 
             {% if registration_write_permissions %}
-                <a class="me-3 mb-3" href="{% url 'registration:url' id=settings.id %}">
+                <a class="me-3 mb-3" href="{% url 'registration:url' %}">
                     Edit
                 </a>
             {% endif %}
@@ -101,7 +101,7 @@
                                                 </li>
                                             {% endif %}
                                             <li>
-                                                <a class="dropdown-item text-wrap text-info show-url-js" role="button" data-link="{{ settings.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
+                                                <a class="dropdown-item text-wrap text-info show-url-js" role="button" data-link="{{ registration_url.url|default:'' }}" data-key="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#show_link">
                                                      Show link
                                                 </a>
                                             </li>
