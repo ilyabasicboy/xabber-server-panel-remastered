@@ -24,7 +24,7 @@
                             <div class="d-flex">
                                 <a class="d-flex align-items-center text-decoration-none" href="{% url 'users:detail' id=user.id %}">
                                     {% if user.is_admin %}
-                                        <div class="icon-link fs-5 me-2">
+                                        <div class="icon-link fs-5 me-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Server administrator">
                                             <i class="bi bi-person-fill-gear d-flex"></i>
                                         </div>
                                     {% endif %}

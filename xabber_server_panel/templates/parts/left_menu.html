@@ -84,7 +84,7 @@
                     {% if request.user.is_admin %}
                         <li class="nav-item">
                             {% url namespace as module_url %}
-                            <a href="{{ module_url }}" class="nav-link text-white {% if module_url in request.path_info %}active{% endif %}">
+                            <a href="{{ module_url }}" class="nav-link text-white {% if module_url and module_url in request.path_info %}active{% endif %}">
                                 {{ module.verbose_name }}
                             </a>
                         </li>
@@ -94,7 +94,7 @@
                     {% if module_read_permissions %}
                         <li class="nav-item">
                             {% url namespace as module_url %}
-                            <a href="{{ module_url }}" class="nav-link text-white {% if module_url in request.path_info %}active{% endif %}">
+                            <a href="{{ module_url }}" class="nav-link text-white {% if module_url and module_url in request.path_info %}active{% endif %}">
                                 {{ module.verbose_name }}
                             </a>
                         </li>

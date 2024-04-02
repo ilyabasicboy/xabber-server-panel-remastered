@@ -20,7 +20,7 @@ from xabber_server_panel.base_modules.users.decorators import permission_read, p
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages, restart_ejabberd, is_ejabberd_started
 
-from .models import LDAPSettings, LDAPServer, RootPage
+from .models import LDAPSettings, LDAPServer, RootPage, DiscoUrls
 from .forms import LDAPSettingsForm, VirtualHostForm
 
 import tarfile
@@ -565,6 +565,9 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
         # delete module data
         self.delete_module_objects(module)
 
+        # delete module disco urls
+        DiscoUrls.objects.filter(module_name=module).delete()
+
         settings.INSTALLED_APPS.remove(app_name)
 
         # update app list
@@ -572,6 +575,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
 
         management.call_command('update_permissions')
         make_xmpp_config()
+
 
         reload_server()
 

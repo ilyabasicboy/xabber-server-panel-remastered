@@ -5,7 +5,7 @@ from django.urls import reverse, resolve, NoReverseMatch
 
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.utils import reload_ejabberd_config, is_ejabberd_started
-from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseXmppOption
+from xabber_server_panel.base_modules.config.models import BaseXmppModule, BaseXmppOption, check_vhost, DiscoUrls
 
 import copy
 import os
@@ -162,6 +162,30 @@ def update_ejabberd_config():
     update_vhosts_config()
     make_xmpp_config()
     reload_ejabberd_config()
+
+
+def get_mod_disco_urls_items():
+    configs = {}
+    hosts = VirtualHost.objects.all()
+    disco_urls_list = DiscoUrls.objects.all()
+
+    def _add_config_items(host, items):
+        if host not in configs:
+            configs[host] = {}
+
+        # set host data
+        for key, value in items.items():
+            configs[host][key] = value
+
+    for obj in disco_urls_list:
+        if check_vhost(obj.host):
+            # set host dict
+            if obj.host == 'global':
+                for host in hosts:
+                    _add_config_items(host.name, obj.get_items())
+            else:
+                _add_config_items(obj.host, obj.get_items())
+    return configs
 
 
 # ========== DNS REQUESTS ===============

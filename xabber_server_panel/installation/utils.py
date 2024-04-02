@@ -136,7 +136,7 @@ def generate_webhooks_secret(data):
     # generate webhook secret
     webhooks_secret = generate_secret()
     module_settings = ModuleSettings(
-        host=data['host'],
+        host='global',
         module='mod_webhooks'
     )
 

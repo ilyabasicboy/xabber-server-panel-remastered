@@ -148,16 +148,59 @@ class ModuleSettings(models.Model):
         max_length=255,
     )
     module = models.CharField(
-        max_length=255
+        max_length=255,
     )
     options = models.TextField()
 
     def set_options(self, options_dict):
-        self.options = json.dumps(options_dict)
+        try:
+            self.options = json.dumps(options_dict)
+        except:
+            pass
 
     def get_options(self):
-        return json.loads(self.options)
+        try:
+            return json.loads(self.options)
+        except:
+            return {}
 
+    class Meta:
+        unique_together = ('host', 'module')
+
+
+class DiscoUrls(models.Model):
+
+    """
+        Add "items" option list for mod_disco_urls in config
+        Items dict format:
+            {
+                'example.com': {
+                    "mediagallery": "https://gallery.clandestino.chat/api/"
+                },
+                'global': {
+                    "purchases:apple:v1": "https://chat.clandestino.chat/admin/modules/subscriptions/api/v1/"
+                }
+            }
+    """
+    module_name = models.CharField(
+        max_length=255
+    )
+    host = models.CharField(
+        max_length=255,
+    )
+    items = models.TextField()
+
+    def set_items(self, items_dict: dict):
+        try:
+            self.items = json.dumps(items_dict)
+        except:
+            pass
+
+    def get_items(self):
+        try:
+            return json.loads(self.items)
+        except:
+            return {}
 
 
 def check_vhost(vhost):
