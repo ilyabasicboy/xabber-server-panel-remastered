@@ -1,3 +1,9 @@
+@media (min-width: 1200px) {
+    .header-create .btn {
+        width: 92px;
+    }
+}
+
 .header-create .dropdown-menu {
     width: 400px;
 }
@@ -5,6 +11,16 @@
 @media (max-width: 575.98px) {
     .header-create .dropdown-menu {
         width: 230px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .header-search {
+        max-width: calc(100% - 16.66666667% - 1.5rem - 92px - 1.5rem - 1.5rem - 160px - 1.5rem - 48px);
+    }
+
+    .header-host form {
+        width: 160px;
     }
 }
 
