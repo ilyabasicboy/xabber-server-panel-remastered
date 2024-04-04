@@ -19,6 +19,8 @@ from xabber_server_panel.utils import get_system_group_suffix, update_app_list, 
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages, restart_ejabberd, is_ejabberd_started
+from xabber_server_panel.crontab.models import CronJob
+from xabber_server_panel.crontab.forms import CronJobForm
 
 from .models import LDAPSettings, LDAPServer, RootPage, DiscoUrls
 from .forms import LDAPSettingsForm, VirtualHostForm
@@ -636,3 +638,95 @@ class ChangeHost(View):
             return HttpResponseRedirect(referer)
         else:
             return HttpResponseRedirect(reverse('home'))
+
+
+class CronJobs(TemplateView):
+
+    template_name = 'config/cron_jobs.html'
+
+    def get(self, request, *args, **kwargs):
+        cron_jobs = CronJob.objects.all()
+
+        context = {
+            'cron_jobs': cron_jobs,
+        }
+        return self.render_to_response(context)
+
+
+class CronJobCreate(TemplateView):
+
+    template_name = 'config/cron_create.html'
+
+    def get(self, request, *args, **kwargs):
+        form = CronJobForm()
+
+        context = {
+            'form': form,
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        form = CronJobForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse('config:cron_jobs')
+            )
+
+        context = {
+            'form': form,
+        }
+        return self.render_to_response(context)
+
+
+class CronJobDelete(View):
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            cron_job = CronJob.objects.get(id=id)
+        except:
+            raise Http404
+
+        cron_job.delete()
+
+        return HttpResponseRedirect(
+            reverse('config:cron_jobs')
+        )
+
+
+class CronJobChange(TemplateView):
+    template_name = 'config/cron_change.html'
+
+    def get(self, request, id, *args, **kwargs):
+        try:
+            cron_job = CronJob.objects.get(id=id)
+        except:
+            raise Http404
+
+        context = {
+            'cron_job': cron_job
+        }
+        return self.render_to_response(context)
+
+    def post(self, request, id, *args, **kwargs):
+        try:
+            cron_job = CronJob.objects.get(id=id)
+        except:
+            raise Http404
+
+        form = CronJobForm(request.POST)
+        if form.is_valid():
+            schedule = form.cleaned_data.get('schedule')
+            command = form.cleaned_data.get('command')
+            cron_job.schedule = schedule
+            cron_job.command = command
+            cron_job.save()
+            return HttpResponseRedirect(
+                reverse('config:cron_jobs')
+            )
+
+        context = {
+            'cron_job': cron_job
+        }
+        return self.render_to_response(context)

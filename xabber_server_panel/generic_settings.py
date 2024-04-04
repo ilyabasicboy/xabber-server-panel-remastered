@@ -163,7 +163,9 @@ INSTALLED_APPS += ['xabber_server_panel.installation']
 
 # ============ DJANGO - CRONTAB ===============#
 INSTALLED_APPS += ['django_crontab', 'xabber_server_panel.crontab']
-CRONJOBS = []
+CRONJOBS = [
+    ('*/1 * * * *', 'django.core.management.call_command', 'check_expires', '>> /tmp/scheduled_job.log')
+]
 
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']

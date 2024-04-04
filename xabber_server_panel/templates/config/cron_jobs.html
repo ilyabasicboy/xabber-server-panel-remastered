@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load config_tags base_tags %}
+
+{% block content_title %}
+    Server settings
+{% endblock %}
+
+{% block content %}
+    {% url 'config:tabs' as url %}
+    <div class="mb-4 col-12">
+        {% include 'config/parts/links.html' %}
+    </div>
+
+    <div class="table-adaptive host-list-js">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Schedule</th>
+                    <th>Command</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cron_job in cron_jobs %}
+                    <tr>
+                        <td class="align-middle" data-title="#">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="align-middle" data-title="Schedule">
+                            {{ cron_job.schedule }}
+                        </td>
+
+                        <td class="align-middle" data-title="Command">
+                            {{ cron_job.command }}
+                        </td>
+
+                        <td class="align-middle" data-title="Actions">
+                            <div class="d-flex">
+                                <div class="dropdown">
+                                    <div class="fs-5" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical d-flex"></i>
+                                    </div>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        {% if settings_write_permissions %}
+                                            <li>
+                                                <a class="dropdown-item text-wrap" href="{% url 'config:cron_change' id=cron_job.id %}">
+                                                     Change
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:cron_delete' id=cron_job.id %}" data-delete-name="Cron job" data-delete-target="{{ cron_job.command }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                     Delete
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 mb-n3 me-n3 d-flex justify-content-end flex-wrap">
+        {% if settings_write_permissions %}
+            <a class="btn btn-primary me-3 mb-3" href="{% url 'config:cron_create' %}">
+                Add cron job
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

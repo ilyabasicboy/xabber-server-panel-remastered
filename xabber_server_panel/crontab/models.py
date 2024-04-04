@@ -9,5 +9,5 @@ class CronJob(models.Model):
         return self.command
 
     def get_job(self):
-        return (self.schedule, 'django.core.management.call_command', [self.command])
+        return (self.schedule, 'django.core.management.call_command', [self.command], '>> /tmp/scheduled_job.log')
 

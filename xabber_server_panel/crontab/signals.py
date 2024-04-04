@@ -14,7 +14,7 @@ def add_cron_job(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=CronJob)
-def add_cron_job(sender, instance, created, **kwargs):
+def add_cron_job(sender, *args, **kwargs):
     crontab = CustomCrontab()
     crontab.remove_jobs()
     crontab.add_jobs()

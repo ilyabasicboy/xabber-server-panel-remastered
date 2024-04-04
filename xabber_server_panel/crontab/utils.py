@@ -3,6 +3,8 @@ from django_crontab.crontab import Crontab
 from .models import CronJob
 
 import sys
+import hashlib
+import json
 
 string_type = basestring if sys.version_info[0] == 2 else str  # flake8: noqa
 
@@ -44,3 +46,11 @@ class CustomCrontab(Crontab):
             })
             if self.verbosity >= 1:
                 print('  adding cronjob: (%s) -> %s' % (self.__hash_job(job), job))
+
+    def __hash_job(self, job):
+        """
+        Builds an md5 hash representing the job
+        """
+        j = json.JSONEncoder(sort_keys=True).encode(job)
+        h = hashlib.md5(j.encode('utf-8')).hexdigest()
+        return h

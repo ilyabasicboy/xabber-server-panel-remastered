@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost, ConfigRoot, CheckDnsRecords, ChangeHost
+from .views import CreateHost, Modules, DeleteModule, RootPageView, Hosts, Admins, Ldap, DeleteHost, DetailHost,\
+    ConfigRoot, CheckDnsRecords, ChangeHost, CronJobs, CronJobCreate, CronJobDelete, CronJobChange
 
 
 urlpatterns = [
@@ -15,4 +16,8 @@ urlpatterns = [
     path('host/detail/<int:id>/', DetailHost.as_view(), name='host_detail'),
     path('host/change/', ChangeHost.as_view(), name='host_change'),
     path('root_page/', RootPageView.as_view(), name='root_page'),
+    path('cron_jobs/', CronJobs.as_view(), name='cron_jobs'),
+    path('cron_create/', CronJobCreate.as_view(), name='cron_create'),
+    path('cron_delete/<int:id>/', CronJobDelete.as_view(), name='cron_delete'),
+    path('cron_change/<int:id>/', CronJobChange.as_view(), name='cron_change'),
 ]

@@ -1,5 +1,5 @@
 <ul class="nav nav-tabs">
-    {% if user.is_admin %}
+    {% if request.user.is_admin %}
         <li class="nav-item">
             {% url 'config:hosts' as hosts %}
             <a class="nav-link {% if hosts == request.path_info %}active{% endif %}" aria-current="page" href="{{ hosts }}">
@@ -19,7 +19,7 @@
             LDAP
         </a>
     </li>
-    {% if user.is_admin %}
+    {% if request.user.is_admin %}
         <li class="nav-item">
             {% url 'config:modules' as modules %}
             <a class="nav-link {% if modules == request.path_info %}active{% endif %}" href="{{ modules }}">
@@ -32,6 +32,14 @@
             {% url 'config:root_page' as root_page %}
             <a class="nav-link {% if root_page == request.path_info %}active{% endif %}" href="{{ root_page }}">
                 Root page
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_admin %}
+        <li class="nav-item">
+            {% url 'config:cron_jobs' as cron_jobs %}
+            <a class="nav-link {% if cron_jobs == request.path_info %}active{% endif %}" href="{{ cron_jobs }}">
+                Cron jobs
             </a>
         </li>
     {% endif %}

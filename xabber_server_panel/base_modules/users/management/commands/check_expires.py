@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument('--reason', type=str, default='Your account has expired')
 
     def handle(self, *args, **options):
-        print('check expires processigcron')
+        print('check expires processing')
         # Get the current date and time
         current_time = timezone.now()
         reason = options['reason']
