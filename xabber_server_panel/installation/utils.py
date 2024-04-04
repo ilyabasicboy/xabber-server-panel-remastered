@@ -11,7 +11,7 @@ from django.conf import settings
 
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config
 from xabber_server_panel.base_modules.circles.models import Circle
-from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings
+from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings, AddSettings
 from xabber_server_panel.base_modules.users.forms import UserForm
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
@@ -140,8 +140,9 @@ def generate_webhooks_secret(data):
         module='mod_webhooks'
     )
 
-    if settings.PANEL_ADDRESS:
-        webhooks_url = settings.PANEL_ADDRESS
+    panel_address = AddSettings.objects.filter(module_name='webhooks', key='panel_address').first()
+    if panel_address:
+        webhooks_url = panel_address.value
     else:
         webhooks_url = "https://xabber.%s/webhooks/" % data['host']
 
@@ -160,7 +161,6 @@ def create_config(data):
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
     data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
-    data['PANEL_ADDRESS'] = settings.PANEL_ADDRESS
 
     # Create add config
     add_config = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)

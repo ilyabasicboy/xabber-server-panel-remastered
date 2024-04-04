@@ -203,6 +203,22 @@ class DiscoUrls(models.Model):
             return {}
 
 
+class AddSettings(models.Model):
+    """
+        Model for additional dynamic settings.
+        Used in base_config for example.
+    """
+
+    module_name = models.CharField(
+        max_length=255
+    )
+    key = models.CharField(
+        max_length=255,
+        unique=True
+    )
+    value = models.TextField()
+
+
 def check_vhost(vhost):
     return VirtualHost.objects.filter(name=vhost).exists() or vhost == "global"
 

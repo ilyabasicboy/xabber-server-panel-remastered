@@ -161,6 +161,10 @@ MODULE_SERVER_FILES_DIR = ''
 # ============ INSTALLATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.installation']
 
+# ============ DJANGO - CRONTAB ===============#
+INSTALLED_APPS += ['django_crontab', 'xabber_server_panel.crontab']
+CRONJOBS = []
+
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']
 WEBHOOKS_SIGNATURE_HEADER = 'x-xmpp-server-signature'
