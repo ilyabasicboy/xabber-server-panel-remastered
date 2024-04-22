@@ -34,4 +34,4 @@ class Command(BaseCommand):
             )
 
         # Update the status of expired users to 'EXPIRED'
-        expired_users.update(status='BLOCKED', reason=reason)
+        expired_users.update(status='EXPIRED', reason=reason)
