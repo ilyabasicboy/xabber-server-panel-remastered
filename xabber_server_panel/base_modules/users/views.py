@@ -162,6 +162,8 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             else:
                 self.errors += ['Password is incorrect.']
 
+        user_status = self.user.status
+
         # set expires if it's provided
         # BEFORE CHANGE STATUS!!!
         expires_date = self.request.POST.get('expires_date')
@@ -188,7 +190,7 @@ class UserDetail(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                     set_expires(self.api, self.user, expires)
 
         status = self.request.POST.get('status')
-        if status and self.user.status != status:
+        if status and user_status != status:
             self.change_status(status)
 
         self.user.save()

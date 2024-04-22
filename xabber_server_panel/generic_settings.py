@@ -162,10 +162,7 @@ MODULE_SERVER_FILES_DIR = ''
 INSTALLED_APPS += ['xabber_server_panel.installation']
 
 # ============ DJANGO - CRONTAB ===============#
-INSTALLED_APPS += ['django_crontab', 'xabber_server_panel.crontab']
-CRONJOBS = [
-    ('*/1 * * * *', 'django.core.management.call_command', 'check_expires', '>> /tmp/scheduled_job.log')
-]
+INSTALLED_APPS += ['xabber_server_panel.crontab']
 
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']

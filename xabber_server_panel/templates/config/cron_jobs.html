@@ -18,6 +18,10 @@
                     <th>#</th>
                     <th>Schedule</th>
                     <th>Command</th>
+                    <th>Active</th>
+                    <th>Type</th>
+                    <th>Args</th>
+                    <th>Kwargs</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -33,6 +37,23 @@
 
                         <td class="align-middle" data-title="Command">
                             {{ cron_job.command }}
+                        </td>
+
+                        <td class="align-middle" data-title="Active">
+                            {% if cron_job.active %}
+                                Active
+                            {% else %}
+                                Disabled
+                            {% endif %}
+                        </td>
+                        <td class="align-middle" data-title="Type">
+                            {{ cron_job.get_type_display }}
+                        </td>
+                        <td class="align-middle" data-title="Args">
+                            {{ cron_job.args }}
+                        </td>
+                        <td class="align-middle" data-title="Kwargs">
+                            {{ cron_job.kwargs }}
                         </td>
 
                         <td class="align-middle" data-title="Actions">

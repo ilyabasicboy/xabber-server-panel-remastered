@@ -67,7 +67,7 @@
                                 <option value="ACTIVE" {% if user.is_active %}selected{% endif %}>
                                     Active
                                 </option>
-                                <option value="BLOCKED" {% if user.status == 'BLOCKED' %}selected{% endif %}>Blocked</option>
+                                <option value="BLOCKED" {% if user.status == 'BLOCKED' or user.status == 'EXPIRED' %}selected{% endif %}>Blocked</option>
                                 {% if not user.auth_backend_is_ldap %}
                                     <option value="BANNED" {% if user.status == 'BANNED' %}selected{% endif %}>Banned</option>
                                 {% endif %}

@@ -2,14 +2,16 @@ from django.conf import settings
 from django.apps import apps
 from collections import OrderedDict
 from django.contrib import messages
-from django.forms import ValidationError
 from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+from datetime import datetime
 
 import subprocess
 import time
 import os
 import random
 import string
+import re
 
 
 # ========== XABBER SERVER =============
@@ -122,6 +124,16 @@ def validate_link(value):
         return False
 
     return True
+
+
+def validate_cron_schedule(value):
+    # Cron schedule pattern: minute hour day_of_month month day_of_week
+    cron_pattern = re.compile(r'^(\*\/[0-9]+|[0-9]+|\*) (\*\/[0-9]+|[0-9]+|\*) (\*\/[0-9]+|[0-9]+|\*) (\*\/[0-9]+|[0-9]+|\*) (\*\/[0-9]+|[0-9]+|\*)$')
+
+    if not cron_pattern.match(value):
+        raise ValidationError(
+            "Invalid cron schedule format.",
+        )
 
 
 # =============== OTHER ==============

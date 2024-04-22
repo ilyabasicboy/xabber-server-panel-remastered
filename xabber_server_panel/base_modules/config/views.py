@@ -670,6 +670,7 @@ class CronJobCreate(TemplateView):
 
         if form.is_valid():
             form.save()
+            messages.success(request, 'Cron created successfully.')
             return HttpResponseRedirect(
                 reverse('config:cron_jobs')
             )
@@ -689,7 +690,7 @@ class CronJobDelete(View):
             raise Http404
 
         cron_job.delete()
-
+        messages.success(request, 'Cron deleted successfully.')
         return HttpResponseRedirect(
             reverse('config:cron_jobs')
         )
@@ -704,8 +705,11 @@ class CronJobChange(TemplateView):
         except:
             raise Http404
 
+        form = CronJobForm()
+
         context = {
-            'cron_job': cron_job
+            'cron_job': cron_job,
+            'form': form
         }
         return self.render_to_response(context)
 
@@ -715,18 +719,17 @@ class CronJobChange(TemplateView):
         except:
             raise Http404
 
-        form = CronJobForm(request.POST)
+        form = CronJobForm(request.POST, instance=cron_job)
         if form.is_valid():
-            schedule = form.cleaned_data.get('schedule')
-            command = form.cleaned_data.get('command')
-            cron_job.schedule = schedule
-            cron_job.command = command
-            cron_job.save()
+            form.save()
+
+            messages.success(request, 'Cron changed successfully.')
             return HttpResponseRedirect(
                 reverse('config:cron_jobs')
             )
 
         context = {
-            'cron_job': cron_job
+            'cron_job': cron_job,
+            'form': form
         }
         return self.render_to_response(context)

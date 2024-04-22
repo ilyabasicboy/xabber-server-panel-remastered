@@ -96,7 +96,7 @@ def unblock_user(api, user):
         "host": user.host
     }
 
-    if user.status == 'BLOCKED':
+    if user.status in ['BLOCKED', 'EXPIRED']:
         api.unblock_user(data)
         user.reason = None
         if user.is_expired:
