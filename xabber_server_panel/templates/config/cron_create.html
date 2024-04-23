@@ -53,6 +53,7 @@
                     <span class="form-text text-secondary">{{ form.args.help_text }}</span>
                 </div>
             </div>
+
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.kwargs.errors %}text-danger{% endif %}">Kwargs</label>
                 <div class="col-12 col-md-9">
@@ -64,7 +65,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.type.errors %}text-danger{% endif %}">Type</label>
                 <div class="col-12 col-md-9">
-                    <select name="type">
+                    <select class="form-select" name="type">
                         {% for choice in form.type.field.choices %}
                             <option value="{{ choice.0 }}" {% if form.type.data == choice.0 %}selected{% endif %}>
                                 {{ choice.1 }}
@@ -73,6 +74,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="row mb-3">
                 <div class="col-12 col-md-3"></div>
                 <div class="col-12 col-md-9">
