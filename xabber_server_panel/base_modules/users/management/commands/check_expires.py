@@ -21,7 +21,7 @@ class Command(BaseCommand):
         api.fetch_token(options['token'])
 
         # Filter users whose expires field is less than the current time
-        expired_users = User.objects.filter(expires__lt=current_time)
+        expired_users = User.objects.filter(expires__lt=current_time).exclude(status='EXPIRED')
 
         # block users in server
         for user in expired_users:
