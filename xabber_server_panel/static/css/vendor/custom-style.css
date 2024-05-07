@@ -170,3 +170,10 @@
 .password.active .password-input.is-invalid + .password-btn {
     right: calc(1.5em + 0.75rem);
 }
+
+/*Custom disabled controls*/
+.custom-disabled {
+    background-color: var(--bs-secondary-bg);
+    opacity: 1;
+    pointer-events: none;
+}
