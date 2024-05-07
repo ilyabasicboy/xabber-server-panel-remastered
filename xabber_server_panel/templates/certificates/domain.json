@@ -1,0 +1,8 @@
+{{% for host in hosts %}
+    "{{ host.name }} *.{{ host.name }}": [
+        {
+            "path": "{{ CERTS_DIR }}/{{ host.name }}.pem",
+            "format": "key,crt,ca"
+        }
+    ]{% if not forloop.last  %},{% endif %}{% endfor %}
+}

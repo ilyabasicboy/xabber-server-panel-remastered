@@ -40,7 +40,7 @@ $(function () {
     });
 
     //Check dns records ajax
-    $('.check-records-js').on('click', function(e) {
+    $('.check-records-js, .check-cert-js').on('click', function(e) {
         e.preventDefault();
         let $this = $(this);
         let url = $this.data('url');
@@ -49,7 +49,10 @@ $(function () {
         $.get(url, {}, function(data) {
             $this.find('.spinner-border').addClass('d-none');
             $this.attr('disabled', false);
-            $('.host-list-js').html(data);
+            $('.host-list-js, .cert-list-js').html(data);
+
+            // Reset check change
+            checkChange();
         });
     });
 

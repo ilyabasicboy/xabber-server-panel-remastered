@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=256, unique=True)),
-                ('check_dns', models.BooleanField(default=False)),
+                ('srv_records', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(

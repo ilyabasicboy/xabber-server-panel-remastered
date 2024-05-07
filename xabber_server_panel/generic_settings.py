@@ -164,6 +164,19 @@ INSTALLED_APPS += ['xabber_server_panel.installation']
 # ============ DJANGO - CRONTAB ===============#
 INSTALLED_APPS += ['xabber_server_panel.crontab']
 
+# ============ CERTIFICATES ===============#
+INSTALLED_APPS += ['xabber_server_panel.certificates']
+CERT_CONF_FILENAME = "acertmgr.conf"
+CERT_DOMAIN_FILENAME = "domain.conf"
+CERT_CONF_DIR = "/etc/acertmgr"
+CERTS_DIR = os.path.join(PROJECT_DIR, 'certs')
+CERT_TTL = 30  # days
+CERT_VALIDATE_OCSP = "sha1" # mandated by RFC5019
+CERT_API = "v2"
+CERT_AUTHORITY = "https://acme-v02.api.letsencrypt.org"
+CHALLENGE_URL = "https://acme-challenge.xabber.com/challenge/"
+CHALLENGE_RECORD = 'alias_acme-challenge.xabber.com.'
+
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']
 WEBHOOKS_SIGNATURE_HEADER = 'x-xmpp-server-signature'

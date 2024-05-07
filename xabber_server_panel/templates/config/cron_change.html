@@ -35,7 +35,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.schedule.errors %}text-danger{% endif %}">Schedule</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control {% if form.schedule.errors %}is-invalid{% endif %}" type="text" name="schedule" placeholder="*/5 * * * *" {% if form.data %}value="{{ form.schedule.data }}"{% else %}value="{{ cron_job.schedule }}"{% endif %}>
+                    <input class="form-control {% if form.schedule.errors %}is-invalid{% endif %} pe-none" type="text" name="schedule" placeholder="*/5 * * * *" {% if form.data %}value="{{ form.schedule.data }}"{% else %}value="{{ cron_job.schedule }}"{% endif %} >
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.args.errors %}text-danger{% endif %}">Args</label>
                 <div class="col-12 col-md-9">
-                    <textarea class="form-control {% if form.args.errors %}is-invalid{% endif %}" placeholder="['arg1', 'arg2']" name="args" cols="30" rows="6">{% if form.data %}{{ form.args.data }}{% else %}{{ cron_job.args }}{% endif %}</textarea>
+                    <textarea class="form-control {% if form.args.errors %}is-invalid{% endif %}" placeholder="['arg1', 'arg2']" name="args" cols="30" rows="6">{% if form.data %}{{ form.args.data }}{% else %}{{ cron_job.args|default:'' }}{% endif %}</textarea>
                     <span class="form-text text-secondary">{{ form.args.help_text }}</span>
                 </div>
             </div>
@@ -57,7 +57,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.kwargs.errors %}text-danger{% endif %}">Kwargs</label>
                 <div class="col-12 col-md-9">
-                    <textarea class="form-control {% if form.kwargs.errors %}is-invalid{% endif %}" placeholder='{"indent": 4}' name="kwargs" cols="30" rows="6">{% if form.data %}{{ form.kwargs.data }}{% else %}{{ cron_job.kwargs }}{% endif %}</textarea>
+                    <textarea class="form-control {% if form.kwargs.errors %}is-invalid{% endif %}" placeholder='{"indent": 4}' name="kwargs" cols="30" rows="6">{% if form.data %}{{ form.kwargs.data }}{% else %}{{ cron_job.kwargs|default:'' }}{% endif %}</textarea>
                     <span class="form-text text-secondary">{{ form.kwargs.help_text }}</span>
                 </div>
             </div>

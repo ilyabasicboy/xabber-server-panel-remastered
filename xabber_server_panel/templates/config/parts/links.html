@@ -43,4 +43,12 @@
             </a>
         </li>
     {% endif %}
+    {% if request.user.is_admin %}
+        <li class="nav-item">
+            {% url 'config:certificates' as certificates %}
+            <a class="nav-link {% if certificates == request.path_info %}active{% endif %}" href="{{ certificates }}">
+                Certificates
+            </a>
+        </li>
+    {% endif %}
 </ul>

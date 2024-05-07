@@ -2,6 +2,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
 from django.urls import reverse, resolve, NoReverseMatch
+from django.db.models import Q
 
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.utils import reload_ejabberd_config, is_ejabberd_started
@@ -191,61 +192,77 @@ def get_mod_disco_urls_items():
 # ========== DNS REQUESTS ===============
 
 def check_hosts_dns():
-    unchecked_hosts = VirtualHost.objects.filter(check_dns=False)
+    unchecked_hosts = VirtualHost.objects.filter(srv_records=False)
 
-    checked_hosts = []
+    srv_records_hosts = []
     for host in unchecked_hosts:
-        records = get_srv_records(host.name)
+        records = get_dns_records(host.name)
         if not 'error' in records:
-            checked_hosts += [host.id]
+            srv_records_hosts += [host.id]
+
+    unchecked_hosts = VirtualHost.objects.filter(cert_records=False)
+    cert_records_hosts = []
+    for host in unchecked_hosts:
+        records = get_dns_records(host.name, type='A')
+        if settings.CHALLENGE_RECORD in records.get('_acme-challenge', []):
+            cert_records_hosts += [host.id]
 
     # update checked hosts
-    VirtualHost.objects.filter(id__in=checked_hosts).update(check_dns=True)
+    VirtualHost.objects.filter(id__in=srv_records_hosts).update(srv_records=True)
+    VirtualHost.objects.filter(id__in=cert_records_hosts).update(cert_records=True)
 
 
-def get_srv_records(domain):
+def get_dns_records(domain, type='SRV'):
 
     """ Request srv records from dns service """
 
-    srv_records = {}
+    records = {}
 
-    for service in ['_xmpp-client._tcp', '_xmpp-server._tcp']:
+    record_types = {
+        'A': ['_acme-challenge'],
+        'SRV': ['_xmpp-client._tcp', '_xmpp-server._tcp']
+    }
+
+    for service in record_types.get(type, []):
         try:
             response = requests.get(
-                    f"{settings.DNS_SERVICE}?name={service}.{domain}&type=SRV",
-                    headers={"accept": "application/dns-json"},
-                    timeout=2
+                "%s?name=%s.%s&type=%s" % (settings.DNS_SERVICE, service, domain, type),
+                headers={"accept": "application/dns-json"},
+                timeout=2
             )
 
             # Check if response is successful
             if response.status_code == 200:
                 data = response.json()
                 if 'Answer' in data:
-                    srv_records[service] = []
+                    records[service] = []
                     for record in data['Answer']:
-                        if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
-                            parts = record['data'].split()
-                            if len(parts) == 4:
-                                srv_records[service].append({
-                                    'priority': int(parts[0]),
-                                    'weight': int(parts[1]),
-                                    'port': int(parts[2]),
-                                    'target': parts[3]
-                                })
+                        if type == 'SRV':
+                            if 'data' in record and ' ' in record['data']:  # Check if data field contains SRV record
+                                parts = record['data'].split()
+                                if len(parts) == 4:
+                                    records[service].append({
+                                        'priority': int(parts[0]),
+                                        'weight': int(parts[1]),
+                                        'port': int(parts[2]),
+                                        'target': parts[3]
+                                    })
+                        else:
+                            records[service] += [record['data']]
                 else:
-                    srv_records['error'] = f"No SRV records found for {service}.{domain}"
+                    records['error'] = "No %s records found for %s.%s" % (type, service, domain)
             else:
-                srv_records['error'] = f"HTTP Error: {response.status}"
+                records['error'] = "HTTP Error: %s" % response.status
         except requests.Timeout:
             # Handle timeout error
-            srv_records['error'] = "Timeout occurred while making the request."
+            records['error'] = "Timeout occurred while making the request."
         except requests.RequestException as e:
             # Handle other client errors
-            srv_records['error'] = f"An error occurred while making the request: {e}"
+            records['error'] = "An error occurred while making the request: %s" % e
         except Exception as e:
-            srv_records['error'] = f"Error: {e}"
+            records['error'] = "Error: %s" % e
 
-    return srv_records
+    return records
 
 
 # ========= OTHER ===============

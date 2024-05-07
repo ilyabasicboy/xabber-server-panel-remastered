@@ -54,10 +54,10 @@
                             {{ cron_job.get_type_display }}
                         </td>
                         <td class="align-middle" data-title="Args">
-                            {{ cron_job.args }}
+                            {{ cron_job.args|default:'' }}
                         </td>
                         <td class="align-middle" data-title="Kwargs">
-                            {{ cron_job.kwargs }}
+                            {{ cron_job.kwargs|default:'' }}
                         </td>
                         <td class="align-middle" data-title="Actions">
                             <div class="d-flex">
@@ -90,10 +90,8 @@
     </div>
 
     <div class="mt-4 mb-n3 me-n3 d-flex justify-content-end flex-wrap">
-        {% if settings_write_permissions %}
-            <a class="btn btn-primary me-3 mb-3" href="{% url 'config:cron_create' %}">
-                Add cron job
-            </a>
-        {% endif %}
+        <a class="btn btn-primary me-3 mb-3" href="{% url 'config:cron_create' %}">
+            Add cron job
+        </a>
     </div>
 {% endblock %}

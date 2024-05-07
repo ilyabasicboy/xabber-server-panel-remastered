@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from xabber_server_panel.base_modules.config.forms import VirtualHostForm
-from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, get_srv_records
+from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, get_dns_records
 
 
 class Command(BaseCommand):
@@ -17,9 +17,9 @@ class Command(BaseCommand):
         }
 
         # check srv records
-        records = get_srv_records(host)
+        records = get_dns_records(host)
         if not 'error' in records:
-            data['check_dns'] = True
+            data['srv_records'] = True
 
         form = VirtualHostForm(data)
         if form.is_valid():

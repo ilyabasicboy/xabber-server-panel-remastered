@@ -9,13 +9,13 @@ class CustomAuthBackend(object):
     """
 
     def authenticate(self, request, username, password, **kwargs):
-        username, host = username.split('@')
         try:
+            username, host = username.split('@')
             user = User.objects.get(
                 username=username,
                 host=host
             )
-        except User.DoesNotExist:
+        except:
             return None
 
         # check permissions

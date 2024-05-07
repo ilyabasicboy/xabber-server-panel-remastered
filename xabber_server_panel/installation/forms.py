@@ -50,6 +50,10 @@ class InstallationForm(forms.Form):
         label='Database user password',
         widget=forms.PasswordInput(render_value=True, attrs={'placeholder': 'Password'})
     )
+    base_cronjobs = forms.BooleanField(
+        initial=False,
+        required=False
+    )
 
     def validate_1_step(self):
         self._validate_field('host')

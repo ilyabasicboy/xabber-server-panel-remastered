@@ -4,7 +4,7 @@ from django.conf import settings
 
 from xabber_server_panel.utils import server_installed
 
-from .utils import check_predefined_config
+from .utils import load_predefined_config
 
 
 class InstallationMiddleware:
@@ -23,14 +23,12 @@ class InstallationMiddleware:
         # check server installed
         if not server_installed() and not request.path.startswith(settings.MEDIA_URL):
 
-            # check predefined config
-            if check_predefined_config():
-
+            config_data = load_predefined_config()
+            if config_data.get('quick_install'):
                 # redirect to quick install
                 if request.path != reverse('installation:quick'):
                     return HttpResponseRedirect(reverse('installation:quick'))
             else:
-
                 # redirect to base installation page
                 if request.path != reverse('installation:steps'):
                     return HttpResponseRedirect(reverse('installation:steps'))

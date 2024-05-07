@@ -14,17 +14,20 @@ from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.users.utils import check_users
-from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_srv_records, check_hosts_dns, check_modules
+from xabber_server_panel.base_modules.config.utils import update_ejabberd_config, make_xmpp_config, check_hosts, get_dns_records, check_hosts_dns
 from xabber_server_panel.utils import get_system_group_suffix, update_app_list, reload_server
 from xabber_server_panel.base_modules.users.decorators import permission_read, permission_write, permission_admin
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.utils import get_error_messages, restart_ejabberd, is_ejabberd_started
 from xabber_server_panel.crontab.models import CronJob
 from xabber_server_panel.crontab.forms import CronJobForm
+from xabber_server_panel.certificates.utils import update_or_create_certs, check_certificates, validate_certificate
+from xabber_server_panel.certificates.models import Certificate
 
 from .models import LDAPSettings, LDAPServer, RootPage, DiscoUrls
 from .forms import LDAPSettingsForm, VirtualHostForm
 
+import threading
 import tarfile
 import shutil
 import os
@@ -51,6 +54,19 @@ class Hosts(LoginRequiredMixin, TemplateView):
         api = get_api(request)
 
         check_hosts(api)
+
+        context = {}
+        return self.render_to_response(context)
+
+    @permission_admin
+    def post(self, request, *args, **kwargs):
+
+        api = get_api(request)
+        check_hosts(api)
+
+        issue_cert_list = request.POST.getlist('issue_cert')
+        VirtualHost.objects.filter(id__in=issue_cert_list).update(issue_cert=True)
+        VirtualHost.objects.exclude(id__in=issue_cert_list).update(issue_cert=False)
 
         context = {}
         return self.render_to_response(context)
@@ -141,11 +157,24 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             host = form.save(commit=False)
 
             # check srv records
-            records = get_srv_records(host.name)
-            if not 'error' in records:
-                host.check_dns = True
+            srv_records = get_dns_records(host.name)
+            if not 'error' in srv_records:
+                host.srv_records = True
+
+            # check cert records
+            cert_records = get_dns_records(host.name, type='A')
+            if settings.CHALLENGE_RECORD in cert_records.get('_acme-challenge', []):
+                host.cert_records = True
+
+            # enable issue certificates flag
+            if host.srv_records and host.cert_records:
+                host.issue_cert = True
 
             host.save()
+
+            # Create a thread to create certificates
+            thread = threading.Thread(target=update_or_create_certs)
+            thread.start()
 
             # update config after creating new host
             update_ejabberd_config()
@@ -158,14 +187,14 @@ class CreateHost(LoginRequiredMixin, TemplateView):
             if not error_messages:
                 messages.success(request, 'Virtual host "%s" created successfully.' % host.name)
 
-            return HttpResponseRedirect(
-                reverse('config:hosts')
-            )
-        else:
-            # add common errors
-            common_error = form.errors.get('__all__')
-            if common_error:
-                messages.error(request, common_error)
+                return HttpResponseRedirect(
+                    reverse('config:hosts')
+                )
+
+        # add common errors
+        common_error = form.errors.get('__all__')
+        if common_error:
+            messages.error(request, common_error)
 
         return self.render_to_response({'form': form})
 
@@ -195,10 +224,15 @@ class CreateHost(LoginRequiredMixin, TemplateView):
         )
 
 
-class CheckDnsRecords(View):
+class CheckDnsRecords(LoginRequiredMixin, View):
 
     def get(self, request):
         check_hosts_dns()
+
+        # Create a thread to create certificates
+        thread = threading.Thread(target=update_or_create_certs)
+        thread.start()
+
         return render(request, 'config/parts/host_list.html')
 
 
@@ -620,7 +654,7 @@ class RootPageView(LoginRequiredMixin, TemplateView):
         return self.render_to_response({})
 
 
-class ChangeHost(View):
+class ChangeHost(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         host_id = request.POST.get('host')
@@ -640,10 +674,11 @@ class ChangeHost(View):
             return HttpResponseRedirect(reverse('home'))
 
 
-class CronJobs(TemplateView):
+class CronJobs(LoginRequiredMixin, TemplateView):
 
     template_name = 'config/cron_jobs.html'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         cron_jobs = CronJob.objects.all()
 
@@ -653,10 +688,11 @@ class CronJobs(TemplateView):
         return self.render_to_response(context)
 
 
-class CronJobCreate(TemplateView):
+class CronJobCreate(LoginRequiredMixin, TemplateView):
 
     template_name = 'config/cron_create.html'
 
+    @permission_admin
     def get(self, request, *args, **kwargs):
         form = CronJobForm()
 
@@ -665,6 +701,7 @@ class CronJobCreate(TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_admin
     def post(self, request, *args, **kwargs):
         form = CronJobForm(request.POST)
 
@@ -681,8 +718,9 @@ class CronJobCreate(TemplateView):
         return self.render_to_response(context)
 
 
-class CronJobDelete(View):
+class CronJobDelete(LoginRequiredMixin, View):
 
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
         try:
             cron_job = CronJob.objects.get(id=id)
@@ -696,9 +734,10 @@ class CronJobDelete(View):
         )
 
 
-class CronJobChange(TemplateView):
+class CronJobChange(LoginRequiredMixin, TemplateView):
     template_name = 'config/cron_change.html'
 
+    @permission_admin
     def get(self, request, id, *args, **kwargs):
         try:
             cron_job = CronJob.objects.get(id=id)
@@ -713,6 +752,7 @@ class CronJobChange(TemplateView):
         }
         return self.render_to_response(context)
 
+    @permission_admin
     def post(self, request, id, *args, **kwargs):
         try:
             cron_job = CronJob.objects.get(id=id)
@@ -733,3 +773,90 @@ class CronJobChange(TemplateView):
             'form': form
         }
         return self.render_to_response(context)
+
+
+class Certificates(LoginRequiredMixin, TemplateView):
+
+    template_name = 'config/certificates.html'
+
+    @permission_admin
+    def get(self, request, *args, **kwargs):
+        check_certificates()
+        certificates = Certificate.objects.all()
+        context = {
+            'certificates_info': certificates,
+        }
+        return self.render_to_response(context)
+
+
+class UpdateCert(LoginRequiredMixin, TemplateView):
+
+    template_name = 'config/parts/cert_list.html'
+
+    @permission_admin
+    def get(self, request, *args, **kwargs):
+        update_or_create_certs()
+        check_certificates()
+        certificates = Certificate.objects.all()
+        context = {
+            'certificates_info': certificates,
+        }
+        return self.render_to_response(context)
+
+
+class UploadCert(LoginRequiredMixin, TemplateView):
+    ALLOWED_EXTENSIONS = ['pem']
+
+    @permission_admin
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+
+        if file:
+            # Validate file extension
+            file_extension = file.name.split('.')[-1].lower()
+
+            if file_extension in self.ALLOWED_EXTENSIONS:
+                destination_path = os.path.join(settings.CERT_CONF_DIR, file.name)
+                if os.path.exists(destination_path):
+                    messages.error(request, "This certificate already exists.")
+                else:
+                    with open(destination_path, 'wb+') as destination:
+                        for chunk in file.chunks():
+                            destination.write(chunk)
+
+                    # Check if certificate has public key and is valid
+                    if validate_certificate(destination_path):
+                        messages.success(request, 'Certificate added successfully.')
+                    else:
+                        os.remove(destination_path)  # Remove the uploaded file
+                        messages.error(request, "Invalid certificate format.")
+            else:
+                messages.error(request, "Invalid file format.")
+
+        else:
+            messages.error(request, "Certificate file is required.")
+
+        return HttpResponseRedirect(
+            reverse('config:certificates')
+        )
+
+
+class DeleteCert(LoginRequiredMixin, TemplateView):
+
+    @permission_admin
+    def get(self, request, name, *args, **kwargs):
+        file_path = os.path.join(settings.CERT_CONF_DIR, name)
+
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                Certificate.objects.filter(name=name).delete()
+                messages.success(request, 'Certificate deleted successfully.')
+            except Exception as e:
+                messages.error(request, e)
+        else:
+            messages.error(request, 'Certificate does not exists.')
+
+        return HttpResponseRedirect(
+            reverse('config:certificates')
+        )

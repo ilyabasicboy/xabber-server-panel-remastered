@@ -7,7 +7,9 @@ class VirtualHost(models.Model):
         max_length=256,
         unique=True
     )
-    check_dns = models.BooleanField(default=False)
+    srv_records = models.BooleanField(default=False)
+    cert_records = models.BooleanField(default=False)
+    issue_cert = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -166,6 +168,9 @@ class ModuleSettings(models.Model):
 
     class Meta:
         unique_together = ('host', 'module')
+
+    def __str__(self):
+        return '%s - %s' % (self.host, self.module)
 
 
 class DiscoUrls(models.Model):

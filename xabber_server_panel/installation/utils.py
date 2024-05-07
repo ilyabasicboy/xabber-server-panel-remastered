@@ -5,16 +5,19 @@ from psycopg2 import sql
 import json
 import string
 import secrets
+import threading
 
 from django.template.loader import get_template
 from django.conf import settings
 
-from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config
+from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config, get_dns_records
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings, AddSettings
 from xabber_server_panel.base_modules.users.forms import UserForm
 from xabber_server_panel.base_modules.users.utils import update_permissions
 from xabber_server_panel.utils import get_system_group_suffix, start_ejabberd, stop_ejabberd, is_ejabberd_started
+from xabber_server_panel.certificates.utils import update_or_create_certs
+from xabber_server_panel.crontab.models import CronJob
 
 
 def generate_secret(length=32):
@@ -124,8 +127,27 @@ def migrate_db(data):
 
 def create_vhost(data):
     try:
+
+        # check srv records
+        records = get_dns_records(data['host'])
+        if 'error' in records:
+            srv_records = False
+        else:
+            srv_records = True
+
+        # check cert records
+        records = get_dns_records(data['host'], type='A')
+        if settings.CHALLENGE_RECORD in records.get('_acme-challenge', []):
+            cert_records = False
+        else:
+            cert_records = True
+
         VirtualHost.objects.get_or_create(
-            name=data['host']
+            name=data['host'],
+            defaults={
+                'srv_records': srv_records,
+                'cert_records': cert_records
+            }
         )
         return True
     except:
@@ -244,6 +266,10 @@ def assign_group_to_all(data):
     return cmd.returncode == 0
 
 
+def activate_base_cronjobs():
+    CronJob.objects.filter(base=True).update(active=True)
+
+
 def start_installation_process(data):
 
     if not database_exists(data):
@@ -267,6 +293,14 @@ def start_installation_process(data):
         print(msg)
         return False, msg
     print('Successfully host created')
+
+    if data.get('base_cronjobs'):
+        activate_base_cronjobs()
+        print('Base cronjobs activated successfully.')
+
+    # Create a thread to create certificates
+    thread = threading.Thread(target=update_or_create_certs)
+    thread.start()
 
     generate_webhooks_secret(data)
     print('Webhooks secret successfully created.')
@@ -337,13 +371,9 @@ def create_circles(data):
     circle.save()
 
 
-def check_predefined_config():
-    return os.path.isfile(os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH))
-
-
 def load_predefined_config():
-    path = os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH)
     data = {}
+    path = os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH)
 
     if os.path.exists(path):
         with open(path) as file:

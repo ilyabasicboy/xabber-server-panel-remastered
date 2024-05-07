@@ -9,6 +9,7 @@
                 <th>#</th>
                 <th>Virtual host</th>
                 <th>DNS records</th>
+                <th>Issue certificates</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -22,18 +23,22 @@
                         {{ host.name }}
                     </td>
 
-                    <td class="align-middle" data-title="DNS">
-                       {% if not host.check_dns %}
+                    <td class="align-middle" data-title="SRV Records">
+                       {% if not host.srv_records or not host.cert_records %}
                             <div class="d-flex align-items-center">
                                 <div class="icon-link text-warning fs-5 me-2">
                                     <i class="bi bi-exclamation-triangle-fill d-flex"></i>
                                 </div>
 
                                 <a href="{% url 'config:host_detail' id=host.id %}">
-                                    Domain records failed
+                                    DNS records failed
                                 </a>
                             </div>
                        {% endif %}
+                    </td>
+
+                    <td class="align-middle" data-title="Issue certificates">
+                        <input name="issue_cert" id="id_issue_cert_{{ host.id }}" type="checkbox" value="{{ host.id }}" {% if host.issue_cert and host.srv_records and host.cert_records %}checked{% endif %} {% if not host.srv_records or not host.cert_records %}disabled{% endif %} >
                     </td>
 
                     <td class="align-middle" data-title="Actions">

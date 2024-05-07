@@ -34,6 +34,9 @@ class CronJob(models.Model):
         null=True,
         help_text='Key-value arguments should be a valid JSON.'
     )
+    base = models.BooleanField(
+        default=False
+    )
 
     command = models.CharField(max_length=255)
 
