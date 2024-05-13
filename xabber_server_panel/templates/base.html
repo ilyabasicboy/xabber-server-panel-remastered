@@ -247,7 +247,7 @@
 
                             <div class="modal fade" id="start_server" tabindex="-1" aria-labelledby="start_server_label" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-scrollable">
-                                    <form class="modal-content" action="{% url 'dashboard:dashboard' %}" method="POST">
+                                    <form class="modal-content form-startserver-js" action="{% url 'dashboard:dashboard' %}" method="POST">
                                         {% csrf_token %}
                                         <div class="modal-header">
                                             <h1 class="modal-title fs-5" id="start_server_label">Enter your password to start server</h1>

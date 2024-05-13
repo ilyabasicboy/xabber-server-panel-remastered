@@ -40,19 +40,30 @@ $(function () {
     });
 
     //Check dns records ajax
-    function checkHost(){
+    function checkHost() {
         $('.check-records-js, .check-cert-js').on('click', function(e) {
             e.preventDefault();
             let $this = $(this);
             let url = $this.data('url');
-            $this.find('.spinner-border').removeClass('d-none');
-            $this.attr('disabled', true);
+
+            if ($this.hasClass('check-records-js')) {
+                $this.find('.spinner-border').removeClass('d-none');
+                $this.attr('disabled', true);
+            }
+
+            if ($this.hasClass('check-cert-js')) {
+                $this.parents('.host-list-js').find('.table-adaptive').append(loader);
+            }
+
             $.get(url, {}, function(data) {
-                $this.find('.spinner-border').addClass('d-none');
-                $this.attr('disabled', false);
+                if ($this.hasClass('check-records-js')) {
+                    $this.find('.spinner-border').addClass('d-none');
+                    $this.attr('disabled', false);
+                }
+
                 $('.host-list-js').html(data);
 
-                // Reset check change
+                //Reset check change
                 checkChange();
                 checkHost();
             });
@@ -350,6 +361,15 @@ $(function () {
                 $(this).removeClass('active-show');
             }
         });
+    });
+
+    //Start server loading
+    let startserverForm = $('.form-startserver-js');
+    let startserverLoader = $('.loader-startserver-js');
+    let startserverModal = new bootstrap.Modal(document.querySelector('#start_server'), {});
+    $(startserverForm).on('submit', function() {
+        startserverModal.hide();
+        startserverLoader.find('.spinner-border').removeClass('d-none');
     });
 
 });

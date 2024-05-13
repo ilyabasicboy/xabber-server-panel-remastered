@@ -11,17 +11,18 @@
             XMPP Server
         </h5>
 
-        <h5 class="mb-3">
+        <h5 class="mb-3 loader-startserver-js">
             Status:
             {% if started %}
-                <span class="text-success">
+                <span class="text-success" role="status">
                     started
                 </span>
             {% else %}
-                <span class="text-danger">
+                <span class="text-danger" role="status">
                     stopped
                 </span>
             {% endif %}
+            <span class="d-none spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
         </h5>
 
         {% if request.user.is_admin %}
@@ -66,7 +67,9 @@
                             Online users
                         </th>
                         <th>DNS</th>
-                        <th>Certificates</th>
+                        <th>
+                            Certificates
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,6 +122,7 @@
                         <td data-title="Total online users">
                             {{ data.online|default:'--' }}
                         </td>
+                        <td class="d-none d-lg-table-cell"></td>
                         <td class="d-none d-lg-table-cell"></td>
                     </tr>
                 </tfoot>
