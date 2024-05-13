@@ -24,7 +24,7 @@
                 <td class="align-middle" data-title="Expiration date">
                     {{ cert.expiration_date|date:"d.m.Y H:i" }}
                 </td>
-                <td class="align-middle" data-title="Status">
+                <td class="align-middle {% if cert.status == 0 %}text-success{% elif cert.status == 1 %}text-warning{% else %}text-danger{% endif %}" data-title="Status">
                     {{ cert.get_status_display }}
                 </td>
                 <td data-title="Actions">

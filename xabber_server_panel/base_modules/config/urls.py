@@ -34,7 +34,7 @@ urlpatterns = [
 
     # certificates
     path('certificates/', views.Certificates.as_view(), name='certificates'),
-    path('update_cert/', views.UpdateCert.as_view(), name='update_cert'),
+    path('update_cert/<str:domain>/', views.UpdateCert.as_view(), name='update_cert'),
     path('upload_cert/', views.UploadCert.as_view(), name='upload_cert'),
     path('delete_cert/<str:name>/', views.DeleteCert.as_view(), name='delete_cert'),
 ]

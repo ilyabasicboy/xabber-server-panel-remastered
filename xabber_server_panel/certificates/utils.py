@@ -323,11 +323,11 @@ def main(
         return exceptions
 
 
-def update_or_create_certs():
+def update_or_create_certs(domain=''):
     result = {'success': True, 'errors': []}
 
     try:
-        errors = main()
+        errors = main(force_renew=domain)
     except Exception as e:
         print(e)
         errors = [e]

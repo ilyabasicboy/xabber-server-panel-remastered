@@ -16,6 +16,18 @@ def pre_save_cron_job(sender, *args, **kwargs):
 
 @receiver(post_save, sender=CronJob)
 def post_save_cron_job(sender, instance, created, **kwargs):
+    # built in activate/deactivate logic
+
+    post_save.disconnect(post_save_cron_job, sender=CronJob)
+
+    if instance.type == 'built_in_job' and instance.active:
+        CronJob.objects.filter(command=instance.command, active=True).exclude(type='built_in_job').update(active=False)
+    elif instance.active:
+        CronJob.objects.filter(command=instance.command, active=True, type='built_in_job').update(active=False)
+
+    post_save.connect(post_save_cron_job, sender=CronJob)
+
+    # recreate cron jobs
     with Crontab() as crontab:
         crontab.add_jobs()
 

@@ -66,6 +66,7 @@
                             Online users
                         </th>
                         <th>DNS</th>
+                        <th>Certificates</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,9 +91,19 @@
                                             <i class="bi bi-exclamation-triangle-fill d-flex"></i>
                                         </div>
                                         <a href="{% url 'config:host_detail' id=obj.host.id %}">
-                                            Domain records failed
+                                            DNS records failed
                                         </a>
                                     </div>
+                               {% endif %}
+                            </td>
+
+                            <td class="align-middle" data-title="Certificates">
+                                {% if obj.host.cert_errors %}
+                                    <div class="icon-link text-warning fs-5 me-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{% for error in obj.host.cert_errors %}{{ error }} {% endfor %}">
+                                        <i class="bi bi-exclamation-triangle-fill d-flex"></i>
+                                    </div>
+                               {% else %}
+                                    Expires on {{ obj.host.certificate.expiration_date|date:"d.m.Y H:i" }}
                                {% endif %}
                             </td>
                         </tr>

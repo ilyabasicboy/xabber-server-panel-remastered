@@ -151,6 +151,7 @@ def get_error_messages(request):
 
     return error_messages
 
+
 def get_success_messages(request):
     success_messages = []
 

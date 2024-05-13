@@ -54,6 +54,7 @@ class Hosts(LoginRequiredMixin, TemplateView):
         api = get_api(request)
 
         check_hosts(api)
+        check_certificates()
 
         context = {}
         return self.render_to_response(context)
@@ -118,8 +119,8 @@ class DeleteHost(LoginRequiredMixin, TemplateView):
         host.delete()
         update_ejabberd_config()
         return HttpResponseRedirect(
-                reverse('config:hosts')
-            )
+            reverse('config:hosts')
+        )
 
 
 class DetailHost(LoginRequiredMixin, TemplateView):
@@ -167,7 +168,7 @@ class CreateHost(LoginRequiredMixin, TemplateView):
                 host.cert_records = True
 
             # enable issue certificates flag
-            if host.srv_records and host.cert_records:
+            if host.srv_records:
                 host.issue_cert = True
 
             host.save()
@@ -232,6 +233,8 @@ class CheckDnsRecords(LoginRequiredMixin, View):
         # Create a thread to create certificates
         thread = threading.Thread(target=update_or_create_certs)
         thread.start()
+
+        check_certificates()
 
         return render(request, 'config/parts/host_list.html')
 
@@ -704,7 +707,6 @@ class CronJobCreate(LoginRequiredMixin, TemplateView):
     @permission_admin
     def post(self, request, *args, **kwargs):
         form = CronJobForm(request.POST)
-
         if form.is_valid():
             form.save()
             messages.success(request, 'Cron created successfully.')
@@ -727,8 +729,12 @@ class CronJobDelete(LoginRequiredMixin, View):
         except:
             raise Http404
 
-        cron_job.delete()
-        messages.success(request, 'Cron deleted successfully.')
+        if cron_job.type == 'built_in_job':
+            messages.error(request, 'You cant delete built in command.')
+        else:
+            cron_job.delete()
+            messages.success(request, 'Cron deleted successfully.')
+
         return HttpResponseRedirect(
             reverse('config:cron_jobs')
         )
@@ -791,16 +797,15 @@ class Certificates(LoginRequiredMixin, TemplateView):
 
 class UpdateCert(LoginRequiredMixin, TemplateView):
 
-    template_name = 'config/parts/cert_list.html'
+    template_name = 'config/parts/host_list.html'
 
     @permission_admin
-    def get(self, request, *args, **kwargs):
-        update_or_create_certs()
+    def get(self, request, domain, *args, **kwargs):
+        update_or_create_certs(domain)
+
         check_certificates()
-        certificates = Certificate.objects.all()
-        context = {
-            'certificates_info': certificates,
-        }
+
+        context = {}
         return self.render_to_response(context)
 
 

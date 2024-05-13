@@ -16,7 +16,7 @@
                         <input class="form-control {% if form.circle.errors %}is-invalid{% endif %}" type="text" name="circle" placeholder="Circle identifier" {% if form.circle.data %}value="{{ form.cleaned_data.circle|default:form.circle.data }}"{% endif %}>
 
                         {% if request.hosts %}
-                            <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host">
+                            <select class="form-select {% if request.hosts|length < 2 %}custom-disabled{% endif %}" name="host">
                                 {% for host in request.hosts %}
                                     <option value="{{ host.name }}"
                                         {% if form.cleaned_data.host %}

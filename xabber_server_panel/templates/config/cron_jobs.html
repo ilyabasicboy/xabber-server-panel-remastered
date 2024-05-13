@@ -73,11 +73,14 @@
                                                      Change
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:cron_delete' id=cron_job.id %}" data-delete-name="Cron job" data-delete-target="{{ cron_job.command }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
-                                                     Delete
-                                                </a>
-                                            </li>
+
+                                            {% if not cron_job.type == 'built_in_job' %}
+                                                <li>
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:cron_delete' id=cron_job.id %}" data-delete-name="Cron job" data-delete-target="{{ cron_job.command }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                         Delete
+                                                    </a>
+                                                </li>
+                                            {% endif %}
                                         {% endif %}
                                     </ul>
                                 </div>

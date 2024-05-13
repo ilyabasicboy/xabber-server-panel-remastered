@@ -1,5 +1,6 @@
 from django.db import models
 import json
+from xabber_server_panel.certificates.models import Certificate
 
 
 class VirtualHost(models.Model):
@@ -13,6 +14,25 @@ class VirtualHost(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def certificate(self):
+        cert = Certificate.objects.filter(domain=self.name).first()
+        return cert
+
+    @property
+    def cert_errors(self):
+        errors = []
+        if not self.cert_records:
+            errors += ['Certificate records failed.']
+
+        if self.certificate:
+            if self.certificate.status == 2:
+                errors += [self.certificate.reason]
+        else:
+            errors += ['The certificate has not been uploaded yet.']
+
+        return errors
 
 
 class LDAPSettings(models.Model):

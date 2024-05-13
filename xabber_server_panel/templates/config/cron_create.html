@@ -43,6 +43,16 @@
                 <label class="col-form-label col-12 col-md-3 {% if form.command.errors %}text-danger{% endif %}">Command</label>
                 <div class="col-12 col-md-9">
                     <input class="form-control {% if form.command.errors %}is-invalid{% endif %}" type="text" name="command" placeholder="clearsessions" {% if form.command.data %}value="{{ form.cleaned_data.command|default:form.command.data }}"{% endif %}>
+                    <select class="form-select" name="base_command">
+                        <option value="">---------</option>
+
+                        {% for choice in form.base_command.field.choices %}
+                            <option value="{{ choice.0 }}" {% if form.base_command.data == choice.0|stringformat:'s' %}selected{% endif %}>
+                                {{ choice.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    Built-in command
                 </div>
             </div>
 
@@ -66,11 +76,15 @@
                 <label class="col-form-label col-12 col-md-3 {% if form.type.errors %}text-danger{% endif %}">Type</label>
                 <div class="col-12 col-md-9">
                     <select class="form-select" name="type">
-                        {% for choice in form.type.field.choices %}
-                            <option value="{{ choice.0 }}" {% if form.type.data == choice.0 %}selected{% endif %}>
-                                {{ choice.1 }}
-                            </option>
-                        {% endfor %}
+                        <option value="internal_command" {% if form.type.data == 'internal_command' %}selected{% endif %}>
+                            Internal command
+                        </option>
+                        <option value="function" {% if form.type.data == 'function' %}selected{% endif %}>
+                            Function
+                        </option>
+                        <option value="console_command" {% if form.type.data == 'console_command' %}selected{% endif %}>
+                            Console command
+                        </option>
                     </select>
                 </div>
             </div>

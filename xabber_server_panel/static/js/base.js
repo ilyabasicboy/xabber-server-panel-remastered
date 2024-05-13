@@ -40,21 +40,25 @@ $(function () {
     });
 
     //Check dns records ajax
-    $('.check-records-js, .check-cert-js').on('click', function(e) {
-        e.preventDefault();
-        let $this = $(this);
-        let url = $this.data('url');
-        $this.find('.spinner-border').removeClass('d-none');
-        $this.attr('disabled', true);
-        $.get(url, {}, function(data) {
-            $this.find('.spinner-border').addClass('d-none');
-            $this.attr('disabled', false);
-            $('.host-list-js, .cert-list-js').html(data);
+    function checkHost(){
+        $('.check-records-js, .check-cert-js').on('click', function(e) {
+            e.preventDefault();
+            let $this = $(this);
+            let url = $this.data('url');
+            $this.find('.spinner-border').removeClass('d-none');
+            $this.attr('disabled', true);
+            $.get(url, {}, function(data) {
+                $this.find('.spinner-border').addClass('d-none');
+                $this.attr('disabled', false);
+                $('.host-list-js').html(data);
 
-            // Reset check change
-            checkChange();
+                // Reset check change
+                checkChange();
+                checkHost();
+            });
         });
-    });
+    }
+    checkHost();
 
     //Separate logic for search
     let target, object;

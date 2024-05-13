@@ -10,20 +10,20 @@ def create_base_cron_jobs(*args, **kwargs):
         schedule="0 * * * *",
         command="check_expires",
         active=False,
-        base=True
+        type='built_in_job'
     )
     CronJob.objects.create(
         schedule="0 13 * * *",
         command="update_certs",
         active=False,
-        base=True
+        type='built_in_job'
     )
 
 
 def delete_base_cron_jobs(apps, schema_editor):
     CronJob.objects.filter(
         command__in=['check_expires', 'update_certs'],
-        base=True
+        type='built_in_job'
     ).delete()
 
 

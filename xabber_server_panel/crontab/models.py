@@ -8,16 +8,17 @@ from xabber_server_panel.utils import validate_cron_schedule
 class CronJob(models.Model):
 
     TYPE_CHOICES = [
-        ('django_command', 'Django command'),
+        ('internal_command', 'Internal command'),
         ('function', 'Function'),
         ('console_command', 'Console command'),
+        ('built_in_job', 'Built-in job'),
     ]
     active = models.BooleanField(
         default=True
     )
     type = models.CharField(
         choices=TYPE_CHOICES,
-        default='django_command',
+        default='enternal_command',
         max_length=20
     )
     schedule = models.CharField(
@@ -34,11 +35,11 @@ class CronJob(models.Model):
         null=True,
         help_text='Key-value arguments should be a valid JSON.'
     )
-    base = models.BooleanField(
-        default=False
+    command = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
     )
-
-    command = models.CharField(max_length=255)
 
     def __str__(self):
         return self.command
@@ -56,7 +57,7 @@ class CronJob(models.Model):
             return []
 
     def get_job(self):
-        if self.type == 'django_command':
+        if self.type == 'enternal_command':
             job = (self.schedule, 'django.core.management.call_command', [self.command], self.get_kwargs())
         elif self.type == 'function':
             job = (self.schedule, 'xabber_server_panel.crontab.utils.%s' % self.command, self.get_args(), self.get_kwargs())

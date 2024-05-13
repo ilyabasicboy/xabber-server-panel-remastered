@@ -20,7 +20,7 @@
                             <input class="form-control {% if form.username.errors %}is-invalid{% endif %}" type="text" name="username" placeholder="Username" {% if form.username.data %}value="{{ form.cleaned_data.username|default:form.username.data }}"{% endif %}>
 
                             {% if request.hosts %}
-                                <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host">
+                                <select class="form-select {% if request.hosts|length < 2 %}custom-disabled{% endif %}" name="host">
 
                                     {% for host in request.hosts %}
                                         <option value="{{ host.name }}"

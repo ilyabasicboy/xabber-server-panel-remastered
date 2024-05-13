@@ -10,6 +10,7 @@
                 <th>Virtual host</th>
                 <th>DNS records</th>
                 <th>Issue certificates</th>
+                <th>Certificates</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -24,7 +25,7 @@
                     </td>
 
                     <td class="align-middle" data-title="SRV Records">
-                       {% if not host.srv_records or not host.cert_records %}
+                       {% if not host.srv_records %}
                             <div class="d-flex align-items-center">
                                 <div class="icon-link text-warning fs-5 me-2">
                                     <i class="bi bi-exclamation-triangle-fill d-flex"></i>
@@ -38,7 +39,17 @@
                     </td>
 
                     <td class="align-middle" data-title="Issue certificates">
-                        <input name="issue_cert" id="id_issue_cert_{{ host.id }}" type="checkbox" value="{{ host.id }}" {% if host.issue_cert and host.srv_records and host.cert_records %}checked{% endif %} {% if not host.srv_records or not host.cert_records %}disabled{% endif %} >
+                        <input name="issue_cert" id="id_issue_cert_{{ host.id }}" type="checkbox" value="{{ host.id }}" {% if host.issue_cert and host.srv_records %}checked{% endif %} {% if not host.srv_records %}disabled{% endif %} >
+                    </td>
+
+                    <td class="align-middle" data-title="Certificates">
+                        {% if host.cert_errors %}
+                            <div class="icon-link text-warning fs-5 me-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{% for error in host.cert_errors %}{{ error }} {% endfor %}">
+                                <i class="bi bi-exclamation-triangle-fill d-flex"></i>
+                            </div>
+                       {% else %}
+                            Expires on {{ host.certificate.expiration_date|date:"d.m.Y H:i" }}
+                        {% endif %}
                     </td>
 
                     <td class="align-middle" data-title="Actions">
@@ -55,6 +66,13 @@
                                         </a>
                                     </li>
                                     {% if settings_write_permissions %}
+                                        <li>
+                                            {# if host.srv_records and host.cert_records #}
+                                                <a class="dropdown-item text-wrap check-cert-js" data-url="{% url 'config:update_cert' domain=host.name %}">
+                                                     Renew certificate
+                                                </a>
+                                            {# endif #}
+                                        </li>
                                         <li>
                                             <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'config:host_delete' id=host.id %}" data-delete-name="host" data-delete-target="{{ host.name }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                  Delete

@@ -10,15 +10,8 @@
     <div class="mb-4 col-12">
         {% include 'config/parts/links.html' %}
     </div>
-    <div class="table-adaptive cert-list-js">
+    <div class="table-adaptive">
         {% include 'config/parts/cert_list.html' %}
-    </div>
-
-    <div class="mt-4 mb-n3 me-n3 d-flex justify-content-end flex-wrap">
-        <button class="btn btn-success me-3 mb-3 check-cert-js" type="button" data-url="{% url 'config:update_cert' %}">
-            <span class="d-none spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-            <span role="status">Update certificates</span>
-        </button>
     </div>
 
     <div class="mt-4">

@@ -16,7 +16,7 @@
                         <input class="form-control {% if form.localpart.errors %}is-invalid{% endif %}" {% if form.localpart.data %}value="{{ form.cleaned_data.localpart|default:form.localpart.data }}"{% endif %} type="text" name="localpart" placeholder="Localpart" required>
 
                         {% if request.hosts %}
-                            <select class="form-select {% if request.hosts|length < 2 %}pe-none{% endif %}" name="host" required>
+                            <select class="form-select {% if request.hosts|length < 2 %}custom-disabled{% endif %}" name="host" required>
                                 {% for host in request.hosts %}
                                     <option value="{{ host.name }}" {% if form.cleaned_data.host %}{% if form.cleaned_data.host == host.name %}selected{% endif %}{% elif request.current_host == host %}selected{% endif %}>
                                         @{{ host.name }}
