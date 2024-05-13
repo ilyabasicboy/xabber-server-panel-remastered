@@ -7,7 +7,7 @@ log_rotate_count: 1
 log_rate_limit: 100
 
 certfiles:
- - "{{ PROJECT_DIR }}/certs/*.pem"
+ - "{{ CERTS_DIR }}*.pem"
 
 listen:
   -

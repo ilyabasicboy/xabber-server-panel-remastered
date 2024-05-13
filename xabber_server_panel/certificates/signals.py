@@ -12,5 +12,5 @@ def delete_cert_data(sender, *args, **kwargs):
     instance = kwargs.get('instance')
     cert_path = os.path.join(settings.CERTS_DIR, instance.name)
 
-    if os.path.isfile(cert_path):
+    if os.path.exists(cert_path):
         os.remove(cert_path)

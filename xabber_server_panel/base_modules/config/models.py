@@ -30,7 +30,7 @@ class VirtualHost(models.Model):
             if self.certificate.status == 2:
                 errors += [self.certificate.reason]
         else:
-            errors += ['The certificate has not been uploaded yet.']
+            errors += ['The certificate has not been uploaded.']
 
         return errors
 

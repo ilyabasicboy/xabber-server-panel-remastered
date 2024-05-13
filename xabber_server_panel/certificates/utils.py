@@ -377,15 +377,16 @@ def check_certificates():
                         expiration_date = cert.not_valid_after
                         domain = cert.subject.rfc4514_string().replace('CN=', '')  # Remove 'CN=' prefix
 
-                        Certificate.objects.update_or_create(
-                            name=file,
-                            domain=domain,
-                            defaults={
-                                'expiration_date': make_aware(expiration_date),
-                            }
-                        )
+                        if VirtualHost.objects.filter(name=domain).exists():
+                            Certificate.objects.update_or_create(
+                                name=file,
+                                domain=domain,
+                                defaults={
+                                    'expiration_date': make_aware(expiration_date),
+                                }
+                            )
 
-                        certificates_info += [file]
+                            certificates_info += [file]
                     except ValueError as e:
                         print(f"Error parsing certificate in file '{file}': {e}")
 

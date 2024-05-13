@@ -850,17 +850,11 @@ class DeleteCert(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def get(self, request, name, *args, **kwargs):
-        file_path = os.path.join(settings.CERT_CONF_DIR, name)
-
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-                Certificate.objects.filter(name=name).delete()
-                messages.success(request, 'Certificate deleted successfully.')
-            except Exception as e:
-                messages.error(request, e)
-        else:
-            messages.error(request, 'Certificate does not exists.')
+        try:
+            Certificate.objects.filter(name=name).delete()
+            messages.success(request, 'Certificate deleted successfully.')
+        except Exception as e:
+            messages.error(request, e)
 
         return HttpResponseRedirect(
             reverse('config:certificates')
