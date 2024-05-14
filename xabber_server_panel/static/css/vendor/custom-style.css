@@ -177,3 +177,8 @@
     opacity: 1;
     pointer-events: none;
 }
+
+/*Custom Selector*/
+.selector-custom select {
+    min-height: 110px;
+}
