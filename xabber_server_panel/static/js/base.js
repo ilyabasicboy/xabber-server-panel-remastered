@@ -396,7 +396,7 @@ $(function () {
         }
 
         //Initial update of hidden fields
-        updateHiddenFields();
+//        updateHiddenFields();
 
         //Filter avaliable members
         $('#id_members_input').on('input', function() {

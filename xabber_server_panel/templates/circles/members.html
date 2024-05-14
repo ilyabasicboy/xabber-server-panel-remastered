@@ -75,7 +75,7 @@
                                             <div class="card-header fs-6 d-flex align-items-center">
                                                 Avaliable members
 
-                                                <div class="icon-link text-body-tertiary fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This is the list of selected members. You can remove some of them by highlighting and clicking 'Remove' below, or by double-clicking.">
+                                                <div class="icon-link text-body-tertiary fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This is the list of avaliable members. You can add some of them by highlighting and clicking 'Add' below, or by double-clicking.">
                                                     <i class="bi bi-info-circle-fill d-flex"></i>
                                                 </div>
                                             </div>
@@ -145,7 +145,7 @@
                                         </div>
                                     </div>
 
-                                    <input name="members" id="id_members_to_hidden">
+                                    <input name="members" id="id_members_to_hidden" {% if circle.members.all %}value="{% for user in circle.members.all %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
                                 </div>
                             </div>
 
