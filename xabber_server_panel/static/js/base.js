@@ -306,9 +306,9 @@ $(function () {
         });
     });
 
-    //Reset form in modal
-    const resetModal = document.querySelectorAll('.reset-modal-js');
-    resetModal.forEach((modal) => {
+    //Reset form checkbox in modal
+    const resetCheckboxModal = document.querySelectorAll('.reset-checkbox-modal-js');
+    resetCheckboxModal.forEach((modal) => {
         modal.addEventListener('hidden.bs.modal', event => {
             let formCheckbox = $(modal).find('form').find('input[type="checkbox"]');
             formCheckbox.each(function(index, checkbox) {
@@ -320,6 +320,17 @@ $(function () {
             });
             //Fix submit disabled
             formCheckbox.first().trigger('change');
+        })
+    });
+
+    //Reset form select multiple in modal
+    const resetSelectmModal = document.querySelectorAll('.reset-selectm-modal-js');
+    resetSelectmModal.forEach((modal) => {
+        modal.addEventListener('hidden.bs.modal', event => {
+            $(modal).find('form')[0].reset();
+
+            let formSelectm = $(modal).find('form').find('select');
+            $(formSelectm).find('option').prop('selected', false).trigger('chosen:updated');
         })
     });
 
@@ -372,65 +383,82 @@ $(function () {
         startserverLoader.find('.spinner-border').removeClass('d-none');
     });
 
+    //Selector widget
+    function selectorWidgetInit() {
+        //Function to update hidden fields with selected members
+        function updateHiddenFields() {
+            var selectedOptions = $('#id_members_to option');
+            var values = selectedOptions.map(function() {
+                return this.value;
+            }).get();
+            $('#id_members_to_hidden').val(values.join(','));
+            $('#id_members_to_hidden').trigger('change');
+        }
 
-    // Members widget
-    // Function to update hidden fields with selected members
-    function updateHiddenFields() {
-        var selectedOptions = $('#id_members_to option');
-        var values = selectedOptions.map(function() {
-            return this.value;
-        }).get();
-        $('#id_members_to_hidden').val(values.join(','));
-    }
+        //Initial update of hidden fields
+        updateHiddenFields();
 
-    // Initial update of hidden fields
-    updateHiddenFields();
-
-    // Filter avaliable members
-    $('#id_members_input').on('input', function() {
-        var filter = $(this).val().toLowerCase();
-        $('#id_members_from option').each(function() {
-            var text = $(this).text().toLowerCase();
-            $(this).toggle(text.includes(filter));
+        //Filter avaliable members
+        $('#id_members_input').on('input', function() {
+            var filter = $(this).val().toLowerCase();
+            $('#id_members_from option').each(function() {
+                var text = $(this).text().toLowerCase();
+                $(this).toggle(text.includes(filter));
+            });
         });
-    });
 
-    // Add selected members
-    $('#id_members_add_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_from option:selected').appendTo('#id_members_to');
-        updateHiddenFields(); // Update hidden fields after adding
-    });
+        //Add selected members
+        $('#id_members_add_link').on('click', function(e) {
+            e.preventDefault();
+            $('#id_members_from option:selected').appendTo('#id_members_to');
+            updateHiddenFields(); //Update hidden fields after adding
+        });
 
-    // Remove selected members
-    $('#id_members_remove_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_to option:selected').appendTo('#id_members_from');
-        updateHiddenFields(); // Update hidden fields after removal
-    });
+        //Remove selected members
+        $('#id_members_remove_link').on('click', function(e) {
+            e.preventDefault();
+            $('#id_members_to option:selected').appendTo('#id_members_from');
+            updateHiddenFields(); //Update hidden fields after removal
+        });
 
-    // Choose all members at once
-    $('#id_members_add_all_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_from option').appendTo('#id_members_to');
-        updateHiddenFields(); // Update hidden fields after adding all
-    });
+        //Choose all members at once
+        $('#id_members_add_all_link').on('click', function(e) {
+            e.preventDefault();
+            $('#id_members_from option').appendTo('#id_members_to');
+            updateHiddenFields(); //Update hidden fields after adding all
+        });
 
-    // Remove all members at once
-    $('#id_members_remove_all_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_to option').appendTo('#id_members_from');
-        updateHiddenFields(); // Update hidden fields after removing all
-    });
+        //Remove all members at once
+        $('#id_members_remove_all_link').on('click', function(e) {
+            e.preventDefault();
+            $('#id_members_to option').appendTo('#id_members_from');
+            updateHiddenFields(); //Update hidden fields after removing all
+        });
 
-    // Double-click for quick adding and removing of members
-    $('#id_members_from').on('dblclick', 'option', function() {
-        $(this).appendTo('#id_members_to');
-        updateHiddenFields(); // Update hidden fields after double-click
-    });
+        //Double-click for quick adding and removing of members
+        $('#id_members_from').on('dblclick', 'option', function() {
+            $(this).appendTo('#id_members_to');
+            updateHiddenFields(); //Update hidden fields after double-click
+        });
 
-    $('#id_members_to').on('dblclick', 'option', function() {
-        $(this).appendTo('#id_members_from');
-        updateHiddenFields(); // Update hidden fields after double-click
-    });
+        $('#id_members_to').on('dblclick', 'option', function() {
+            $(this).appendTo('#id_members_from');
+            updateHiddenFields(); //Update hidden fields after double-click
+        });
+
+        //Double-click for mobile
+        $('#id_members_from, #id_members_to').on('touchstart', 'option', function(event) {
+            let now = new Date().getTime();
+            let lastTouch = $(this).data('lastTouch') || now + 1;
+            let delta = now - lastTouch;
+                if (delta < 500 && delta > 0) {
+                    $(this).trigger('dblclick');
+                    $(this).data('lastTouch', null);
+                } else {
+                $(this).data('lastTouch', now);
+            }
+        });
+    };
+    selectorWidgetInit();
+
 });

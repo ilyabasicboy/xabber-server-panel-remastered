@@ -53,7 +53,7 @@
 
         {% if circles_write_permissions and users_read_permissions %}
 
-            <div class="modal modal-lg fade" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
+            <div class="modal modal-lg fade reset-selectm-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
                     <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
                         {% csrf_token %}
@@ -70,9 +70,9 @@
                         {% else %}
                             <div class="modal-body">
                                 <div class="row selector-custom">
-                                    <div class="col-5 d-flex">
+                                    <div class="col-12 col-lg-5 d-flex">
                                         <div class="card w-100">
-                                            <div class="card-header fs-5 d-flex align-items-center">
+                                            <div class="card-header fs-6 d-flex align-items-center">
                                                 Avaliable members
 
                                                 <div class="icon-link text-body-tertiary fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This is the list of selected members. You can remove some of them by highlighting and clicking 'Remove' below, or by double-clicking.">
@@ -95,7 +95,7 @@
                                                 </li>
 
                                                 <li class="list-group-item">
-                                                    <select class="form-control" id="id_members_from" size="5" name="members_old" multiple data-field-name="members">
+                                                    <select class="form-control nocheck-change-js" id="id_members_from" size="5" name="members_old" multiple data-field-name="members">
                                                         {% for user in users %}
                                                             {% if user not in circle.members.all %}
                                                                 <option value="{{ user.id }}" title="{{ user.full_jid }}">{{ user.full_jid }}</option>
@@ -111,7 +111,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                    <div class="col-12 col-lg-2 d-flex align-items-center justify-content-center my-3 my-lg-0">
                                         <div class="icon-link fs-3 me-2" id="id_members_remove_link" type="button" title="Remove">
                                             <i class="bi bi-arrow-left-circle-fill d-flex"></i>
                                         </div>
@@ -121,9 +121,9 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-5 d-flex">
+                                    <div class="col-12 col-lg-5 d-flex">
                                         <div class="card w-100">
-                                            <div class="card-header fs-5 d-flex align-items-center">
+                                            <div class="card-header fs-6 d-flex align-items-center">
                                                 Added members
 
                                                 <div class="icon-link text-body-tertiary fs-5 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="This is the list of selected members. You can delete some of them by highlighting and clicking 'Remove' below or by double-clicking.">
@@ -132,9 +132,9 @@
                                             </div>
 
                                             <div class="card-body">
-                                                <select class="form-control h-100" id="id_members_to" size="5" multiple name="members">
+                                                <select class="form-control h-100 nocheck-change-js" id="id_members_to" size="5" multiple name="members">
                                                     {% for user in circle.members.all %}
-                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}">{{ user.full_jid }}</option>
+                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}" data-checked>{{ user.full_jid }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -145,7 +145,7 @@
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="members" id="id_members_to_hidden">
+                                    <input name="members" id="id_members_to_hidden">
                                 </div>
                             </div>
 
