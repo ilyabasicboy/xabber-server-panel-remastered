@@ -382,28 +382,37 @@ $(function () {
     //Start server loading
     let startserverForm = $('.form-startserver-js');
     let startserverLoader = $('.loader-startserver-js');
-    let startserverModal = new bootstrap.Modal(document.querySelector('#start_server'), {});
-    $(startserverForm).on('submit', function() {
-        startserverModal.hide();
-        startserverLoader.find('.spinner-border').removeClass('d-none');
-    });
+    let startserverTarget = document.querySelector('#start_server');
+    if ($(startserverTarget).length > 0) {
+        let startserverModal = new bootstrap.Modal(startserverTarget, {});
+        $(startserverForm).on('submit', function() {
+            startserverModal.hide();
+            startserverLoader.find('.spinner-border').removeClass('d-none');
+        });
+    }
 
     //Selector widget
     //Function to update hidden fields with selected members
     function updateHiddenFields() {
-        var selectedOptions = $('#id_members_to option');
-        var values = selectedOptions.map(function() {
+        let selectedOptions = $('#id_members_to option');
+        let values = selectedOptions.map(function() {
             return this.value;
         }).get();
+
+        values.sort(function(a, b){
+            return parseInt(a)- parseInt(b);
+        });
+
         $('#id_members_to_hidden').val(values.join(','));
+
         $('#id_members_to_hidden').trigger('change');
     }
 
     //Filter avaliable members
     $('#id_members_input').on('input', function() {
-        var filter = $(this).val().toLowerCase();
+        let filter = $(this).val().toLowerCase();
         $('#id_members_from option').each(function() {
-            var text = $(this).text().toLowerCase();
+            let text = $(this).text().toLowerCase();
             $(this).toggle(text.includes(filter));
         });
     });
