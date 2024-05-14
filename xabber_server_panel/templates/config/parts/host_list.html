@@ -69,7 +69,7 @@
                                         {% if settings_write_permissions %}
                                             <li>
                                                 {# if host.srv_records and host.cert_records #}
-                                                    <a class="dropdown-item text-wrap check-cert-js" data-url="{% url 'config:update_cert' domain=host.name %}">
+                                                    <a class="dropdown-item text-wrap check-cert-js" data-url="{% url 'config:update_cert' domain=host.name %}" role="button">
                                                          Renew certificate
                                                     </a>
                                                 {# endif #}
