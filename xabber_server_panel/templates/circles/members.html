@@ -134,7 +134,7 @@
                                             <div class="card-body">
                                                 <select class="form-control h-100 nocheck-change-js" id="id_members_to" size="5" multiple name="members">
                                                     {% for user in circle.members.all %}
-                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}" data-checked>{{ user.full_jid }}</option>
+                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}" data-selected>{{ user.full_jid }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -145,7 +145,7 @@
                                         </div>
                                     </div>
 
-                                    <input name="members" id="id_members_to_hidden" {% if circle.members.all %}value="{% for user in circle.members.all %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
+                                    <input type="hidden" name="members" id="id_members_to_hidden" {% if circle.members.all %}value="{% for user in circle.members.all %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
                                 </div>
                             </div>
 
