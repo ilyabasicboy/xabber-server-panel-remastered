@@ -409,9 +409,18 @@ $(function () {
     }
 
     //Filter avaliable members
-    $('#id_members_input').on('input', function() {
+    $('#id_members_from_input').on('input', function() {
         let filter = $(this).val().toLowerCase();
         $('#id_members_from option').each(function() {
+            let text = $(this).text().toLowerCase();
+            $(this).toggle(text.includes(filter));
+        });
+    });
+
+    //Filter added members
+    $('#id_members_to_input').on('input', function() {
+        let filter = $(this).val().toLowerCase();
+        $('#id_members_to option').each(function() {
             let text = $(this).text().toLowerCase();
             $(this).toggle(text.includes(filter));
         });

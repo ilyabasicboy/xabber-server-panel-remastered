@@ -82,14 +82,14 @@
 
                                             <ul class="list-group list-group-flush">
                                                 <li class="list-group-item">
-                                                    <div id="id_members_filter">
+                                                    <div>
                                                         <div class="input-group">
-                                                            <label class="input-group-text" for="id_members_input">
+                                                            <label class="input-group-text" for="id_members_from_input">
                                                                 <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of available members.">
                                                                     <i class="bi bi-search d-flex"></i>
                                                                 </div>
                                                             </label>
-                                                            <input class="form-control nocheck-change-js" type="text" placeholder="Filter" id="id_members_input">
+                                                            <input class="form-control nocheck-change-js" type="text" placeholder="Filter" id="id_members_from_input">
                                                         </div>
                                                     </div>
                                                 </li>
@@ -130,6 +130,19 @@
                                                     <i class="bi bi-info-circle-fill d-flex"></i>
                                                 </div>
                                             </div>
+
+                                            <li class="list-group-item">
+                                                <div>
+                                                    <div class="input-group">
+                                                        <label class="input-group-text" for="id_members_to_input">
+                                                            <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of added members.">
+                                                                <i class="bi bi-search d-flex"></i>
+                                                            </div>
+                                                        </label>
+                                                        <input class="form-control nocheck-change-js" type="text" placeholder="Filter" id="id_members_to_input">
+                                                    </div>
+                                                </div>
+                                            </li>
 
                                             <div class="card-body">
                                                 <select class="form-control h-100 nocheck-change-js" id="id_members_to" size="5" multiple name="members">
