@@ -303,7 +303,10 @@ class CircleMembers(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     def members_api(self):
 
-        self.members = self.request.POST.getlist('members')
+        self.members = self.request.POST.get('members', [])
+
+        if self.members:
+            self.members = self.members.split(',')
 
         members = User.objects.filter(id__in=self.members)
         new_members = set(map(int, self.members))
