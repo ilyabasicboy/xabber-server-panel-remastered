@@ -323,19 +323,31 @@ $(function () {
         })
     });
 
-    //Reset form select multiple in modal
-    const resetSelectmModal = document.querySelectorAll('.reset-selectm-modal-js');
-    resetSelectmModal.forEach((modal) => {
+    //Reset members form in modal
+    const resetMembersModal = document.querySelectorAll('.reset-members-modal-js');
+    resetMembersModal.forEach((modal) => {
         modal.addEventListener('hidden.bs.modal', event => {
             $(modal).find('form')[0].reset();
 
-            let formSelectm = $(modal).find('form').find('select');
-            $(formSelectm).find('option').prop('selected', false).trigger('chosen:updated');
+            let membersSelect = $(modal).find('form').find('select');
+            $(membersSelect).find('option').prop('selected', false).trigger('chosen:updated');
 
-            //Update for members
-            $('#id_members_to option:not([data-selected])').appendTo('#id_members_from');
-            $('#id_members_from option[data-selected]').appendTo('#id_members_to');
-            updateHiddenFields(); //Update hidden fields after removing all
+            let membersTo = $(modal).find('.selector-custom-to');
+            let membersFrom = $(modal).find('.selector-custom-from');
+            let membersResult = $(modal).find('.selector-custom-result');
+
+            membersTo.find('option:not([data-selected])').appendTo(membersFrom);
+            membersFrom.find('option[data-selected]').appendTo(membersTo);
+
+            let membersOptionTo = membersTo.find('option');
+            let values = membersOptionTo.map(function() {
+                return this.value;
+            }).get();
+            values.sort(function(a, b) {
+                return parseInt(a) - parseInt(b);
+            });
+            membersResult.val(values.join(','));
+            membersResult.trigger('change');
         })
     });
 
@@ -389,93 +401,6 @@ $(function () {
             startserverModal.hide();
             startserverLoader.find('.spinner-border').removeClass('d-none');
         });
-    }
-
-    //Selector widget
-    //Function to update hidden fields with selected members
-    function updateHiddenFields() {
-        let selectedOptions = $('#id_members_to option');
-        let values = selectedOptions.map(function() {
-            return this.value;
-        }).get();
-
-        values.sort(function(a, b){
-            return parseInt(a)- parseInt(b);
-        });
-
-        $('#id_members_to_hidden').val(values.join(','));
-
-        $('#id_members_to_hidden').trigger('change');
-    }
-
-    //Filter avaliable members
-    $('#id_members_from_input').on('input', function() {
-        let filter = $(this).val().toLowerCase();
-        $('#id_members_from option').each(function() {
-            let text = $(this).text().toLowerCase();
-            $(this).toggle(text.includes(filter));
-        });
-    });
-
-    //Filter added members
-    $('#id_members_to_input').on('input', function() {
-        let filter = $(this).val().toLowerCase();
-        $('#id_members_to option').each(function() {
-            let text = $(this).text().toLowerCase();
-            $(this).toggle(text.includes(filter));
-        });
-    });
-
-    //Add selected members
-    $('#id_members_add_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_from option:selected').appendTo('#id_members_to');
-        updateHiddenFields(); //Update hidden fields after adding
-    });
-
-    //Remove selected members
-    $('#id_members_remove_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_to option:selected').appendTo('#id_members_from');
-        updateHiddenFields(); //Update hidden fields after removal
-    });
-
-    //Choose all members at once
-    $('#id_members_add_all_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_from option').appendTo('#id_members_to');
-        updateHiddenFields(); //Update hidden fields after adding all
-    });
-
-    //Remove all members at once
-    $('#id_members_remove_all_link').on('click', function(e) {
-        e.preventDefault();
-        $('#id_members_to option').appendTo('#id_members_from');
-        updateHiddenFields(); //Update hidden fields after removing all
-    });
-
-    //Double-click for quick adding and removing of members
-    $('#id_members_from').on('dblclick', 'option', function() {
-        $(this).appendTo('#id_members_to');
-        updateHiddenFields(); //Update hidden fields after double-click
-    });
-
-    $('#id_members_to').on('dblclick', 'option', function() {
-        $(this).appendTo('#id_members_from');
-        updateHiddenFields(); //Update hidden fields after double-click
-    });
-
-    //Double-click for mobile
-    $('#id_members_from, #id_members_to').on('touchstart', 'option', function(event) {
-        let now = new Date().getTime();
-        let lastTouch = $(this).data('lastTouch') || now + 1;
-        let delta = now - lastTouch;
-            if (delta < 500 && delta > 0) {
-                $(this).trigger('dblclick');
-                $(this).data('lastTouch', null);
-            } else {
-            $(this).data('lastTouch', now);
-        }
-    });
+    };
 
 });

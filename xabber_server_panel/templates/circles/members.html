@@ -53,7 +53,7 @@
 
         {% if circles_write_permissions and users_read_permissions %}
 
-            <div class="modal modal-lg fade reset-selectm-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
+            <div class="modal modal-lg fade reset-members-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
                     <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
                         {% csrf_token %}
@@ -69,7 +69,7 @@
                             </div>
                         {% else %}
                             <div class="modal-body">
-                                <div class="row selector-custom">
+                                <div class="row selector-custom selector-custom-js">
                                     <div class="col-12 col-lg-5 d-flex">
                                         <div class="card w-100">
                                             <div class="card-header fs-6 d-flex align-items-center">
@@ -89,13 +89,13 @@
                                                                     <i class="bi bi-search d-flex"></i>
                                                                 </div>
                                                             </label>
-                                                            <input class="form-control nocheck-change-js" type="text" placeholder="Filter" id="id_members_from_input">
+                                                            <input class="form-control nocheck-change-js selector-custom-filter-from" type="text" placeholder="Filter" id="id_members_from_input">
                                                         </div>
                                                     </div>
                                                 </li>
 
                                                 <li class="list-group-item">
-                                                    <select class="form-control nocheck-change-js" id="id_members_from" size="5" name="members_old" multiple data-field-name="members">
+                                                    <select class="form-control nocheck-change-js selector-custom-from" size="5" name="members_old" multiple data-field-name="members">
                                                         {% for user in users %}
                                                             {% if user not in circle.members.all %}
                                                                 <option value="{{ user.id }}" title="{{ user.full_jid }}">{{ user.full_jid }}</option>
@@ -106,17 +106,17 @@
                                             </ul>
 
                                             <div class="card-footer">
-                                                <a title="Click to select all members at once." href="#" id="id_members_add_all_link">Choose all</a>
+                                                <a class="selector-custom-add-all" title="Click to select all members at once." href="#">Choose all</a>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-12 col-lg-2 d-flex align-items-center justify-content-center my-3 my-lg-0">
-                                        <div class="icon-link fs-3 me-2" id="id_members_remove_link" type="button" title="Remove">
+                                        <div class="icon-link fs-3 me-2 selector-custom-remove" type="button" title="Remove">
                                             <i class="bi bi-arrow-left-circle-fill d-flex"></i>
                                         </div>
 
-                                        <div class="icon-link fs-3" id="id_members_add_link" type="button" title="Add">
+                                        <div class="icon-link fs-3 selector-custom-add" type="button" title="Add">
                                             <i class="bi bi-arrow-right-circle-fill d-flex"></i>
                                         </div>
                                     </div>
@@ -131,34 +131,36 @@
                                                 </div>
                                             </div>
 
-                                            <li class="list-group-item">
-                                                <div>
-                                                    <div class="input-group">
-                                                        <label class="input-group-text" for="id_members_to_input">
-                                                            <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of added members.">
-                                                                <i class="bi bi-search d-flex"></i>
-                                                            </div>
-                                                        </label>
-                                                        <input class="form-control nocheck-change-js" type="text" placeholder="Filter" id="id_members_to_input">
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item">
+                                                    <div>
+                                                        <div class="input-group">
+                                                            <label class="input-group-text" for="id_members_to_input">
+                                                                <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of added members.">
+                                                                    <i class="bi bi-search d-flex"></i>
+                                                                </div>
+                                                            </label>
+                                                            <input class="form-control nocheck-change-js selector-custom-filter-to" type="text" placeholder="Filter" id="id_members_to_input">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </li>
+                                                </li>
 
-                                            <div class="card-body">
-                                                <select class="form-control h-100 nocheck-change-js" id="id_members_to" size="5" multiple name="members">
-                                                    {% for user in circle.members.all %}
-                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}" data-selected>{{ user.full_jid }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
+                                                <li class="list-group-item">
+                                                    <select class="form-control nocheck-change-js selector-custom-to" size="5" multiple name="members">
+                                                        {% for user in circle.members.all %}
+                                                            <option value="{{ user.id }}" title="{{ user.full_jid }}" data-selected>{{ user.full_jid }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </li>
+                                            </ul>
 
                                             <div class="card-footer">
-                                                <a title="Click to delete all members at once." href="#" id="id_members_remove_all_link">Clear all</a>
+                                                <a class="selector-custom-remove-all" title="Click to delete all members at once." href="#">Clear all</a>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="members" id="id_members_to_hidden" {% if circle.members.all %}value="{% for user in circle.members.all %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
+                                    <input class="selector-custom-result" type="hidden" name="members" {% if circle.members.all %}value="{% for user in circle.members.all %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
                                 </div>
                             </div>
 
