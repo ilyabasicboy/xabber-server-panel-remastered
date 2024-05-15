@@ -146,7 +146,7 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         self.context = {}
 
-        if self.hosts:
+        if self.hosts and self.text:
             if 'circles' in self.objects:
                 self.search_circles()
 
