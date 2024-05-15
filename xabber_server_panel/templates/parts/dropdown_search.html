@@ -1,0 +1,35 @@
+{% if circles or groups or users %}
+    {% if circles %}
+        <div>
+            {% for circle in circles %}
+                <a href="{% url 'circles:detail' id=circle.id %}">
+                    {{ circle.full_jid }} <span class="text-secondary">Circle</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if groups %}
+        <div>
+            {% for group in groups %}
+                <div>
+                  {{ group.name }} <span class="text-secondary">Group</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if users %}
+        <div>
+            {% for user in users %}
+                <a href="{% url 'users:detail' id=user.id %}">
+                    {{ user.full_jid }} <span class="text-secondary">User</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <button>
+        View all
+    </button>
+{% endif %}

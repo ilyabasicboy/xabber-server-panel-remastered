@@ -96,8 +96,14 @@
 
                 <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-2 order-md-0 col-12 col-md-1 header-search" id="search">
                     <form class="w-100 pt-2 pt-md-0" action="{% url 'search' %}" method="GET">
-                        <input class="form-control" type="text" name="search" {% if request.GET.search %}value="{{ request.GET.search }}"{% endif %}  placeholder="Search for Users, Circles, Groups">
+                        <input class="form-control check-suggestions-js" type="text" name="search"
+                               {% if request.GET.search %}value="{{ request.GET.search }}"{% endif %}
+                               placeholder="Search for Users, Circles, Groups" data-objects="users,circles,groups"
+                               data-url="{% url 'suggestions' %}" data-target="search-suggestions-js" data-type="search">
+
+                        <div class="search-suggestions-js text-white"></div>
                     </form>
+
                 </div>
 
                 {% block host_select %}{% endblock %}

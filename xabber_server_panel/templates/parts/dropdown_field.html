@@ -1,0 +1,29 @@
+{% if circles %}
+    <div>
+        {% for circle in circles %}
+            <div>
+                {{ circle.full_jid }} <span class="text-secondary">Circle</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if groups %}
+    <div>
+        {% for group in groups %}
+            <div>
+                {{ group.name }} <span class="text-secondary">Group</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if users %}
+    <div>
+        {% for user in users %}
+            <div>
+                {{ user.full_jid }} <span class="text-secondary">User</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

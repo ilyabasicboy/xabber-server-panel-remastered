@@ -1,7 +1,7 @@
 from django.shortcuts import reverse, loader
 from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from xabber_server_panel.base_modules.config.models import RootPage
@@ -59,7 +59,6 @@ class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         except:
             text = ''
 
-        object = request.GET.get('object')
         host = request.current_host
         api = get_api(request)
 
@@ -93,7 +92,7 @@ class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             ).get('groups')
 
             if groups:
-                group_list = [group for group in groups if text in group.get('name', '') or text in group.get('owner', '')]
+                group_list = [group for group in groups if text in group.get('name', '')]
                 context['groups'] = group_list
 
         if request.is_ajax():
@@ -112,3 +111,111 @@ class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             return JsonResponse(response_data)
 
         return self.render_to_response(context, **kwargs)
+
+
+class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
+
+    template_name = 'parts/dropdown_field.html'
+
+    def get(self, request, *args, **kwargs):
+
+        try:
+            self.text = request.GET.get('text', '').strip()
+        except:
+            self.text = ''
+
+        if self.text.count('@') == 1:
+            # Split the search string into local part and host
+            self.localpart, self.host_part = self.text.split('@')
+        else:
+            self.localpart = self.host_part = None
+
+        try:
+            self.objects = request.GET.get('objects').split(',')
+        except:
+            self.objects = []
+
+        type = request.GET.get('type')
+
+        if type == 'search':
+            self.template_name = 'parts/dropdown_search.html'
+
+        self.hosts = request.hosts.values_list('name', flat=True)
+
+        self.api = get_api(request)
+
+        self.context = {}
+
+        if self.hosts:
+            if 'circles' in self.objects:
+                self.search_circles()
+
+            if 'users' in self.objects:
+                self.search_users()
+
+            if 'groups' in self.objects:
+                self.search_groups()
+
+        return self.render_to_response(self.context)
+
+    def search_circles(self):
+        # create circles query
+        q = Q()
+        if self.localpart or self.host_part:
+            q |= Q(
+                circle__contains=self.localpart,
+                host__startswith=self.host_part,
+                host__in=self.hosts
+            )
+        else:
+            q |= Q(
+                circle__contains=self.text,
+                host__in=self.hosts
+            )
+            q |= Q(
+                host__contains=self.text,
+                host__in=self.hosts
+            )
+            q |= Q(
+                name__contains=self.text,
+                host__in=self.hosts
+            )
+
+        circles = Circle.objects.only('id', 'circle', 'host').filter(q).order_by('circle', 'host')
+        circles = circles.exclude(circle__in=self.hosts)
+        self.context['circles'] = circles[:10]
+
+    def search_users(self):
+        q = Q()
+        if self.localpart or self.host_part:
+            q |= Q(
+                username__contains=self.localpart,
+                host__startswith=self.host_part,
+                host__in=self.hosts
+            )
+        else:
+            q |= Q(username__contains=self.text, host__in=self.hosts)
+            q |= Q(host__contains=self.text, host__in=self.hosts)
+            q |= Q(first_name__contains=self.text, host__in=self.hosts)
+            q |= Q(last_name__contains=self.text, host__in=self.hosts)
+
+        users = User.objects.only('id', 'username', 'host').filter(q).order_by('username', 'host')
+        self.context['users'] = users[:10]
+
+    def search_groups(self):
+        group_list = []
+
+        for host in self.hosts:
+            # get group list
+            groups = self.api.get_groups(
+                {
+                    "host": host
+                }
+            ).get('groups')
+
+            if groups:
+                for group in groups:
+                    if self.text in group.get('name', ''):
+                        group_list += [group]
+
+                self.context['groups'] = group_list[:10]

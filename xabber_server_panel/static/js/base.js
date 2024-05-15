@@ -403,4 +403,30 @@ $(function () {
         });
     };
 
+    // suggestions dropdown
+    function checkSuggestions($object){
+        let text = $object.val();
+        let objects = $object.data('objects');
+        let type = $object.data('type');
+        let url = $object.data('url');
+        let target = $object.data('target');
+
+        let data = {
+            'text': text,
+            'objects': objects,
+            'type': type,
+        };
+
+        $.get(url, data, function(data) {
+            $(`.${target}`).html(data);
+        });
+    }
+
+    let timeout;
+    $('.check-suggestions-js').on('input', function(e){
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            checkSuggestions($(this));
+        }.bind(this), 1000); // 1 sec timeout
+    })
 });
