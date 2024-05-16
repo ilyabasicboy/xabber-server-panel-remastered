@@ -423,7 +423,9 @@ $(function () {
         };
 
         $.get(url, data, function(data) {
-            $(`.${target}`).html(data);
+            if (data['html'] != undefined){
+                $(`.${target}`).html(data['html']);
+            }
         });
     };
 

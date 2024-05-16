@@ -148,6 +148,8 @@ default_ram_db: mnesia
 
 modules:
   mod_adhoc: {}
+  mod_favorites: {}
+  mod_notify: {}
   mod_admin_extra: {}
   mod_announce: # recommends mod_adhoc
     access: announce
@@ -184,8 +186,6 @@ modules:
         access_model: whitelist
       "storage:bookmarks":
         access_model: whitelist
-  mod_push:
-    db_type: mnesia
   mod_roster:
     versioning: true
   mod_shared_roster: {}

@@ -6,14 +6,31 @@ import time
 
 from django.conf import settings
 
+from xabber_server_panel.base_modules.config.models import ModuleSettings
+
+
+def get_webhook_secret():
+    webhook_settings = ModuleSettings.objects.filter(
+        host='global',
+        module='mod_webhooks'
+    ).first()
+
+    if webhook_settings is None:
+        return None
+
+    return webhook_settings.get_options().get('secret')
+
 
 def check_signature(request):
     signature = request.headers.get(settings.WEBHOOKS_SIGNATURE_HEADER)
     if not signature:
         return check_jwt(request)
-    key = settings.WEBHOOKS_SECRET
+
+    key = get_webhook_secret()
+
     if key is None:
         return False
+
     key = key.encode()
     body = request.body
     body_hash = hmac.new(key, body, hashlib.sha256).hexdigest()
@@ -41,9 +58,12 @@ def _to_json(b64str):
 
 
 def check_jwt(request):
-    key = settings.WEBHOOKS_SECRET
+
+    key = get_webhook_secret()
+
     if key is None:
         return False
+
     token = _extract_jwt(request.headers.get('Authorization'))
     if token is None:
         return False

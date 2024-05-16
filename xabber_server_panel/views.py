@@ -146,6 +146,7 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         self.context = {}
 
+        response_data = {}
         if self.hosts and self.text:
             if 'circles' in self.objects:
                 self.search_circles()
@@ -156,7 +157,11 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             if 'groups' in self.objects:
                 self.search_groups()
 
-        return self.render_to_response(self.context)
+            html = loader.render_to_string(self.template_name, self.context)
+
+            response_data['html'] = html
+
+        return JsonResponse(response_data)
 
     def search_circles(self):
         # create circles query
