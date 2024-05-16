@@ -1,6 +1,5 @@
 {% if circles %}
     <li class="list-group-item">
-        <div class="text-secondary">Circles</div>
         {% for circle in circles %}
             <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ circle.full_jid }}
@@ -11,7 +10,6 @@
 
 {% if groups %}
     <li class="list-group-item">
-        <div class="text-secondary">Groups</div>
         {% for group in groups %}
             <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ group.name }}
@@ -22,7 +20,6 @@
 
 {% if users %}
     <li class="list-group-item">
-        <div class="text-secondary">Users</div>
         {% for user in users %}
             <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ user.full_jid }}

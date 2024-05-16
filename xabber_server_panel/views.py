@@ -201,8 +201,6 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         else:
             q |= Q(username__contains=self.text, host__in=self.hosts)
             q |= Q(host__contains=self.text, host__in=self.hosts)
-            q |= Q(first_name__contains=self.text, host__in=self.hosts)
-            q |= Q(last_name__contains=self.text, host__in=self.hosts)
 
         users = User.objects.only('id', 'username', 'host').filter(q).order_by('username', 'host')
         self.context['users'] = users[:10]
