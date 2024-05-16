@@ -435,7 +435,7 @@ $(function () {
         let suggestionsList = $(item).find('.suggestions-custom__list');
 
         //Show suggestions dropdown
-        suggestionsInput.on('input change keyup paste', function(e) {
+        suggestionsInput.on('input', function(e) {
             checkSuggestions($(this));
             suggestionsList.addClass('active');
         });

@@ -2,7 +2,7 @@
     <li class="list-group-item">
         <div class="text-secondary">Circles</div>
         {% for circle in circles %}
-            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
+            <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ circle.full_jid }}
             </div>
         {% endfor %}
@@ -13,7 +13,7 @@
     <li class="list-group-item">
         <div class="text-secondary">Groups</div>
         {% for group in groups %}
-            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
+            <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ group.name }}
             </div>
         {% endfor %}
@@ -24,7 +24,7 @@
     <li class="list-group-item">
         <div class="text-secondary">Users</div>
         {% for user in users %}
-            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
+            <div class="list-group-item-action d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ user.full_jid }}
             </div>
         {% endfor %}
