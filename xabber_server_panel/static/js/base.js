@@ -100,7 +100,7 @@ $(function () {
     };
 
     function searchPagination() {
-        $('.search-pagination-js').on('click', '.pagination a', function(e){
+        $('.search-pagination-js').on('click', '.pagination a', function(e) {
             e.preventDefault();
 
             //Add Loader
@@ -136,13 +136,18 @@ $(function () {
 
         //Check if the content of the span tag is empty
         if ($('.show-url-js').length != 0 ) {
-            if ($('.show-url-js').data('link').trim() === ''){
+            if ($('.show-url-js').data('link').trim() === '') {
                 //If it's empty, insert the current URL
                 $('.show-url-js').data('link', schemeAndHost);
             }
         }
     };
     setCurrentUrl();
+
+    //Toggle search
+    $('.header-search-icon').on('click', function () {
+        $('.header-search-content').slideToggle();
+    });
 
     //Add url to title
     $(document).on('click', '.show-url-js', function() {
@@ -403,8 +408,8 @@ $(function () {
         });
     };
 
-    // suggestions dropdown
-    function checkSuggestions($object){
+    //Init suggestions dropdown
+    function checkSuggestions($object) {
         let text = $object.val();
         let objects = $object.data('objects');
         let type = $object.data('type');
@@ -420,13 +425,29 @@ $(function () {
         $.get(url, data, function(data) {
             $(`.${target}`).html(data);
         });
-    }
+    };
 
-    let timeout;
-    $('.check-suggestions-js').on('input', function(e){
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
+    let suggestions = $('.suggestions-custom-js');
+    suggestions.each(function(index, item) {
+        let suggestionsInput = $(item).find('.suggestions-custom__input');
+        let suggestionsList = $(item).find('.suggestions-custom__list');
+
+        //Show suggestions dropdown
+        suggestionsInput.on('input change keyup paste', function(e) {
             checkSuggestions($(this));
-        }.bind(this), 1000); // 1 sec timeout
-    })
+            suggestionsList.addClass('active');
+        });
+
+        //Close suggestions dropdown
+        $(document).on('click', function(e) {
+            if (!suggestionsInput.is(e.target) && suggestionsInput.has(e.target).length === 0 && !suggestionsList.is(e.target) && suggestionsList.has(e.target).length === 0) {
+                suggestionsList.removeClass('active');
+            }
+        });
+    });
+    //Add value suggestions dropdown
+    $(document).on('click', '.suggestions-custom__item', function(e) {
+        $(this).parents('.suggestions-custom-js').find('.suggestions-custom__input').val($(this).text().trim());
+    });
+
 });

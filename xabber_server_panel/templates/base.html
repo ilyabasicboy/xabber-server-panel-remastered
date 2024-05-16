@@ -94,16 +94,15 @@
                     </div>
                 {% endif %}
 
-                <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-2 order-md-0 col-12 col-md-1 header-search" id="search">
-                    <form class="w-100 pt-2 pt-md-0" action="{% url 'search' %}" method="GET">
-                        <input class="form-control check-suggestions-js" type="text" name="search"
+                <div class="d-md-block flex-grow-1 collapse hide me-0 me-md-4 order-2 order-md-0 col-12 col-md-1 header-search-content">
+                    <form class="w-100 pt-2 pt-md-0 position-relative suggestions-custom suggestions-custom-js" action="{% url 'search' %}" method="GET">
+                        <input class="form-control suggestions-custom__input" type="text" name="search"
                                {% if request.GET.search %}value="{{ request.GET.search }}"{% endif %}
                                placeholder="Search for Users, Circles, Groups" data-objects="users,circles,groups"
                                data-url="{% url 'suggestions' %}" data-target="search-suggestions-js" data-type="search">
 
-                        <div class="search-suggestions-js text-white"></div>
+                        <ul class="search-suggestions-js suggestions-custom__list position-absolute top-100 start-0 w-100 h-auto list-group mt-2 shadow-sm"></ul>
                     </form>
-
                 </div>
 
                 {% block host_select %}{% endblock %}
@@ -135,7 +134,7 @@
 
                 <ul class="navbar-nav d-md-none flex-row">
                     <li class="nav-item text-nowrap">
-                        <button class="nav-link icon-link px-2 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#search" aria-controls="search" aria-expanded="false" aria-label="Toggle search">
+                        <button class="nav-link icon-link px-2 text-white header-search-icon" type="button" aria-controls="search" aria-expanded="false" aria-label="Toggle search">
                             <i class="bi bi-search d-flex"></i>
                         </button>
                     </li>

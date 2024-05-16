@@ -178,7 +178,19 @@
     pointer-events: none;
 }
 
-/*Custom Selector*/
+/*Selector Custom*/
 .selector-custom select {
     min-height: 110px;
+}
+
+/*Suggestions Custom*/
+.suggestions-custom__list {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.suggestions-custom__list.active {
+    opacity: 1;
+    pointer-events: auto;
 }

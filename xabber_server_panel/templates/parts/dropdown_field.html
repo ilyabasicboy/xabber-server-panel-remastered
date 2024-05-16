@@ -1,29 +1,32 @@
 {% if circles %}
-    <div>
+    <li class="list-group-item">
+        <div class="text-secondary">Circles</div>
         {% for circle in circles %}
-            <div>
+            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ circle.full_jid }}
             </div>
         {% endfor %}
-    </div>
+    </li>
 {% endif %}
 
 {% if groups %}
-    <div>
+    <li class="list-group-item">
+        <div class="text-secondary">Groups</div>
         {% for group in groups %}
-            <div>
+            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ group.name }}
             </div>
         {% endfor %}
-    </div>
+    </li>
 {% endif %}
 
 {% if users %}
-    <div>
+    <li class="list-group-item">
+        <div class="text-secondary">Users</div>
         {% for user in users %}
-            <div>
+            <div class="d-block text-break pe-auto suggestions-custom__item" role="button">
                 {{ user.full_jid }}
             </div>
         {% endfor %}
-    </div>
+    </li>
 {% endif %}

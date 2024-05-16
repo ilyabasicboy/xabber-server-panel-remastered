@@ -38,15 +38,14 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.owner.errors %}text-danger{% endif %}">Owner *</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control {% if form.owner.errors %}is-invalid{% endif %} check-suggestions-js"
-                           {% if form.owner.data %}value="{{ form.cleaned_data.owner|default:form.owner.data }}"{% endif %}
-                           type="text" required placeholder="username@example.com" name="owner" data-objects="users"
-                           data-url="{% url 'suggestions' %}" data-target="owner-suggestions-js">
+                    <div class="position-relative suggestions-custom suggestions-custom-js">
+                        <input class="form-control {% if form.owner.errors %}is-invalid{% endif %} suggestions-custom__input"
+                               {% if form.owner.data %}value="{{ form.cleaned_data.owner|default:form.owner.data }}"{% endif %}
+                               type="text" required placeholder="username@example.com" name="owner" data-objects="users"
+                               data-url="{% url 'suggestions' %}" data-target="owner-suggestions-js">
+                        <ul class="owner-suggestions-js suggestions-custom__list position-absolute top-100 start-0 w-100 h-auto list-group mt-2 shadow-sm"></ul>
+                    </div>
                 </div>
-            </div>
-
-            <div class="owner-suggestions-js">
-
             </div>
 
             <div class="row mb-3">
