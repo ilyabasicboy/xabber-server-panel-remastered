@@ -426,7 +426,7 @@ $(function () {
         };
 
         $.get(url, data, function(data) {
-            if (data['html'] != undefined){
+            if (data['html']){
                 $(`.${target}`).html(data['html']);
             }
         });
