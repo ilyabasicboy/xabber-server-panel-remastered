@@ -24,8 +24,9 @@ class ChallengeHandler(HTTPChallengeHandler):
         if response.status_code == 200:
             print("Challenge created successfully.")
         else:
-            print("Failed to create challenge. Status: %s. Reason: %s" % (response.status_code, response.reason))
-            raise Exception
+            e = "Failed to create challenge. Status: %s. Reason: %s" % (response.status_code, response.reason)
+            print(e)
+            raise Exception(e)
 
     @staticmethod
     def _determine_txtvalue(thumbprint, token):
