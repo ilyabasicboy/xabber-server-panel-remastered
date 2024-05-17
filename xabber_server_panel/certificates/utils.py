@@ -258,7 +258,6 @@ def main(
                 )
 
             except Exception as e:
-                log("Certificate issue/renew failed", e, error=True)
                 Certificate.objects.update_or_create(
                     domain=domain,
                     name='%s.pem' % domain,
@@ -267,6 +266,7 @@ def main(
                         'reason': str(e)
                     }
                 )
+                log("Certificate issue/renew failed", e, error=True)
                 exceptions.append(e)
 
         # deploy new certificates after all are renewed
@@ -405,7 +405,7 @@ def check_certificates():
                     except ValueError as e:
                         print(f"Error parsing certificate in file '{file}': {e}")
 
-    Certificate.objects.exclude(name__in=certificates_info).delete()
+    # Certificate.objects.exclude(name__in=certificates_info).delete()
 
 
 def validate_certificate(certificate_path):
