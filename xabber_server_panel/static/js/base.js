@@ -63,6 +63,9 @@ $(function () {
 
                 $('.host-list-js').html(data);
 
+                //Reinit functions
+                initTooltip();
+
                 //Reset check change
                 checkChange();
                 checkHost();
