@@ -116,7 +116,7 @@
                                     </div>
 
                                     <div class="col-12 col-lg-5 d-flex">
-                                        <div class="card w-100">
+                                        <div class="card w-100 border-0">
                                             <div class="card-header fs-6 d-flex align-items-center">
                                                 Added members
 
@@ -125,28 +125,22 @@
                                                 </div>
                                             </div>
 
-                                            <ul class="list-group list-group-flush">
-                                                <li class="list-group-item">
-                                                    <div>
-                                                        <div class="input-group">
-                                                            <label class="input-group-text" for="id_members_to_input">
-                                                                <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of added members.">
-                                                                    <i class="bi bi-search d-flex"></i>
-                                                                </div>
-                                                            </label>
-                                                            <input class="form-control nocheck-change-js selector-custom-filter-to" type="text" placeholder="Filter" id="id_members_to_input">
+                                            <div class="card-body px-0">
+                                                <div class="input-group">
+                                                    <label class="input-group-text" for="id_members_to_input">
+                                                        <div class="icon-link text-body-tertiary fs-5" type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start typing text in this field to filter the list of added members.">
+                                                            <i class="bi bi-search d-flex"></i>
                                                         </div>
-                                                    </div>
-                                                </li>
+                                                    </label>
+                                                    <input class="form-control nocheck-change-js selector-custom-filter-to" type="text" placeholder="Filter" id="id_members_to_input">
+                                                </div>
 
-                                                <li class="list-group-item">
-                                                    <select class="form-control nocheck-change-js selector-custom-to" size="5" multiple name="members">
-                                                        {% for user in circle.members.all %}
-                                                            <option value="{{ user.id }}" title="{{ user.full_jid }}" data-selected>{{ user.full_jid }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </li>
-                                            </ul>
+                                                <select class="form-control nocheck-change-js selector-custom-to mt-3" size="5" multiple name="members">
+                                                    {% for user in circle.members.all %}
+                                                        <option value="{{ user.id }}" title="{{ user.full_jid }}" data-selected>{{ user.full_jid }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
 
                                             <div class="card-footer">
                                                 <a class="selector-custom-remove-all" title="Click to delete all members at once." href="#">Clear all</a>
