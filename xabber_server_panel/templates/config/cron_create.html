@@ -42,17 +42,19 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3 {% if form.command.errors %}text-danger{% endif %}">Command</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control {% if form.command.errors %}is-invalid{% endif %}" type="text" name="command" placeholder="clearsessions" {% if form.command.data %}value="{{ form.cleaned_data.command|default:form.command.data }}"{% endif %}>
-                    <select class="form-select" name="base_command">
-                        <option value="">---------</option>
+                    <div class="input-group follow-select-js">
+                        <input class="form-control {% if form.command.errors %}is-invalid{% endif %}" type="text" name="command" placeholder="clearsessions" {% if form.command.data %}value="{{ form.cleaned_data.command|default:form.command.data }}"{% endif %}>
 
-                        {% for choice in form.base_command.field.choices %}
-                            <option value="{{ choice.0 }}" {% if form.base_command.data == choice.0|stringformat:'s' %}selected{% endif %}>
-                                {{ choice.1 }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    Built-in command
+                        <select class="form-select" name="base_command">
+                            <option value="">---------</option>
+                            {% for choice in form.base_command.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.base_command.data == choice.0|stringformat:'s' %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <span class="form-text text-secondary">Built-in command</span>
                 </div>
             </div>
 

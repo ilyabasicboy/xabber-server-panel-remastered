@@ -453,4 +453,25 @@ $(function () {
         $(this).parents('.suggestions-custom-js').find('.suggestions-custom__list').removeClass('active');
     });
 
+    //Follow select
+    let followSelect = $('.follow-select-js');
+    followSelect.each(function(index, item) {
+        let select = $(item).find('select');
+        let input = $(item).find('input');
+
+        select.on('change', function() {
+            if ($(this).val() === '') {
+                input.removeClass('custom-disabled');
+            } else {
+                input.addClass('custom-disabled');
+            }
+            input.val($(this).val());
+            input.trigger('change');
+        });
+
+        input.on('input', function() {
+            select.prop('selectedIndex', 0);
+        });
+    });
+
 });
