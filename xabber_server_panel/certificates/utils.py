@@ -340,16 +340,31 @@ def update_or_create_certs(domain=''):
 
 
 def update_cert_config():
-    template = 'certificates/domain.json'
 
     hosts = VirtualHost.objects.filter(srv_records=True, cert_records=True, issue_cert=True)
 
+    if not os.path.exists(settings.CERT_CONF_DIR):
+        os.mkdir(settings.CERT_CONF_DIR)
+
+    # create domain config
+    domain_template = 'certificates/domain.json'
     file = open(
         os.path.join(
             settings.CERT_CONF_DIR,
             settings.CERT_DOMAIN_FILENAME
         ), 'w+')
-    json = render_to_string(template, {'hosts': hosts, 'CERTS_DIR': settings.CERTS_DIR})
+    json = render_to_string(domain_template, {'hosts': hosts, 'CERTS_DIR': settings.CERTS_DIR})
+    file.write(json)
+    file.close()
+
+    # create acertmgr config
+    acert_template = 'certificates/acertmgr.json'
+    file = open(
+        os.path.join(
+            settings.CERT_CONF_DIR,
+            settings.CERT_CONF_FILENAME
+        ), 'w+')
+    json = render_to_string(acert_template, {'hosts': hosts, 'CERTS_DIR': settings.CERTS_DIR})
     file.write(json)
     file.close()
 
