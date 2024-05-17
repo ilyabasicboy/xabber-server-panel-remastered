@@ -184,6 +184,10 @@
 }
 
 /*Suggestions Custom*/
+.suggestions-custom .list-group-item {
+    padding: var(--bs-list-group-item-padding-y) 0.75rem;
+}
+
 .suggestions-custom__list {
     opacity: 0;
     pointer-events: none;

@@ -450,6 +450,7 @@ $(function () {
     //Add value suggestions dropdown
     $(document).on('click', '.suggestions-custom__item', function(e) {
         $(this).parents('.suggestions-custom-js').find('.suggestions-custom__input').val($(this).text().trim());
+        $(this).parents('.suggestions-custom-js').find('.suggestions-custom__list').removeClass('active');
     });
 
 });
