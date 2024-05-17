@@ -26,6 +26,12 @@
                 </td>
                 <td class="align-middle {% if cert.status == 0 %}text-success{% elif cert.status == 1 %}text-warning{% else %}text-danger{% endif %}" data-title="Status">
                     {{ cert.get_status_display }}
+
+                    {% if cert.status == 2 %}
+                        <div class="icon-link text-warning fs-5 me-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ cert.reason }}">
+                            <i class="bi bi-exclamation-triangle-fill d-flex"></i>
+                        </div>
+                    {% endif %}
                 </td>
                 <td data-title="Actions">
                     <div class="d-flex">
