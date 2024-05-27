@@ -1,7 +1,7 @@
 from django import forms
 from .models import LDAPSettings, VirtualHost
 
-from xabber_server_panel.jid_validation.utils import validate_host
+from jid_validation.utils import validate_host
 
 
 class LDAPSettingsForm(forms.ModelForm):

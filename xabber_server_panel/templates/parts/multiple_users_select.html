@@ -77,5 +77,5 @@
         </div>
     </div>
 
-    <input class="selector-custom-result" type="hidden" name="{{ objects_name }}" {% if selected_objects %}value="{% for user in selected_objects %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
+    <input class="selector-custom-result" type="hidden" name="{{ field_name }}" {% if selected_objects %}value="{% for user in selected_objects %}{{ user.id }}{% if not forloop.last %},{% endif %}{% endfor %}"{% endif %}>
 </div>

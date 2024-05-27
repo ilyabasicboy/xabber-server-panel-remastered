@@ -1,6 +1,6 @@
 from django import forms
 
-from xabber_server_panel.jid_validation.utils import validate_host, validate_localpart
+from jid_validation.utils import validate_host, validate_localpart
 
 from .models import Circle
 

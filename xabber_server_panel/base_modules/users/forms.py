@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 
-from xabber_server_panel.jid_validation.utils import validate_host, validate_localpart
+from jid_validation.utils import validate_host, validate_localpart
 from xabber_server_panel.base_modules.users.models import User
 
 
