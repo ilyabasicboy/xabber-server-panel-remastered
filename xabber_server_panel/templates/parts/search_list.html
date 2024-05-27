@@ -1,8 +1,8 @@
 {% load users_tags %}
 
-{% check_user_permissions request.user 'users' as users_read_permissions %}
-{% check_user_permissions request.user 'circles' as circles_read_permissions %}
-{% check_user_permissions request.user 'groups' as groups_read_permissions %}
+{% check_user_permissions 'users' as users_read_permissions %}
+{% check_user_permissions 'circles' as circles_read_permissions %}
+{% check_user_permissions 'groups' as groups_read_permissions %}
 
 {% if users and users_read_permissions %}
     <div class="mb-4">

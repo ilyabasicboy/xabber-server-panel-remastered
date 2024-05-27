@@ -18,6 +18,7 @@ def get_user_by_jid(jid):
     return user
 
 
-@register.simple_tag()
-def check_user_permissions(user, app, permission=None):
-    return check_permissions(user, app, permission)
+@register.simple_tag(takes_context=True)
+def check_user_permissions(context, app, permission=None):
+    request = context.get('request')
+    return check_permissions(request.user, app, permission)

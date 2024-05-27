@@ -1,6 +1,6 @@
 {% load base_tags users_tags %}
 
-{% check_user_permissions request.user 'circles' 'write' as circles_write_permissions %}
+{% check_user_permissions 'circles' 'write' as circles_write_permissions %}
 
 {% if circles %}
     {% paginate circles 8 as paginated_circles %}

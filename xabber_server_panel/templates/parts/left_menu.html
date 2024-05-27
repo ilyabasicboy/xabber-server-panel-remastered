@@ -90,7 +90,7 @@
                         </li>
                     {% endif %}
                 {% else %}
-                    {% check_user_permissions request.user module.name as module_read_permissions %}
+                    {% check_user_permissions module.name as module_read_permissions %}
                     {% if module_read_permissions %}
                         <li class="nav-item">
                             {% url namespace as module_url %}

@@ -1,7 +1,7 @@
 {% load users_tags %}
 
-{% check_user_permissions request.user 'config' as settings_read_permissions %}
-{% check_user_permissions request.user 'config' 'write' as settings_write_permissions %}
+{% check_user_permissions 'config' as settings_read_permissions %}
+{% check_user_permissions 'config' 'write' as settings_write_permissions %}
 {% if request.hosts %}
     <div class="table-adaptive position-relative">
         <table class="table table-striped mb-0">

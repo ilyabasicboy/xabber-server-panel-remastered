@@ -1,6 +1,6 @@
 {% load base_tags users_tags %}
 
-{% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
+{% check_user_permissions 'registration' 'write' as registration_write_permissions %}
 
 <div class="mb-4 overflow-hidden">
     <form class="check-change-js" method="post">

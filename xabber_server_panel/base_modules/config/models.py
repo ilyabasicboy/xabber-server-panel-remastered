@@ -166,6 +166,10 @@ class Module(models.Model):
 
 class ModuleSettings(models.Model):
 
+    """
+        Module settings for modules_config.yml
+    """
+
     host = models.CharField(
         max_length=255,
     )

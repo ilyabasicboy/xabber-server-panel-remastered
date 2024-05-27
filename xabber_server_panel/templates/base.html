@@ -27,18 +27,18 @@
     {% block body %}
         {% get_external_modules as modules %}
 
-        {% check_user_permissions request.user 'dashboard' 'write' as dashboard_write_permissions %}
-        {% check_user_permissions request.user 'dashboard' as dashboard_read_permissions %}
-        {% check_user_permissions request.user 'users' 'write' as users_write_permissions %}
-        {% check_user_permissions request.user 'users' as users_read_permissions %}
-        {% check_user_permissions request.user 'circles' 'write' as circles_write_permissions %}
-        {% check_user_permissions request.user 'circles' as circles_read_permissions %}
-        {% check_user_permissions request.user 'groups' 'write' as groups_write_permissions %}
-        {% check_user_permissions request.user 'groups' as groups_read_permissions %}
-        {% check_user_permissions request.user 'registration' 'write' as registration_write_permissions %}
-        {% check_user_permissions request.user 'registration' as registration_read_permissions %}
-        {% check_user_permissions request.user 'config' 'write' as settings_write_permissions %}
-        {% check_user_permissions request.user 'config' as settings_read_permissions %}
+        {% check_user_permissions 'dashboard' 'write' as dashboard_write_permissions %}
+        {% check_user_permissions 'dashboard' as dashboard_read_permissions %}
+        {% check_user_permissions 'users' 'write' as users_write_permissions %}
+        {% check_user_permissions 'users' as users_read_permissions %}
+        {% check_user_permissions 'circles' 'write' as circles_write_permissions %}
+        {% check_user_permissions 'circles' as circles_read_permissions %}
+        {% check_user_permissions 'groups' 'write' as groups_write_permissions %}
+        {% check_user_permissions 'groups' as groups_read_permissions %}
+        {% check_user_permissions 'registration' 'write' as registration_write_permissions %}
+        {% check_user_permissions 'registration' as registration_read_permissions %}
+        {% check_user_permissions 'config' 'write' as settings_write_permissions %}
+        {% check_user_permissions 'config' as settings_read_permissions %}
 
         <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-body bg-opacity-75">
             <header class="navbar d-flex flex-wrap flex-md-nowrap justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
