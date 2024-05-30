@@ -1,6 +1,0 @@
-{
-    "authority_tos_agreement": "true",
-    "authority": "https://acme-staging-v02.api.letsencrypt.org",
-    "mode": "xabber_dns",
-    "port": 5000
-}

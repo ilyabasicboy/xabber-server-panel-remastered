@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UsernameField
 from django import forms
 from django.contrib.auth import authenticate
 from xabber_server_panel.api.api import EjabberdAPI
+from xabber_server_panel.custom_auth.exceptions import UnauthorizedException
 
 
 class CustomAuthenticationForm(forms.Form):
@@ -89,17 +90,23 @@ class ApiAuthenticationForm(forms.Form):
         self.user = authenticate(
             request=self.request,
             username=self.cleaned_data['username'],
-            password=self.cleaned_data['password']
+            password=self.cleaned_data['password'],
+            check_password=False
         )
         if self.user is None:
             self.add_error(
-                None, 'The username and password you have entered is invalid.'
+                None, 'The username or password you have entered is invalid.'
             )
 
     def clean(self):
         super(ApiAuthenticationForm, self).clean()
         if not self.errors:
-            self.api.login(self.cleaned_data)
+            try:
+                self.api.login(self.cleaned_data)
+            except UnauthorizedException:
+                self.add_error(
+                    None, 'The username or password you have entered is invalid.'
+                )
 
             # check api errors
             if self.api.errors:

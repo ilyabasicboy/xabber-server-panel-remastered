@@ -8,6 +8,7 @@
         <ul>
             <li>A record for subdomain <b>{{ host }}</b> to make server management panel available from the Internet on this address</li>
             <li>SRV records to help XMPP clients and servers find your server</li>
+            <li>To use free certificates, add an CNAME record "_acme-challenge" for the domain.</li>
         </ul>
     </div>
 
@@ -29,6 +30,30 @@
                     <tr>
                         <td data-title="Hostname">xabber.{{ host }}</td>
                         <td data-title="IP Address">Your server IP</td>
+                        <td data-title="TTL (seconds)">Default</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mb-4">
+        <h5 class="pb-2">
+            CNAME record
+        </h5>
+
+        <div class="table-adaptive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Aliases to</th>
+                        <th>TTL (seconds)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-title="Hostname">_acme-challenge</td>
+                        <td data-title="IP Address">alias_acme-challenge.{{ host }}</td>
                         <td data-title="TTL (seconds)">Default</td>
                     </tr>
                 </tbody>

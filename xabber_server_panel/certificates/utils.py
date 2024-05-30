@@ -347,26 +347,35 @@ def update_cert_config():
         os.mkdir(settings.CERT_CONF_DIR)
 
     # create domain config
-    domain_template = 'certificates/domain.json'
-    file = open(
-        os.path.join(
-            settings.CERT_CONF_DIR,
-            settings.CERT_DOMAIN_FILENAME
-        ), 'w+')
-    json = render_to_string(domain_template, {'hosts': hosts, 'CERTS_DIR': settings.CERTS_DIR})
-    file.write(json)
-    file.close()
+    domain_config_data = {}
+    for host in hosts:
+        key = "%s *.%s" % (host.name, host.name)
+        host_data = {
+            "path": os.path.join(settings.CERTS_DIR, "%s.pem" % host.name),
+            "format": "key,crt,ca"
+        }
+        domain_config_data[key] = host_data
+
+    domain_config = os.path.join(
+        settings.CERT_CONF_DIR,
+        settings.CERT_DOMAIN_FILENAME
+    )
+    with open(domain_config, 'w+') as file:
+        json.dump(domain_config_data, file, indent=2)
 
     # create acertmgr config
-    acert_template = 'certificates/acertmgr.json'
-    file = open(
-        os.path.join(
-            settings.CERT_CONF_DIR,
-            settings.CERT_CONF_FILENAME
-        ), 'w+')
-    json = render_to_string(acert_template, {'hosts': hosts, 'CERTS_DIR': settings.CERTS_DIR})
-    file.write(json)
-    file.close()
+    acert_config_data = {
+        "authority_tos_agreement": "true",
+        "authority": settings.CERT_AUTHORITY,
+        "mode": "xabber_dns",
+        "port": 5000
+    }
+    acert_config = os.path.join(
+        settings.CERT_CONF_DIR,
+        settings.CERT_CONF_FILENAME
+    )
+    with open(acert_config, 'w+') as file:
+        json.dump(acert_config_data, file, indent=2)
 
 
 def check_certificates():

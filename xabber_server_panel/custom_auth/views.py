@@ -30,7 +30,6 @@ class CustomLoginView(TemplateView):
 
         if form.is_valid():
             login(request, form.user)
-
             if next:
                 return HttpResponseRedirect(next)
             else:

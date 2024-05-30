@@ -10,7 +10,6 @@
                 <tr>
                     <th>Username</th>
                     <th>Name</th>
-                    <th>Created(UTC)</th>
                     <th>Expires(UTC)</th>
                     <th>Auth</th>
                     <th>Status</th>
@@ -40,11 +39,6 @@
                             {% else %}
                                 {{ user.full_name|truncatechars:'15' }}
                             {% endif %}
-                        </td>
-                        <td data-title="Created(UTC)">
-                            <span class="text-body-secondary">
-                                {{ user.created|date:"d.m.Y H:i" }}
-                            </span>
                         </td>
                         <td data-title="Expires(UTC)">
                             <span class="text-body-secondary">
