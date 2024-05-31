@@ -326,11 +326,11 @@ def main(
 def update_or_create_certs(domain=''):
     result = {'success': True, 'errors': []}
 
-    try:
-        errors = main(force_renew=domain)
-    except Exception as e:
-        print(e)
-        errors = [e]
+    # try:
+    errors = main(force_renew=domain)
+    # except Exception as e:
+    #     print(e)
+    #     errors = [e]
 
     if errors:
         result['success'] = False
@@ -350,10 +350,13 @@ def update_cert_config():
     domain_config_data = {}
     for host in hosts:
         key = "%s *.%s" % (host.name, host.name)
-        host_data = {
-            "path": os.path.join(settings.CERTS_DIR, "%s.pem" % host.name),
-            "format": "key,crt,ca"
-        }
+
+        host_data = [
+            {
+                "path": os.path.join(settings.CERTS_DIR, "%s.pem" % host.name),
+                "format": "key,crt,ca"
+            }
+        ]
         domain_config_data[key] = host_data
 
     domain_config = os.path.join(
