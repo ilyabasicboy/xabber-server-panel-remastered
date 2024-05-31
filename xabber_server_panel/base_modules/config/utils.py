@@ -219,7 +219,7 @@ def get_dns_records(domain, type='SRV'):
     records = {}
 
     record_types = {
-        'A': ['_acme-challenge'],
+        'A': ['_acme-challenge', 'xabber'],
         'SRV': ['_xmpp-client._tcp', '_xmpp-server._tcp']
     }
 

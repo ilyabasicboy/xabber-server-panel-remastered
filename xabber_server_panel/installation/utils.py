@@ -138,15 +138,18 @@ def create_vhost(data):
         # check cert records
         records = get_dns_records(data['host'], type='A')
         if settings.CHALLENGE_RECORD in records.get('_acme-challenge', []):
-            cert_records = False
-        else:
             cert_records = True
+        else:
+            cert_records = False
+
+        issue_cert = srv_records and cert_records
 
         VirtualHost.objects.get_or_create(
             name=data['host'],
             defaults={
                 'srv_records': srv_records,
-                'cert_records': cert_records
+                'cert_records': cert_records,
+                'issue_cert': issue_cert,
             }
         )
         return True
@@ -374,7 +377,7 @@ def create_circles(data):
 
 def load_predefined_config():
     data = {}
-    path = os.path.join(settings.BASE_DIR, settings.PREDEFINED_CONFIG_FILE_PATH)
+    path = settings.PREDEFINED_CONFIG_FILE_PATH
 
     if os.path.exists(path):
         with open(path) as file:
