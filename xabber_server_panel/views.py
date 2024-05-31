@@ -8,7 +8,7 @@ from xabber_server_panel.base_modules.config.models import RootPage
 from xabber_server_panel.base_modules.users.models import User
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.circles.utils import check_circles
-from xabber_server_panel.base_modules.users.utils import check_users
+from xabber_server_panel.base_modules.users.utils import check_users, check_permissions
 from xabber_server_panel.base_modules.config.utils import get_modules
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.mixins import ServerStartedMixin
@@ -65,35 +65,39 @@ class Search(ServerStartedMixin, LoginRequiredMixin, TemplateView):
         context = {}
 
         if host:
-            # check circles from server
-            check_circles(api, host.name)
 
-            circles = Circle.objects.filter(
-                Q(circle__contains=text, host=host.name)
-                | Q(name__contains=text, host=host.name)
-            ).exclude(circle=host.name).order_by('circle')
-            context['circles'] = circles
+            if check_permissions(request.user, 'circles'):
+                # check circles from server
+                check_circles(api, host.name)
 
-            # check users from server
-            check_users(api, host.name)
+                circles = Circle.objects.filter(
+                    Q(circle__contains=text, host=host.name)
+                    | Q(name__contains=text, host=host.name)
+                ).exclude(circle=host.name).order_by('circle')
+                context['circles'] = circles
 
-            users = User.objects.filter(
-                Q(username__contains=text, host=host.name)
-                | Q(first_name__contains=text, host=host.name)
-                | Q(last_name__contains=text, host=host.name)
-            ).order_by('username')
-            context['users'] = users
+            if check_permissions(request.user, 'users'):
+                # check users from server
+                check_users(api, host.name)
 
-            # get group list
-            groups = api.get_groups(
-                {
-                    "host": host.name
-                }
-            ).get('groups')
+                users = User.objects.filter(
+                    Q(username__contains=text, host=host.name)
+                    | Q(first_name__contains=text, host=host.name)
+                    | Q(last_name__contains=text, host=host.name)
+                ).order_by('username')
+                context['users'] = users
 
-            if groups:
-                group_list = [group for group in groups if text in group.get('name', '')]
-                context['groups'] = group_list
+            if check_permissions(request.user, 'groups'):
+                # get group list
+                groups = api.get_groups(
+                    {
+                        "host": host.name
+                    }
+                ).get('groups')
+
+                if groups:
+                    group_list = [group for group in groups if text in group.get('name', '')]
+                    context['groups'] = group_list
 
         if request.is_ajax():
             if object == 'users':
@@ -148,13 +152,13 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
         response_data = {}
         if self.hosts and self.text:
-            if 'circles' in self.objects:
+            if 'circles' in self.objects and check_permissions(request.user, 'circles'):
                 self.search_circles()
 
-            if 'users' in self.objects:
+            if 'users' in self.objects and check_permissions(request.user, 'users'):
                 self.search_users()
 
-            if 'groups' in self.objects:
+            if 'groups' in self.objects and check_permissions(request.user, 'groups'):
                 self.search_groups()
 
             html = loader.render_to_string(self.template_name, self.context)

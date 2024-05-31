@@ -447,6 +447,11 @@ class Modules(LoginRequiredMixin, TemplateView):
         except Exception as e:
             # Delete temporary dir
             shutil.rmtree(self.temp_extract_dir, ignore_errors=True)
+
+            target_path = os.path.join(settings.MODULES_DIR, module_name)
+            if os.path.exists(target_path):
+                shutil.rmtree(target_path)
+
             messages.error(self.request, e)
 
     def install_module(self, panel_path, module_dir, ):
