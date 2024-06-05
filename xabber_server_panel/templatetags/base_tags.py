@@ -84,3 +84,13 @@ def get_messages(context):
             messages['error'] = error_messages
 
     return messages
+
+
+@register.filter
+def bytes_to_mb(value):
+    try:
+        bytes_value = float(value)
+        mb_value = bytes_value / (1024 * 1024)
+        return "%.2f" % mb_value
+    except (ValueError, TypeError):
+        return value
