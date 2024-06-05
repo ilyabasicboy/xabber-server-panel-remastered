@@ -187,3 +187,4 @@ if os.path.exists(MODULES_DIR):
         if os.path.isdir(folder_path):
             app_name = "modules." + folder
             INSTALLED_APPS += [app_name]
+            STATICFILES_DIRS += [os.path.join(BASE_DIR, MODULES_DIR, folder, "static"),]
