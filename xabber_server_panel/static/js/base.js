@@ -1,23 +1,14 @@
 $(function () {
 
-    let url, page, updateChange, updateTooltip;
-    function ajax_send(url, page='', updateChange=false, updateTooltip=false) {
+    let url, page, data;
+    function ajax_send(url, page='', data={}) {
         let ajax_url = url + page;
-
-        //Create the data objec`t with query parameters
-        let data = {};
 
         $.get(ajax_url, data, function(data) {
             $('.list-js').html(data['html']);
             setCurrentUrl();
-
-            //Reinit functions
-            if (updateChange) {
-                checkChange();
-            }
-            if (updateTooltip) {
-                initTooltip();
-            }
+            setSort();
+            checkChange();
         });
     };
 
@@ -36,8 +27,31 @@ $(function () {
         //Add Loader
         $(this).parents('.list-js').find('.table-adaptive').append(loader);
 
-        ajax_send(url, $(this).attr('href'));
+        //Set sort data
+        let data = {}
+        $(this).parents('.list-js').find('.sort-js:checked').map((index, elem) => data[$(elem).attr('name')] = $(elem).val());
+
+        ajax_send(url, $(this).attr('href'), data);
     });
+
+    function setSort() {
+        $('.sort-js').on('change', function(e) {
+            e.preventDefault();
+
+            let url = $(this).parents('.list-js').data('url');
+
+            //Add Loader
+            $(this).parents('.list-js').find('.table-adaptive').append(loader);
+
+            //Set sort data
+            let data = {}
+            $(this).parents('.list-js').find('.sort-js:checked').map((index, elem) => data[$(elem).attr('name')] = $(elem).val());
+
+            ajax_send(url, $(this).attr('href'), data);
+        });
+    }
+    setSort();
+
 
     //Check dns records ajax
     function checkHost() {
@@ -438,9 +452,13 @@ $(function () {
         let suggestionsList = $(item).find('.suggestions-custom__list');
 
         //Show suggestions dropdown
+        let timeout;
         suggestionsInput.on('input', function(e) {
-            checkSuggestions($(this));
-            suggestionsList.addClass('active');
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                checkSuggestions($(this));
+                suggestionsList.addClass('active');
+            }.bind(this), 500); // 0.5 sec timeout
         });
 
         //Close suggestions dropdown

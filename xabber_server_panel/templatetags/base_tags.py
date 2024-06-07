@@ -3,6 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.html import strip_spaces_between_tags
 from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
+import math
 
 from xabber_server_panel.utils import get_success_messages, get_error_messages
 
@@ -91,6 +92,6 @@ def bytes_to_mb(value):
     try:
         bytes_value = float(value)
         mb_value = bytes_value / (1024 * 1024)
-        return "%.2f" % mb_value
+        return "%s" % int(math.ceil(mb_value))
     except (ValueError, TypeError):
         return value
