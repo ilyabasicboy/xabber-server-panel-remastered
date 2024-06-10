@@ -198,3 +198,8 @@
     opacity: 1;
     pointer-events: auto;
 }
+
+/*Table*/
+.table-custom-header {
+    display: table-header-group;
+}

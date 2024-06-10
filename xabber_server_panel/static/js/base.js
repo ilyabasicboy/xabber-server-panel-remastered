@@ -49,9 +49,8 @@ $(function () {
 
             ajax_send(url, $(this).attr('href'), data);
         });
-    }
+    };
     setSort();
-
 
     //Check dns records ajax
     function checkHost() {
@@ -85,7 +84,7 @@ $(function () {
                 checkHost();
             });
         });
-    }
+    };
     checkHost();
 
     //Separate logic for search
@@ -130,7 +129,7 @@ $(function () {
                 $(this).attr('href')
             );
         });
-    }
+    };
     searchPagination()
 
     function setCurrentUrl() {
