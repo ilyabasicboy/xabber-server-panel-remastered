@@ -214,68 +214,70 @@
 
                             {% block content %}{% endblock %}
 
-                            <div class="modal fade" id="delete_modal" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-scrollable">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h1 class="modal-title fs-5" id="delete_modal_label">Delete <span></span>. Do you really want to delete?</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
+                            {% block modal %}
+                                <div class="modal fade" id="delete_modal" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="delete_modal_label">Delete <span></span>. Do you really want to delete?</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
 
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <a class="btn btn-danger" href="">Delete <span></span></a>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a class="btn btn-danger" href="">Delete <span></span></a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="modal fade" id="block_user" tabindex="-1" aria-labelledby="block_user_label" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-scrollable">
-                                    <form class="modal-content" action="" method="GET">
-                                        <div class="modal-header">
-                                            <h1 class="modal-title fs-5" id="block_user_label">Reason for blocking</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-
-                                        <div class="modal-body">
-                                            <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking"></textarea>
-                                        </div>
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-info">Block</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="modal fade" id="start_server" tabindex="-1" aria-labelledby="start_server_label" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-scrollable">
-                                    <form class="modal-content form-startserver-js" action="{% url 'dashboard:dashboard' %}" method="POST">
-                                        {% csrf_token %}
-                                        <div class="modal-header">
-                                            <h1 class="modal-title fs-5" id="start_server_label">Enter your password to start server</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-
-                                        <div class="modal-body">
-                                            <div class="password">
-                                                <input class="password-input form-control" type="password" name="password" placeholder="Password" required>
-                                                <button class="password-btn" type="button">
-                                                    <i class="password-icon bi bi-eye"></i>
-                                                    <i class="password-icon bi bi-eye-slash"></i>
-                                                </button>
+                                <div class="modal fade" id="block_user" tabindex="-1" aria-labelledby="block_user_label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <form class="modal-content" action="" method="GET">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="block_user_label">Reason for blocking</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                        </div>
 
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-success" name="start" value="start">Start server</button>
-                                        </div>
-                                    </form>
+                                            <div class="modal-body">
+                                                <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking"></textarea>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-info">Block</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <div class="modal fade" id="start_server" tabindex="-1" aria-labelledby="start_server_label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <form class="modal-content form-startserver-js" action="{% url 'dashboard:dashboard' %}" method="POST">
+                                            {% csrf_token %}
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="start_server_label">Enter your password to start server</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <div class="password">
+                                                    <input class="password-input form-control" type="password" name="password" placeholder="Password" required>
+                                                    <button class="password-btn" type="button">
+                                                        <i class="password-icon bi bi-eye"></i>
+                                                        <i class="password-icon bi bi-eye-slash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success" name="start" value="start">Start server</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endblock %}
                         </div>
                     </main>
                 </div>

@@ -92,6 +92,6 @@ def bytes_to_mb(value):
     try:
         bytes_value = float(value)
         mb_value = bytes_value / (1024 * 1024)
-        return "%s" % int(math.ceil(mb_value))
+        return "%s" % int(math.floor(mb_value))
     except (ValueError, TypeError):
         return value
