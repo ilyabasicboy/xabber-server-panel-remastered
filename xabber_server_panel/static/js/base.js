@@ -31,6 +31,12 @@ $(function () {
         let data = {}
         $(this).parents('.list-js').find('.sort-js:checked').map((index, elem) => data[$(elem).attr('name')] = $(elem).val());
 
+        //Set select data
+        let list_select = $(this).parents('.list-js').find('.list-select-js:checked').map((index, elem) => {
+            return $(elem).val();
+        }).get();
+        data['list_select'] = list_select;
+
         ajax_send(url, $(this).attr('href'), data);
     });
 
@@ -46,6 +52,12 @@ $(function () {
             //Set sort data
             let data = {}
             $(this).parents('.list-js').find('.sort-js:checked').map((index, elem) => data[$(elem).attr('name')] = $(elem).val());
+
+            //Set select data
+            let list_select = $(this).parents('.list-js').find('.list-select-js:checked').map((index, elem) => {
+                return $(elem).val();
+            }).get();
+            data['list_select'] = list_select
 
             ajax_send(url, $(this).attr('href'), data);
         });
