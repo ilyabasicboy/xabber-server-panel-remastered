@@ -199,7 +199,11 @@
     pointer-events: auto;
 }
 
-/*Table*/
-.table-custom-header {
-    display: table-header-group;
+/*Modal*/
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
 }
