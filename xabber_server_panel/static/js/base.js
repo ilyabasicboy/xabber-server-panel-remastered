@@ -344,31 +344,34 @@ $(function () {
         })
     });
 
-    //Reset members form in modal
-    const resetMembersModal = document.querySelectorAll('.reset-members-modal-js');
-    resetMembersModal.forEach((modal) => {
+    //Reset form selector in modal
+    const resetSelectorModal = document.querySelectorAll('.reset-selector-custom-modal-js');
+    resetSelectorModal.forEach((modal) => {
         modal.addEventListener('hidden.bs.modal', event => {
             $(modal).find('form')[0].reset();
 
-            let membersSelect = $(modal).find('form').find('select');
-            $(membersSelect).find('option').prop('selected', false).trigger('chosen:updated');
+            let selectorSelect = $(modal).find('form').find('select');
+            $(selectorSelect).find('option').prop('selected', false).trigger('chosen:updated');
 
-            let membersTo = $(modal).find('.selector-custom-to');
-            let membersFrom = $(modal).find('.selector-custom-from');
-            let membersResult = $(modal).find('.selector-custom-result');
+            let selectorTo = $(modal).find('.selector-custom-to');
+            let selectorFrom = $(modal).find('.selector-custom-from');
+            let selectorResult = $(modal).find('.selector-custom-result');
 
-            membersTo.find('option:not([data-selected])').appendTo(membersFrom);
-            membersFrom.find('option[data-selected]').appendTo(membersTo);
+            selectorTo.find('option:not([data-selected])').appendTo(selectorFrom);
+            selectorFrom.find('option[data-selected]').appendTo(selectorTo);
 
-            let membersOptionTo = membersTo.find('option');
-            let values = membersOptionTo.map(function() {
+            selectorTo.find('option').show();
+            selectorFrom.find('option').show();
+
+            let selectorOptionTo = selectorTo.find('option');
+            let values = selectorOptionTo.map(function() {
                 return this.value;
             }).get();
             values.sort(function(a, b) {
                 return parseInt(a) - parseInt(b);
             });
-            membersResult.val(values.join(','));
-            membersResult.trigger('change');
+            selectorResult.val(values.join(','));
+            selectorResult.trigger('change');
         })
     });
 

@@ -53,7 +53,7 @@
 
         {% if circles_write_permissions and users_read_permissions %}
 
-            <div class="modal modal-lg fade reset-members-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
+            <div class="modal modal-lg fade reset-selector-custom-modal-js" id="manage_members" tabindex="-1" aria-labelledby="manage_members_label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable">
                     <form class="modal-content check-change-js" action="{% url 'circles:members' id=circle.id %}" method="POST">
                         {% csrf_token %}
