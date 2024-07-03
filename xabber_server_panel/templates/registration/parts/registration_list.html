@@ -95,7 +95,7 @@
                                             {% endif %}
                                             {% if registration_write_permissions %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'registration:delete' key=obj.key %}" data-delete-name="key" data-delete-target="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'registration:delete' key=obj.key %}" data-delete-name="Key" data-delete-target="{{ obj.key }}" data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete
                                                     </a>
                                                 </li>

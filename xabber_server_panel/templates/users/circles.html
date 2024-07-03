@@ -44,7 +44,7 @@
                     <li class="list-group-item d-flex align-items-center">
                         <div class="d-flex">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="circles" {% if circle.all_users %}disabled{% endif %} {% if circle in user.circles.all or circle.all_users %}checked{% endif %} value="{{ circle.id }}" id="circles_{{ circle.id }}">
+                                <input class="form-check-input" type="checkbox" name="circles" {% if circle.all_users or not users_write_permissions or not circles_write_permissions %}disabled{% endif %} {% if circle in user.circles.all or circle.all_users %}checked{% endif %} value="{{ circle.id }}" id="circles_{{ circle.id }}">
                                 <label class="form-check-label" for="circles_{{ circle.id }}">
                                     {{ circle.circle }}
                                 </label>

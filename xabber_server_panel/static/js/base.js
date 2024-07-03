@@ -377,7 +377,7 @@ $(function () {
         let deleteName = $(this).data('delete-name');
         let deleteTarget = $(this).data('delete-target');
         let deleteHref = $(this).data('delete-href');
-        let deleteTitle = deleteName + ' \"' + deleteTarget + '\"';
+        let deleteTitle = deleteName + ' ' + deleteTarget;
 
         $('#delete_modal .modal-header .modal-title').find('span').text(deleteTitle);
         $('#delete_modal .modal-footer a').attr('href', deleteHref).find('span').text(deleteName);

@@ -8,7 +8,7 @@
         </label>
         <div class="col-9 d-flex align-items-center">
             <div class="form-switch mb-0 fs-4">
-                <input class="form-check-input" type="checkbox" id="enabled" name="enabled" role="switch" data-bs-toggle="collapse" href="#options" aria-expanded="false" aria-controls="options" {% if ldap_settings.enabled or form.enabled.data %}checked{% endif %}>
+                <input class="form-check-input" type="checkbox" id="enabled" name="enabled" role="switch" data-bs-toggle="collapse" href="#options" aria-expanded="false" aria-controls="options" {% if ldap_settings.enabled or form.enabled.data %}checked{% endif %} {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
         </div>
     </div>
@@ -25,7 +25,10 @@
                 Server list
             </label>
             <div class="col-10 col-md-8">
-                <textarea class="form-control {% if form.server_list.errors %}is-invalid{% endif %}" name="server_list" cols="30" rows="6" placeholder="ldap1.example.org ldap2.example.org ldap3.example.org">{% if form.server_list.data %}{% for server in form.server_list.data %}{{ server }}{% endfor %}{% elif ldap_settings.servers.all %}{% for server in ldap_settings.servers.all %}{{ server.server }}{% endfor %}{% endif %}</textarea>
+                <textarea class="form-control {% if form.server_list.errors %}is-invalid{% endif %}"
+                          name="server_list" cols="30" rows="6"
+                          placeholder="ldap1.example.org ldap2.example.org ldap3.example.org"
+                          {% if not settings_write_permissions %}disabled{% endif %}>{% if form.server_list.data %}{% for server in form.server_list.data %}{{ server }}{% endfor %}{% elif ldap_settings.servers.all %}{% for server in ldap_settings.servers.all %}{{ server.server }}{% endfor %}{% endif %}</textarea>
                 <span class="form-text text-secondary">
                     Enter the each server name from a new line
                 </span>
@@ -42,7 +45,7 @@
                 Encrypt
             </label>
             <div class="col-10 col-md-8">
-                <select class="form-select" name="encrypt">
+                <select class="form-select" name="encrypt" {% if not settings_write_permissions %}disabled{% endif %}>
                     <option value="none"
                         {% if form.data %}
                             {% if form.data.encrypt == 'none' %}selected{% endif %}
@@ -65,7 +68,7 @@
                 TLS Verify
             </label>
             <div class="col-10 col-md-8">
-                <select class="form-select" name="tls_verify">
+                <select class="form-select" name="tls_verify" {% if not settings_write_permissions %}disabled{% endif %}>
                     <option value="false"
                         {% if form.data %}
                             {% if form.data.tls_verify == 'false' %}selected{% endif %}
@@ -98,7 +101,8 @@
                            value="{{ form.data.tls_cacertfile }}"
                        {% elif ldap_settings.tls_cacertfile %}
                            value="{{ ldap_settings.tls_cacertfile }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Path to file containing PEM encoded CA certificates. This option is needed (and required) when TLS verification is enabled.">
@@ -117,7 +121,8 @@
                            value="{{ form.data.tls_depth }}"
                        {% elif ldap_settings.tls_depth %}
                             value="{{ ldap_settings.tls_depth }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Specifies the maximum verification depth when TLS verification is enabled, i.e. how far in a chain of certificates the verification process can proceed before the verification is considered to fail. Peer certificate = 0, CA certificate = 1, higher level CA certificate = 2, etc. The value 2 thus means that a chain can at most contain peer cert, CA cert, next CA cert, and an additional CA cert. The default value is 1.">
@@ -136,7 +141,8 @@
                             value="{{ form.data.port }}"
                        {% else %}
                             value="{{ ldap_settings.port|default:389 }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Port to connect to your LDAP server. The default port is 389 if encryption is disabled; and 636 if encryption is enabled. If you configure a value, it is stored in ejabberd's database. Then, if you remove that value from the configuration file, the value previously stored in the database will be used instead of the default port.">
@@ -156,6 +162,7 @@
                        {% elif ldap_settings.rootdn %}
                         value="{{ ldap_settings.rootdn }}"
                        {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}
                        placeholder="cn=Manager,dc=domain,dc=org">
             </div>
             <div class="col-2 col-md-1">
@@ -176,7 +183,8 @@
                         value="{{ form.data.password }}"
                        {% elif ldap_settings.password %}
                         value="{{ ldap_settings.password }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Bind password. The default value is is empty string.">
@@ -190,7 +198,7 @@
                 Deref aliases
             </label>
             <div class="col-10 col-md-8">
-                <select class="form-select" name="deref_aliases">
+                <select class="form-select" name="deref_aliases" {% if not settings_write_permissions %}disabled{% endif %}>
                     <option value="never"
                         {% if form.data %}
                             {% if form.data.deref_aliases == 'never' %}selected{% endif %}
@@ -227,7 +235,8 @@
                         value="{{ form.data.base }}"
                        {% elif ldap_settings.base %}
                         value="{{ ldap_settings.base }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="LDAP base directory which stores users accounts. This option is required.">
@@ -246,7 +255,8 @@
                         value="{{ form.data.uids }}"
                        {% elif ldap_settings.uids %}
                         value="{{ ldap_settings.uids }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="LDAP attribute which holds a list of attributes to use as alternatives for getting the JID. The default attributes are [{uid, %u}]. The attributes are of the form: [{ldap_uidattr}] or [{ldap_uidattr, ldap_uidattr_format}]. You can use as many comma separated attributes as needed.">
@@ -266,7 +276,8 @@
                         value="{{ form.data.filter }}"
                        {% elif ldap_settings.filter %}
                         value="{{ ldap_settings.filter }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="LDAP filter. The default Filter value is: undefined. Please, do not forget to close brackets and do not use superfluous whitespaces. Also you must not use ldap_uidattr attribute in filter because this attribute will be substituted in LDAP filter automatically.">
@@ -285,7 +296,8 @@
                         value="{{ form.data.dn_filter }}"
                        {% elif ldap_settings.dn_filter %}
                         value="{{ ldap_settings.dn_filter }}"
-                       {% endif %}>
+                       {% endif %}
+                       {% if not settings_write_permissions %}disabled{% endif %}>
             </div>
             <div class="col-2 col-md-1">
                 <div class="icon-link text-body-tertiary fs-2" type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="This filter is applied on the results returned by the main filter. This filter performs additional LDAP lookup to make the complete result. This is useful when you are unable to define all filter rules in ldap_filter. You can define %u, %d, %s and %D pattern variables in Filter: %u is replaced by a user's part of a JID, %d is replaced by the corresponding domain (virtual host), all %s variables are consecutively replaced by values of FilterAttrs attributes and %D is replaced by Distinguished Name. By default ldap_dn_filter is undefined.">

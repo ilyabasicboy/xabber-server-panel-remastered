@@ -76,7 +76,7 @@
                                         {% if user != request.user %}
                                             {% if users_write_permissions and not user.auth_backend_is_ldap %}
                                                 <li>
-                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-delete-name="user" data-delete-target='{{ user.username }}' data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
+                                                    <a class="dropdown-item text-wrap text-danger" data-delete-href="{% url 'users:delete' id=user.id %}" data-delete-name="User" data-delete-target='{{ user.username }}' data-bs-toggle="modal" data-bs-target="#delete_modal" type="button">
                                                          Delete user
                                                     </a>
                                                 </li>

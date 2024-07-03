@@ -42,7 +42,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3">Nickname</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if user.nickname %}value="{{ user.nickname }}"{% endif %}>
+                    <input class="form-control" type="text" name="nickname" placeholder="John Doe" {% if user.nickname %}value="{{ user.nickname }}"{% endif %} {% if not users_write_permissions %}disabled{% endif %}>
                     <span class="form-text text-secondary">Nickname will be seen to user's contact.</span>
                 </div>
             </div>
@@ -50,7 +50,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3">First name</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" name="first_name" placeholder="John" {% if user.first_name %}value="{{ user.first_name }}"{% endif %}>
+                    <input class="form-control" type="text" name="first_name" placeholder="John" {% if user.first_name %}value="{{ user.first_name }}"{% endif %} {% if not users_write_permissions %}disabled{% endif %}>
                     <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
             <div class="row mb-3">
                 <label class="col-form-label col-12 col-md-3">Last name</label>
                 <div class="col-12 col-md-9">
-                    <input class="form-control" type="text" name="last_name" placeholder="Doe" {% if user.last_name %}value="{{ user.last_name }}"{% endif %}>
+                    <input class="form-control" type="text" name="last_name" placeholder="Doe" {% if user.last_name %}value="{{ user.last_name }}"{% endif %} {% if not users_write_permissions %}disabled{% endif %}>
                     <span class="form-text text-secondary">Permitted symbols are a..z, 0..9, dots and underscores.</span>
                 </div>
             </div>

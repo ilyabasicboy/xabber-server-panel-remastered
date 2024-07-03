@@ -261,12 +261,13 @@ class Admins(LoginRequiredMixin, TemplateView):
 
     @permission_admin
     def post(self, request, *args, **kwargs):
-        request_data = dict(request.POST)
-
         # exclude authenticated user because he cant change self status
         users = User.objects.exclude(id=request.user.id)
 
-        admins = request_data.get('admins', [])
+        admins = request.POST.get('admins', '')
+        if admins:
+            admins = admins.split(',')
+
         api = get_api(request)
 
         admins_to_add = users.filter(id__in=admins, is_admin=False)

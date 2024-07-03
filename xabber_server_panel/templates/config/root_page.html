@@ -26,7 +26,7 @@
                         Module
                     </label>
                     <div class="col-12 col-md-9">
-                        <select class="form-select" name="module">
+                        <select class="form-select" name="module" {% if not settings_write_permissions %}disabled{% endif %}>
                             <option value="home">
                                 Home page
                             </option>

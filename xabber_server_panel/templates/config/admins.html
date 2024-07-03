@@ -45,7 +45,7 @@
             </a>
         </div>
 
-        <div class="modal fade reset-checkbox-modal-js" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
+        <div class="modal fade reset-members-modal-js" id="manage" tabindex="-1" aria-labelledby="manage_label" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
                 <form class="modal-content check-change-js" method="post">
                     {% csrf_token %}
@@ -56,16 +56,7 @@
                     </div>
 
                     <div class="modal-body">
-                        {% for user in users %}
-                            <div class="{% if not forloop.last %}mb-3{% endif %}">
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="checkbox" name="admins" {% if user.is_admin %}data-checked{% endif %} {% if user.is_admin %}checked{% endif %} value="{{ user.id }}" id="user_{{ user.id }}">
-                                    <label class="form-check-label" for="user_{{ user.id }}">
-                                        {{ user.full_jid }}
-                                    </label>
-                                </div>
-                            </div>
-                        {% endfor %}
+                        {% include 'parts/multiple_users_select.html' with objects_name='users' avaliable_objects=users selected_objects=admins field_name='admins' %}
                     </div>
 
                     <div class="modal-footer">
