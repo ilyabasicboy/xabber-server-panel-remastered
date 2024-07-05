@@ -18,7 +18,7 @@ class CronJob(models.Model):
     )
     type = models.CharField(
         choices=TYPE_CHOICES,
-        default='enternal_command',
+        default='internal_command',
         max_length=20
     )
     schedule = models.CharField(
@@ -57,7 +57,7 @@ class CronJob(models.Model):
             return []
 
     def get_job(self):
-        if self.type == 'enternal_command':
+        if self.type == 'internal_command':
             job = (self.schedule, 'django.core.management.call_command', [self.command], self.get_kwargs())
         elif self.type == 'function':
             job = (self.schedule, 'xabber_server_panel.crontab.utils.%s' % self.command, self.get_args(), self.get_kwargs())
