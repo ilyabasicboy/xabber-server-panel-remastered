@@ -1,10 +1,7 @@
-import time
-
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.contrib.auth import login
-from django.conf import settings
 
 from xabber_server_panel.utils import server_installed
 from xabber_server_panel.base_modules.config.models import VirtualHost
@@ -13,9 +10,6 @@ from xabber_server_panel.custom_auth.forms import ApiAuthenticationForm
 
 from .forms import InstallationForm
 from .utils import install_cmd, create_circles, load_predefined_config
-
-import os
-import subprocess
 
 
 class Steps(TemplateView):

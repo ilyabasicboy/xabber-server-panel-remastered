@@ -173,8 +173,24 @@ def generate_webhooks_secret(data):
 
     module_settings.set_options(
         {
-            'secret': webhooks_secret,
-            'url': webhooks_url
+            'secret': f'\"{webhooks_secret}\"',
+            'url': f'\"{webhooks_url}\"'
+        }
+    )
+    module_settings.save()
+
+
+def generate_cronjob_token(data):
+    # generate cronjob token
+    cronjob_token = generate_secret()
+    module_settings = ModuleSettings(
+        host='global',
+        module='mod_panel'
+    )
+
+    module_settings.set_options(
+        {
+            'cronjob_token': f"\"{cronjob_token}\"",
         }
     )
     module_settings.save()
@@ -308,6 +324,9 @@ def start_installation_process(data):
 
     generate_webhooks_secret(data)
     print('Webhooks secret successfully created.')
+
+    generate_cronjob_token(data)
+    print('Cronjob token successfully created.')
 
     create_config(data)
     print("Successfully create config for ejabberd.")

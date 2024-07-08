@@ -206,6 +206,8 @@ modules:
   mod_devices: {}
   mod_groups: {}
   mod_panel: {}
+  mod_favorites: {}
+  mod_notify: {}
   nick_generator:
     pre_generated_images: "{{ PROJECT_DIR }}/pre_images"
     pre_generated_images_count: 20

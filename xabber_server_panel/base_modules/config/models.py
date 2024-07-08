@@ -24,13 +24,13 @@ class VirtualHost(models.Model):
     def cert_errors(self):
         errors = []
         if not self.cert_records:
-            errors += ['Certificate records failed.']
+            errors += ['- DNS records for the certificates are missing.']
 
         if self.certificate:
             if self.certificate.status == 2:
-                errors += [self.certificate.reason]
+                errors += ['- ' + self.certificate.reason]
         else:
-            errors += ['The certificate has not been uploaded.']
+            errors += ['- The certificate has not been uploaded.']
 
         return errors
 

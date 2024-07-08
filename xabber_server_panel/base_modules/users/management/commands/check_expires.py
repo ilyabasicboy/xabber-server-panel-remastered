@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.utils import timezone
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.config.models import ModuleSettings
 from xabber_server_panel.api.api import EjabberdAPI
 
 
@@ -17,8 +18,13 @@ class Command(BaseCommand):
         current_time = timezone.now()
         reason = options['reason']
 
+        # get cronjob token from db
+        cronjob_token = ModuleSettings.objects.filter(host='global', module='mod_panel').first().get_options().get('cronjob_token')
+        if not cronjob_token:
+            cronjob_token = options['token']
+
         api = EjabberdAPI()
-        api.fetch_token(options['token'])
+        api.fetch_token(cronjob_token)
 
         # Filter users whose expires field is less than the current time
         expired_users = User.objects.filter(expires__lt=current_time).exclude(status='EXPIRED')

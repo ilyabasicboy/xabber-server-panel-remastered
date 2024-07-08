@@ -163,11 +163,12 @@ INSTALLED_APPS += ['xabber_server_panel.installation']
 
 # ============ DJANGO - CRONTAB ===============#
 INSTALLED_APPS += ['xabber_server_panel.crontab']
+CRON_JOB_TOKEN = ''
 
 # ============ CERTIFICATES ===============#
 INSTALLED_APPS += ['xabber_server_panel.certificates']
 CERT_CONF_FILENAME = "acertmgr.conf"
-CERT_DOMAIN_FILENAME = "domain.conf"
+CERT_DOMAIN_FILENAME = "domains.conf"
 CERT_CONF_DIR = os.path.join(PROJECT_DIR, 'acertmgr')
 CERTS_DIR = os.path.join(PROJECT_DIR, 'certs')
 CERT_VALIDATE_OCSP = "sha1" # mandated by RFC5019
