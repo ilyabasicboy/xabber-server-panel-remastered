@@ -174,20 +174,20 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             q |= Q(
                 circle__contains=self.localpart,
                 host__startswith=self.host_part,
-                host__in=self.hosts
+                host=self.request.current_host.name
             )
         else:
             q |= Q(
                 circle__contains=self.text,
-                host__in=self.hosts
+                host=self.request.current_host.name
             )
             q |= Q(
                 host__contains=self.text,
-                host__in=self.hosts
+                host=self.request.current_host.name
             )
             q |= Q(
                 name__contains=self.text,
-                host__in=self.hosts
+                host=self.request.current_host.name
             )
 
         circles = Circle.objects.only('id', 'circle', 'host').filter(q).order_by('circle', 'host')
@@ -200,11 +200,11 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
             q |= Q(
                 username__contains=self.localpart,
                 host__startswith=self.host_part,
-                host__in=self.hosts
+                host=self.request.current_host.name
             )
         else:
-            q |= Q(username__contains=self.text, host__in=self.hosts)
-            q |= Q(host__contains=self.text, host__in=self.hosts)
+            q |= Q(username__contains=self.text, host=self.request.current_host.name)
+            q |= Q(host__contains=self.text, host=self.request.current_host.name)
 
         users = User.objects.only('id', 'username', 'host').filter(q).order_by('username', 'host')
         self.context['users'] = users[:10]
@@ -212,17 +212,16 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
     def search_groups(self):
         group_list = []
 
-        for host in self.hosts:
-            # get group list
-            groups = self.api.get_groups(
-                {
-                    "host": host
-                }
-            ).get('groups')
+        # get group list
+        groups = self.api.get_groups(
+            {
+                "host": self.request.current_host.name
+            }
+        ).get('groups')
 
-            if groups:
-                for group in groups:
-                    if self.text in group.get('name', ''):
-                        group_list += [group]
+        if groups:
+            for group in groups:
+                if self.text in group.get('name', ''):
+                    group_list += [group]
 
-                self.context['groups'] = group_list[:10]
+            self.context['groups'] = group_list[:10]

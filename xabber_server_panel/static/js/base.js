@@ -9,6 +9,7 @@ $(function () {
             setCurrentUrl();
             setSort();
             checkChange();
+            initTooltip();
         });
     };
 
