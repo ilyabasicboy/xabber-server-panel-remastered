@@ -9,6 +9,7 @@ import threading
 
 from django.template.loader import get_template
 from django.conf import settings
+from requests.utils import certs
 
 from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config, get_dns_records
 from xabber_server_panel.base_modules.circles.models import Circle
@@ -198,11 +199,11 @@ def generate_cronjob_token(data):
 
 def create_config(data):
 
-    data['PROJECT_DIR'] = settings.PROJECT_DIR
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
     data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
-    data['CERTS_DIR'] = settings.CERTS_DIR
+    data['CA_FILE'] = certs.where()
+    data['settings'] = settings
 
     # Create add config
     add_config = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)

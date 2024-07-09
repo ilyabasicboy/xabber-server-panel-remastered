@@ -7,11 +7,12 @@ log_rotate_count: 1
 log_rate_limit: 100
 
 certfiles:
- - "{{ CERTS_DIR }}*.pem"
+ - "{{ settings.CERTS_DIR }}*.pem"
+ca_file: "{{ CA_FILE }}"
 
 listen:
   -
-    port: 5222
+    port: {{ settings.XMPP_CLIENT_PORT }}
     ip: "::"
     module: ejabberd_c2s
     max_stanza_size: 65536
@@ -19,11 +20,11 @@ listen:
     access: c2s
 
   -
-    port: 5269
+    port: {{ settings.XMPP_SERVER_PORT }}
     ip: "::"
     module: ejabberd_s2s_in
 
-  - port: 5443
+  - port: {{ settings.XMPP_HTTP_PORT }}
     ip: "::"
     module: ejabberd_http
     tls: true
@@ -39,7 +40,7 @@ listen:
       "Access-Control-Allow-Origin": "*"
 
 
-  - port: 5280
+  - port: {{ settings.XMPP_HTTPS_PORT }}
     ip: "::"
     module: ejabberd_http
     request_handlers:
@@ -161,7 +162,7 @@ modules:
   mod_disco: {}
   mod_echo: {}
   mod_http_upload:
-    docroot: "{{ PROJECT_DIR }}/user_images"
+    docroot: "{{ settings.PROJECT_DIR }}/user_images"
     get_url: "https://xabber.@HOST@:5443/upload"
     put_url: "https://xabber.@HOST@:5443/upload"
   mod_last: {}
@@ -209,7 +210,7 @@ modules:
   mod_favorites: {}
   mod_notify: {}
   nick_generator:
-    pre_generated_images: "{{ PROJECT_DIR }}/pre_images"
+    pre_generated_images: "{{ settings.PROJECT_DIR }}/pre_images"
     pre_generated_images_count: 20
   mod_block_users: {}
   mod_ws_proxy_detect: {}

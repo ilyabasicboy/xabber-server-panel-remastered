@@ -6,9 +6,6 @@ PROJECT_ROOT = os.path.join(BASE_DIR, 'xabber_server_panel')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(PROJECT_ROOT, "static"),
-]
 
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
@@ -157,6 +154,11 @@ INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
 DNS_SERVICE = 'https://dns.google/resolve'
 MODULE_SERVER_FILES_DIR = ''
+XMPP_CLIENT_PORT = '5222'
+XMPP_SERVER_PORT = '5269'
+XMPP_HTTP_PORT = '5443'
+XMPP_HTTPS_PORT = '5280'
+XMPPS_CLIENT_PORT = '5223'
 
 # ============ INSTALLATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.installation']
@@ -188,4 +190,3 @@ if os.path.exists(MODULES_DIR):
         if os.path.isdir(folder_path):
             app_name = "modules." + folder
             INSTALLED_APPS += [app_name]
-            STATICFILES_DIRS += [os.path.join(BASE_DIR, MODULES_DIR, folder, "static"),]

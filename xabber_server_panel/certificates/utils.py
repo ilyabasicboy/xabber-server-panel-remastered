@@ -167,6 +167,19 @@ def load(
                         # Handle older config format with just one entry per same domain set
                         entries = data.items()
                     for entry in entries:
+
+                        # set crt folder path
+                        if entry:
+                            try:
+                                domains = entry[0].split(' ')
+                                domain = domains[0]
+                                certs_dir = os.path.join(runtimeconfig.get('work_dir'), domain)
+                                if not os.path.exists(certs_dir):
+                                    os.mkdir(certs_dir)
+                                runtimeconfig['work_dir'] = certs_dir
+                            except Exception as e:
+                                print(e)
+
                         domainconfigs.append(parse_config_entry(entry, globalconfig, runtimeconfig))
 
     # Define a fallback authority from global configuration / defaults

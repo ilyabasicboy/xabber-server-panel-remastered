@@ -411,7 +411,7 @@ class Modules(LoginRequiredMixin, TemplateView):
         if self.uploaded_file:
             self.handle_upload()
 
-        return self.render_to_response({})
+        return HttpResponseRedirect(reverse('config:modules'))
 
     def handle_upload(self):
         self.temp_extract_dir = os.path.join(settings.BASE_DIR, 'temp_extract')
@@ -473,8 +473,7 @@ class Modules(LoginRequiredMixin, TemplateView):
         if os.path.exists(os.path.join(target_path, 'migrations', '__init__.py')):
             management.call_command('migrate', module_dir, interactive=False)
 
-        if not settings.DEBUG:
-            management.call_command('collectstatic', '--noinput', interactive=False)
+        management.call_command('collectstatic', '--noinput', interactive=False)
 
     def check_version(self):
 
