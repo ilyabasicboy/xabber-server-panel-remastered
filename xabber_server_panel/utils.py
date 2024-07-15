@@ -168,3 +168,30 @@ def get_success_messages(request):
 
 def get_system_group_suffix():
     return ''.join(random.choices(string.ascii_lowercase, k=8))
+
+
+def check_versions(current_version, new_version):
+
+    """ Returns success = True if new version more than current version. """
+
+    response = {
+        'error': '',
+        'success': True
+    }
+
+    try:
+        current_version = tuple(map(int, current_version.split('.')))
+        new_version = tuple(map(int, new_version.split('.')))
+    except ValueError:
+        response['error'] = "Invalid version format."
+        response['success'] = False
+        return response
+
+    if new_version < current_version:
+        response['error'] += "You have a newer module version."
+        response['success'] = False
+    elif new_version == current_version:
+        response['error'] += "You already have this module."
+        response['success'] = False
+
+    return response

@@ -23,6 +23,7 @@ from xabber_server_panel.crontab.models import CronJob
 from xabber_server_panel.crontab.forms import CronJobForm
 from xabber_server_panel.certificates.utils import update_or_create_certs, check_certificates, validate_certificate
 from xabber_server_panel.certificates.models import Certificate
+from xabber_server_panel.utils import check_versions
 
 from .models import LDAPSettings, LDAPServer, RootPage, DiscoUrls
 from .forms import LDAPSettingsForm, VirtualHostForm
@@ -496,18 +497,10 @@ class Modules(LoginRequiredMixin, TemplateView):
 
         module = Module.objects.filter(name=module_name).first()
         if module:
-
             # check version if module already installed
-            try:
-                installed_version = tuple(map(int, module.version.split('.')))
-                new_version = tuple(map(int, version.split('.')))
-            except ValueError:
-                raise Exception("Invalid version format.")
-
-            if new_version < installed_version:
-                raise Exception("You have a newer module version.")
-            elif new_version == installed_version:
-                raise Exception("You already have this module.")
+            version_result = check_versions(module.version, version)
+            if not version_result.get('success'):
+                raise Exception(version_result.get('error'))
 
         return module_name, version
 
