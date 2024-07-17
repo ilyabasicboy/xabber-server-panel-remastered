@@ -3,17 +3,27 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core import management
+from django.contrib import messages
 
 from xabber_server_panel.base_modules.config.models import RootPage
 from xabber_server_panel.base_modules.users.models import User
+from xabber_server_panel.base_modules.users.decorators import permission_admin
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.circles.utils import check_circles
 from xabber_server_panel.base_modules.users.utils import check_users, check_permissions
 from xabber_server_panel.base_modules.config.utils import get_modules
+from xabber_server_panel.utils import check_versions, reload_server, get_error_messages
 from xabber_server_panel.api.utils import get_api
 from xabber_server_panel.mixins import ServerStartedMixin
+from xabber_server_panel import version as current_version
 
 import importlib
+import os
+import re
+import shutil
+import zipfile
+from django.conf import settings
 
 
 class Root(TemplateView):
@@ -225,3 +235,76 @@ class Suggestions(ServerStartedMixin, LoginRequiredMixin, TemplateView):
                     group_list += [group]
 
             self.context['groups'] = group_list[:10]
+
+
+class UpdatePanel(LoginRequiredMixin, TemplateView):
+
+    @permission_admin
+    def get(self, request, *args, **kwargs):
+        self.archive_path = 'panel.zip'  # Path to your zip archive
+        if os.path.exists(self.archive_path):
+            self.extract_files()
+        else:
+            messages.error(request, 'Panel archive does not exists.')
+
+        error_messages = get_error_messages(request)
+        if not error_messages:
+            messages.success(request, 'Xabber Server Panel updated successfully.')
+
+        return HttpResponseRedirect(
+            reverse('home')
+        )
+
+    def extract_files(self):
+        # Define paths
+        base_dir = settings.BASE_DIR  # Base directory of the project
+        project_path = settings.PROJECT_ROOT
+        unzipped_path = os.path.join(settings.BASE_DIR, 'unzipped_project')
+        version_file = 'xabber_server_panel/__init__.py'
+
+        try:
+            # Unzip the archive and check version
+            new_version = None
+            with zipfile.ZipFile(self.archive_path, 'r') as zip_ref:
+                zip_ref.extractall(unzipped_path)  # Extract to a temporary directory
+                if version_file in zip_ref.namelist():
+                    with zip_ref.open(version_file) as f:
+                        file_content = f.read().decode('utf-8')
+                        new_version = self.extract_version(file_content)
+
+            check_v_result = check_versions(current_version, new_version)
+            if not check_v_result.get('success'):
+                raise Exception(check_v_result.get('error'))
+
+            # Backup current project files (optional but recommended)
+            backup_path = os.path.join(base_dir, 'backup')
+            if os.path.exists(backup_path):
+                shutil.rmtree(backup_path)
+            shutil.copytree(project_path, os.path.join(backup_path, 'xabber_server_panel'))
+
+            # Replace the project files
+            for item in os.listdir(unzipped_path):
+                s = os.path.join(unzipped_path, item)
+                d = os.path.join(base_dir, item)
+                if os.path.isdir(s):
+                    if os.path.exists(d):
+                        shutil.rmtree(d)
+                    shutil.copytree(s, d)
+                else:
+                    shutil.copy2(s, d)
+
+            management.call_command('collectstatic', '--noinput', interactive=False)
+
+            reload_server()
+        except Exception as e:
+            messages.error(self.request, e)
+
+        # Clean up
+        shutil.rmtree(unzipped_path)
+
+    def extract_version(self, file_content):
+        for line in file_content.splitlines():
+            match = re.match(r"^version\s*=\s*['\"]([^'\"]*)['\"]", line)
+            if match:
+                return match.group(1)
+        return None

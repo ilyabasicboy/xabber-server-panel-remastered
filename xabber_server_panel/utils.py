@@ -183,15 +183,15 @@ def check_versions(current_version, new_version):
         current_version = tuple(map(int, current_version.split('.')))
         new_version = tuple(map(int, new_version.split('.')))
     except ValueError:
-        response['error'] = "Invalid version format."
+        response['error'] = "Invalid version format. Versions should be in the format 'mm.dd.v'."
         response['success'] = False
         return response
 
     if new_version < current_version:
-        response['error'] += "You have a newer module version."
+        response['error'] = "You have a newer version installed. Downgrade is not allowed."
         response['success'] = False
     elif new_version == current_version:
-        response['error'] += "You already have this module."
+        response['error'] = "You already have this version installed."
         response['success'] = False
 
     return response

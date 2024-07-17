@@ -589,8 +589,7 @@ class DeleteModule(LoginRequiredMixin, TemplateView):
         if os.path.exists(os.path.join(module_path, 'migrations', '__init__.py')):
             management.call_command('migrate', module, 'zero', interactive=True)
 
-        if not settings.DEBUG:
-            management.call_command('collectstatic', '--noinput', interactive=False)
+        management.call_command('collectstatic', '--noinput', interactive=False)
 
         shutil.rmtree(module_path)
 

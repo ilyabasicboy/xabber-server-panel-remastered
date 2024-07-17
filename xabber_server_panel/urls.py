@@ -1,13 +1,14 @@
 from django.urls import path, include
 from django.contrib import admin
 
-from xabber_server_panel.views import HomePage, Search, Root, Suggestions
+from xabber_server_panel.views import HomePage, Search, Root, Suggestions, UpdatePanel
 from xabber_server_panel.base_modules.config.utils import get_modules
 
 
 urlpatterns = [
     path('', Root.as_view(), name='root'),
     path('panel/', HomePage.as_view(), name='home'),
+    path('panel/update/', UpdatePanel.as_view(), name='update_panel'),
     path('panel/search/', Search.as_view(), name='search'),
     path('panel/suggestions/', Suggestions.as_view(), name='suggestions'),
     path('panel/', include('xabber_server_panel.base_modules.urls')),
