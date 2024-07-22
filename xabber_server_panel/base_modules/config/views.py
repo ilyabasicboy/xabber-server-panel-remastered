@@ -506,6 +506,9 @@ class Modules(LoginRequiredMixin, TemplateView):
 
     def install_server_files(self, server_path):
 
+        if not os.path.exists(settings.MODULE_SERVER_FILES_DIR):
+            os.mkdir(settings.MODULE_SERVER_FILES_DIR)
+
         if os.path.exists(server_path):
 
             # copy list files
