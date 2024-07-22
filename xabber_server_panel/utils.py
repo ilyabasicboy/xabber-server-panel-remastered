@@ -30,7 +30,7 @@ def execute_ejabberd_cmd(cmd):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    return command is 0
+    return command == 0
 
 
 def is_ejabberd_started():

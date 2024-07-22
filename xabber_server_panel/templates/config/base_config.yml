@@ -162,7 +162,7 @@ modules:
   mod_disco: {}
   mod_echo: {}
   mod_http_upload:
-    docroot: "{{ settings.PROJECT_DIR }}/user_images"
+    docroot: "{{ settings.USER_FILES }}"
     get_url: "https://xabber.@HOST@:5443/upload"
     put_url: "https://xabber.@HOST@:5443/upload"
   mod_last: {}

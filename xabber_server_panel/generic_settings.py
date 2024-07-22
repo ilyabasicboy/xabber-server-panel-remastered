@@ -62,7 +62,7 @@ WSGI_APPLICATION = 'xabber_server_panel.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.abspath(BASE_DIR), 'xmppserver.sqlite3'),
+        'NAME': os.path.join(os.path.abspath(BASE_DIR), 'panel.sqlite3'),
     }
 }
 
@@ -178,6 +178,7 @@ CERT_API = "v2"
 CERT_AUTHORITY = "https://acme-staging-v02.api.letsencrypt.org"
 CHALLENGE_URL = "https://acme-challenge.xabber.com/challenge/"
 CHALLENGE_RECORD = 'alias_acme-challenge.xabber.com.'
+USER_FILES = os.path.join(PROJECT_DIR, 'user_files')
 
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']
