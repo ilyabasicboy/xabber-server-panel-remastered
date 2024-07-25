@@ -161,7 +161,7 @@ def create_vhost(data):
 def generate_webhooks_secret(data):
     # generate webhook secret
     webhooks_secret = generate_secret()
-    module_settings = ModuleSettings(
+    module_settings, created = ModuleSettings.objects.get_or_create(
         host='global',
         module='mod_webhooks'
     )
@@ -184,7 +184,7 @@ def generate_webhooks_secret(data):
 def generate_cronjob_token(data):
     # generate cronjob token
     cronjob_token = generate_secret()
-    module_settings = ModuleSettings(
+    module_settings, created = ModuleSettings.objects.get_or_create(
         host='global',
         module='mod_panel'
     )
