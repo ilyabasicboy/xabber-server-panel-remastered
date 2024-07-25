@@ -1,7 +1,6 @@
 from django.shortcuts import reverse, loader
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from datetime import datetime

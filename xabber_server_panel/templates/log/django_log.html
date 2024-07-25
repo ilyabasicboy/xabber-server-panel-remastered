@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load config_tags %}
+
+{% block content_title %}
+    Django log
+{% endblock %}
+
+{% block host_select %}
+    {% if request.user.is_admin %}
+        <div class="ms-auto me-0 me-md-4 pt-2 pt-md-0 order-1 order-md-0 col-12 col-md-auto header-host">
+            {% include 'parts/host_select.html' %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="mb-4 col-12">
+        {% include 'log/parts/links.html' %}
+    </div>
+
+    <form class="log-form-js" action="{% url 'log:django_log' %}">
+        <input type="number" name="lines" value="{{ request.GET.lines|default:500 }}">
+        <select name="file">
+            {% for file in log_files %}
+                <option value="{{ file }}" {% if file in log_path %}selected{% endif %}>{{ file }}</option>
+            {% endfor %}
+        </select>
+        <button>Show log</button>
+    </form>
+
+    <div>
+        Update log every:
+        <label>
+            <input type="radio" name="log_range" value="5" checked>
+            5 seconds
+        </label>
+        <label>
+            <input type="radio" name="log_range" value="15">
+            15 seconds
+        </label>
+        <label>
+            <input type="radio" name="log_range" value="30">
+            30 seconds
+        </label>
+    </div>
+
+    <div class="col-12 pb-5 mb-5">
+        <div>
+            <a target="_blank" href="{% url 'log:django_log' %}?full=1{% if request.GET.file %}&file={{ request.GET.file }}{% endif %}">Full log</a>
+        </div>
+
+        <div class="log-list-js" data-url="{% url 'log:django_log' %}">
+            {% include 'log/parts/log_list.html' %}
+        </div>
+    </div>
+{% endblock %}

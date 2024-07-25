@@ -27,6 +27,7 @@ def paginate(context, objects, num=10):
     except EmptyPage:
         # If the page is out of range (e.g., 9999), deliver the last page of results
         objects = paginator.page(paginator.num_pages)
+
     return objects
 
 

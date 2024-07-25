@@ -499,4 +499,43 @@ $(function () {
         });
     });
 
+    // Config log update
+    if ($('.log-list-js').length > 0) {
+        updateLogList();
+        updateLogInterval();
+        var logInterval;
+
+        $('input[name=log_range]').click(function(e){
+            updateLogInterval();
+            console.log('log range updated');
+        });
+    }
+
+    function updateLogList() {
+        let url = $('.log-list-js').data('url');
+
+        let form_data = $('.log-form-js').serializeArray();
+        let data = {};
+        for (let i = 0; i < form_data.length; i++)
+            data[form_data[i].name] = form_data[i].value;
+
+        $.get(url, data, function(data){
+            $('.log-list-js').html(data['log']);
+            console.log('Log list updated');
+        });
+    }
+
+     // Check if log-list-js block exists
+    function updateLogInterval(){
+        // Clear existing interval before setting a new one
+        if (logInterval) {
+            clearInterval(logInterval);
+        }
+
+        let range = $('input[name=log_range]:checked').val() || 60
+        // Optional: Automatically update the log list every minute
+        logInterval = setInterval(function() {
+            updateLogList();
+        }, range * 1000); // 60000 milliseconds = 1 minute
+    }
 });

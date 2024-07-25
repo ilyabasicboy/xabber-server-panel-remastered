@@ -8,4 +8,5 @@ urlpatterns = [
     path('groups/', include(('xabber_server_panel.base_modules.groups.urls', 'groups'), namespace='groups')),
     path('registration/', include(('xabber_server_panel.base_modules.registration.urls', 'registration'), namespace='registration')),
     path('config/', include(('xabber_server_panel.base_modules.config.urls', 'config'), namespace='config')),
+    path('log/', include(('xabber_server_panel.base_modules.log.urls', 'log'), namespace='log')),
 ]

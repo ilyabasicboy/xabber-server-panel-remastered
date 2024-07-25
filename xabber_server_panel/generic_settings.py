@@ -97,6 +97,7 @@ MODULES_DIR = os.path.join(BASE_DIR, 'modules')
 # ======== Ejabberd settings ============= #
 
 INSTALLATION_LOCK = os.path.join(PROJECT_ROOT, '.installation_lock')
+EJD_DIR = os.path.join(BASE_DIR, "xabberserver")
 EJABBERD_DUMP = os.path.join(PROJECT_ROOT, 'utils/psql/pg.sql')
 EJABBERD_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'xmppserver/etc/ejabberd/')
 EJABBERD_MODULES_CONFIG_FILE = 'modules_config.yml'
@@ -116,6 +117,15 @@ EJABBERD_VHOSTS_CONFIG_FILE = 'virtual_hosts.yml'
 EJABBERD_API_URL = 'http://127.0.0.1:5280/panel'
 EJABBERD_API_TOKEN_TTL = 60 * 60 * 24 * 365
 EJABBERD_API_SCOPES = 'sasl_auth'
+
+MODULE_SERVER_FILES_DIR = ''
+XMPP_CLIENT_PORT = '5222'
+XMPP_SERVER_PORT = '5269'
+XMPP_HTTP_PORT = '5443'
+XMPP_HTTPS_PORT = '5280'
+XMPPS_CLIENT_PORT = '5223'
+
+USER_FILES = os.path.join(PROJECT_DIR, 'user_files')
 
 PAGINATION_PAGE_SIZE = 30
 HTTP_REQUEST_TIMEOUT = 5
@@ -150,15 +160,45 @@ INSTALLED_APPS += ['xabber_server_panel.base_modules.groups']
 # ============ REGISTRATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.registration']
 
+# ============ LOG ===============#
+INSTALLED_APPS += ['xabber_server_panel.base_modules.log']
+EJABBERD_LOG_DIR = os.path.join(EJD_DIR, 'var', 'log', 'ejabberd')
+EJABBERD_LOG = os.path.join(EJABBERD_LOG_DIR, 'ejabberd.log')
+DJANGO_LOG_DIR = os.path.join(BASE_DIR, 'logs')
+DJANGO_LOG = os.path.join(DJANGO_LOG_DIR, 'django.log')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'rotate_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'maxBytes': 10 * 1024 * 1024,  # 10 MB
+            'backupCount': 5,  # Number of backup files to keep
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['rotate_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+# Ensure the logs directory exists
+os.makedirs(DJANGO_LOG_DIR, exist_ok=True)
+
 # ============ CONFIG ===============#
 INSTALLED_APPS += ['xabber_server_panel.base_modules.config']
 DNS_SERVICE = 'https://dns.google/resolve'
-MODULE_SERVER_FILES_DIR = ''
-XMPP_CLIENT_PORT = '5222'
-XMPP_SERVER_PORT = '5269'
-XMPP_HTTP_PORT = '5443'
-XMPP_HTTPS_PORT = '5280'
-XMPPS_CLIENT_PORT = '5223'
 
 # ============ INSTALLATION ===============#
 INSTALLED_APPS += ['xabber_server_panel.installation']
@@ -178,7 +218,6 @@ CERT_API = "v2"
 CERT_AUTHORITY = "https://acme-staging-v02.api.letsencrypt.org"
 CHALLENGE_URL = "https://acme-challenge.xabber.com/challenge/"
 CHALLENGE_RECORD = 'alias_acme-challenge.xabber.com.'
-USER_FILES = os.path.join(PROJECT_DIR, 'user_files')
 
 # ============ WEBHOOKS ===============#
 INSTALLED_APPS += ['xabber_server_panel.webhooks']

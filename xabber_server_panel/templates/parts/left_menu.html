@@ -67,6 +67,16 @@
             </a>
         </li>
     {% endif %}
+
+    {% if request.user.is_admin %}
+        <li class="nav-item">
+            {% url 'log:server_log' as server_log %}
+            <a href="{{ server_log }}" class="nav-link text-white {% if server_log in request.path_info %}active{% endif %}">
+                <i class="bi bi-sliders me-1 pe-none"></i>
+                Log
+            </a>
+        </li>
+    {% endif %}
 </ul>
 
 {% if modules and user.is_authenticated %}
