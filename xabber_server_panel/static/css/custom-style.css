@@ -29,6 +29,11 @@
     max-width: 480px;
 }
 
+.mh-400 {
+    height: 100%;
+    max-height: 400px;
+}
+
 .login-page__bottom {
     position: relative;
     margin-left: calc((var(--bs-gutter-x) * .5) * -1);
