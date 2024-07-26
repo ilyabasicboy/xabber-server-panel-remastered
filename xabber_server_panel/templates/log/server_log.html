@@ -60,19 +60,13 @@
     </div>
 
     <div class="col-12 pb-5 mb-5">
+        <a class="btn btn-primary mb-4" target="_blank" href="{% url 'log:server_log' %}?full=1{% if request.GET.file %}&file={{ request.GET.file }}{% endif %}">
+            Full log
+        </a>
+
         <div class="overflow-hidden overflow-y-auto d-flex flex-column-reverse mh-400">
             <div class="log-list-js d-flex flex-column" data-url="{% url 'log:server_log' %}">
                 {% include 'log/parts/log_list.html' %}
-            </div>
-        </div>
-
-        <div class="fixed-bottom row col-md-9 col-xl-10 m-0 ms-auto py-4 px-0 px-md-4 bg-body border-top shadow">
-            <div class="col-12 p-md-0">
-                <div class="container-xxl p-0">
-                    <a class="btn btn-primary" target="_blank" href="{% url 'log:server_log' %}?full=1{% if request.GET.file %}&file={{ request.GET.file }}{% endif %}">
-                        Full log
-                    </a>
-                </div>
             </div>
         </div>
     </div>
