@@ -198,15 +198,14 @@ def generate_cronjob_token(data):
 
 
 def create_config(data):
-
+    add_config = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
     data['VHOST_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     data['MODULES_FILE'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_MODULES_CONFIG_FILE)
-    data['ADD_CONFIG'] = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
+    data['ADD_CONFIG'] = add_config
     data['CA_FILE'] = certs.where()
     data['settings'] = settings
 
     # Create add config
-    add_config = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_ADD_CONFIG_FILE)
     if not os.path.isfile(add_config):
         with open(add_config, 'w') as f:
             # Write an empty string to the file

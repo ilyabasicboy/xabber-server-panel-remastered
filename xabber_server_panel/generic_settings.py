@@ -97,7 +97,7 @@ MODULES_DIR = os.path.join(BASE_DIR, 'modules')
 # ======== Ejabberd settings ============= #
 
 INSTALLATION_LOCK = os.path.join(PROJECT_ROOT, '.installation_lock')
-EJD_DIR = os.path.join(BASE_DIR, "xabberserver")
+EJD_DIR = os.path.join(BASE_DIR, "xmppserver")
 EJABBERD_DUMP = os.path.join(PROJECT_ROOT, 'utils/psql/pg.sql')
 EJABBERD_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'xmppserver/etc/ejabberd/')
 EJABBERD_MODULES_CONFIG_FILE = 'modules_config.yml'
@@ -174,8 +174,8 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-            'maxBytes': 10 * 1024 * 1024,  # 10 MB
-            'backupCount': 5,  # Number of backup files to keep
+            'maxBytes': 1024 * 1024,  # 1 MB
+            'backupCount': 10,  # Number of backup files to keep
             'formatter': 'verbose',
         },
     },
