@@ -1,7 +1,6 @@
 import os
 import subprocess
 import psycopg2
-import stat
 from psycopg2 import sql
 import json
 import string
@@ -12,7 +11,7 @@ from django.template.loader import get_template
 from django.conf import settings
 from requests.utils import certs
 
-from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config, get_dns_records
+from xabber_server_panel.base_modules.config.utils import make_xmpp_config, update_vhosts_config, get_dns_records, create_config_file
 from xabber_server_panel.base_modules.circles.models import Circle
 from xabber_server_panel.base_modules.config.models import VirtualHost, ModuleSettings, AddSettings
 from xabber_server_panel.base_modules.users.forms import UserForm
@@ -206,35 +205,19 @@ def create_config(data):
     data['CA_FILE'] = certs.where()
     data['settings'] = settings
 
-    # Create add config
+    # Add config
     if not os.path.exists(add_config):
-        if os.path.islink(add_config):
-            target_path = os.readlink(add_config)
-        else:
-            target_path = add_config
+        create_config_file(add_config)
 
-        with open(target_path, 'w') as f:
-            # Write an empty string to the file
-            f.write("")
-
-        # Combine the desired permissions
-        desired_permissions = (
-                stat.S_IRWXU |  # Owner: read, write, execute
-                stat.S_IRGRP |  # Group: read
-                stat.S_IXGRP |  # Group: execute
-                stat.S_IROTH |  # Others: read
-                stat.S_IXOTH |  # Others: execute
-                stat.S_IWOTH  # Others: write
-        )
-
-        # Change the permissions
-        os.chmod(add_config, desired_permissions)
-
+    # main config
     config_template = get_template('config/base_config.yml')
-    config_file = open(os.path.join(settings.EJABBERD_CONFIG_PATH, 'ejabberd.yml'), "w+")
-    config_file.write(config_template.render(context=data))
-    config_file.close()
+    config_path = os.path.join(settings.EJABBERD_CONFIG_PATH, 'ejabberd.yml')
+    create_config_file(config_path, config_template.render(context=data))
+
+    # vhosts config
     update_vhosts_config([data['host']])
+
+    # modules config
     make_xmpp_config()
 
 

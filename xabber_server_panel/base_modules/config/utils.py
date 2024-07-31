@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.apps import apps
 from django.urls import reverse, resolve, NoReverseMatch
-from django.db.models import Q
+import stat
 
 from xabber_server_panel.base_modules.config.models import VirtualHost, Module
 from xabber_server_panel.utils import reload_ejabberd_config, is_ejabberd_started
@@ -114,7 +114,12 @@ def make_xmpp_config():
             pass
 
     # Write the configurations to the Ejabberd configuration file
-    with open(config_path, "w") as f:
+    if os.path.islink(config_path):
+        target_path = os.readlink(config_path)
+    else:
+        target_path = config_path
+
+    with open(target_path, "w") as f:
         # Write global options to the file
         for key, value in global_options.items():
             f.write(get_value(key, value, level=0))
@@ -139,6 +144,9 @@ def make_xmpp_config():
             else:
                 f.write('  "{}":\n'.format(key) + "    modules: []\n")
 
+    # Change the permissions
+    os.chmod(target_path, desired_permissions)
+
 
 def update_vhosts_config(hosts=None):
     template = 'config/hosts_template.yml'
@@ -149,14 +157,9 @@ def update_vhosts_config(hosts=None):
     if not hosts:
         return
 
-    file = open(
-        os.path.join(
-            settings.EJABBERD_CONFIG_PATH,
-            settings.EJABBERD_VHOSTS_CONFIG_FILE
-        ), 'w+')
+    vhosts_config_path = os.path.join(settings.EJABBERD_CONFIG_PATH, settings.EJABBERD_VHOSTS_CONFIG_FILE)
     xml = render_to_string(template, {'hosts': hosts})
-    file.write(xml)
-    file.close()
+    create_config_file(vhosts_config_path, xml)
 
 
 def update_ejabberd_config():
@@ -187,6 +190,31 @@ def get_mod_disco_urls_items():
             else:
                 _add_config_items(obj.host, obj.get_items())
     return configs
+
+
+# Combine the desired permissions for config
+desired_permissions = (
+        stat.S_IRWXU |  # Owner: read, write, execute
+        stat.S_IRGRP |  # Group: read
+        stat.S_IXGRP |  # Group: execute
+        stat.S_IROTH |  # Others: read
+        stat.S_IXOTH |  # Others: execute
+        stat.S_IWOTH  # Others: write
+)
+
+
+def create_config_file(path, content=""):
+    if os.path.islink(path):
+        target_path = os.readlink(path)
+    else:
+        target_path = path
+
+    with open(target_path, 'w') as f:
+        # Write an empty string to the file
+        f.write(content)
+
+    # Change the permissions
+    os.chmod(path, desired_permissions)
 
 
 # ========== DNS REQUESTS ===============
