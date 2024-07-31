@@ -152,37 +152,39 @@
                                         </div>
                                     </div>
 
-                                    <div id="installation" class="installation-content content {% if step == '4' %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
+                                    <div id="error" class="installation-content content {% if installation_error %}active{% endif %}" role="tabpanel" aria-labelledby="installation-trigger">
                                         <div class="col-12 col-lg-8 mx-auto">
-                                            {% if installation_error %}
-                                                <div class="mb-4">
-                                                    <div class="text-danger">
-                                                        {{ installation_error }}
-                                                    </div>
-
-                                                    <div class="mt-2 alert alert-warning">
-                                                        Database installation instruction can be found <a class="alert-link" target="_blank" href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
-                                                    </div>
+                                            <div class="mb-4">
+                                                <div class="text-danger">
+                                                    {{ installation_error }}
                                                 </div>
 
-                                                <div class="mw-480 mx-auto">
-                                                    <div class="d-flex justify-content-between align-items-center mt-4">
-                                                        <button class="btn btn-secondary installation-prev" type="submit" name="previous" value="3">
-                                                            Back
-                                                        </button>
-                                                        <button class="btn btn-success ms-auto installation-next installation-final" type="submit" name="step" value="3">
-                                                            Retry
-                                                        </button>
-                                                    </div>
+                                                <div class="mt-2 alert alert-warning">
+                                                    Database installation instruction can be found <a class="alert-link" target="_blank" href="https://github.com/redsolution/xabber-server/wiki/Installation#postgresql-installation">here</a>.
                                                 </div>
-                                            {% else %}
-                                                <div class="text-center">
-                                                    <div class="spinner-border text-primary" role="status">
-                                                        <span class="visually-hidden">Loading...</span>
-                                                    </div>
-                                                    <div class="mt-3">Waiting for installation...</div>
+                                            </div>
+
+                                            <div class="mw-480 mx-auto">
+                                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                                    <button class="btn btn-secondary installation-prev" type="submit" name="previous" value="3">
+                                                        Back
+                                                    </button>
+                                                    <button class="btn btn-success ms-auto installation-next installation-final" type="submit" name="step" value="3">
+                                                        Retry
+                                                    </button>
                                                 </div>
-                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="loader" class="installation-content content" role="tabpanel" aria-labelledby="installation-trigger">
+                                        <div class="col-12 col-lg-8 mx-auto">
+                                            <div class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <div class="mt-3">Waiting for installation...</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

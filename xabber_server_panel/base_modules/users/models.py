@@ -188,6 +188,7 @@ def get_apps_choices():
         ('groups', 'Groups'),
         ('registration', 'Registration'),
         ('config', 'Settings'),
+        ('log', 'Log'),
         *[(module, module) for module in get_modules()]
     ]
     return apps

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
-from xabber_server_panel.base_modules.users.decorators import permission_admin
+from xabber_server_panel.base_modules.users.decorators import permission_admin, permission_read
 
 import os
 
@@ -13,7 +13,7 @@ class ServerLog(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'log/server_log.html'
 
-    @permission_admin
+    @permission_read
     def get(self, request, *args, **kwargs):
         try:
             self.lines = int(request.GET.get('lines', 500))
@@ -65,7 +65,7 @@ class DjangoLog(ServerStartedMixin, LoginRequiredMixin, TemplateView):
 
     template_name = 'log/django_log.html'
 
-    @permission_admin
+    @permission_read
     def get(self, request, *args, **kwargs):
         try:
             self.lines = int(request.GET.get('lines', 500))

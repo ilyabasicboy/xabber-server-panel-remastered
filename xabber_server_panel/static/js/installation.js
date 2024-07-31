@@ -15,8 +15,8 @@ $(function () {
                 $(btnNext).parents('.installation-form').find('.step').removeClass('active');
                 $(btnNext).parents('.installation-form').find('.content').removeClass('active');
 
-                $(btnNext).parents('.installation-form').find('.step[data-target="#installation"]').addClass('active');
-                $(btnNext).parents('.installation-form').find('#installation').addClass('active');
+                $(btnNext).parents('.installation-form').find('.step[data-target="#loader"]').addClass('active');
+                $(btnNext).parents('.installation-form').find('#loader').addClass('active');
             }
         }
 
