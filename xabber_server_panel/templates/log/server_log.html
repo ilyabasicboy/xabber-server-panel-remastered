@@ -36,6 +36,11 @@
                         Show log
                     </button>
                 </div>
+                <div class="me-3 mb-3 d-flex align-items-end">
+                    <a class="btn btn-primary" target="_blank" href="{% url 'log:server_log' %}?full=1{% if request.GET.file %}&file={{ request.GET.file }}{% endif %}">
+                        Download
+                    </a>
+                </div>
             </div>
         </form>
     </div>
@@ -59,12 +64,6 @@
                     <input class="form-check-input" type="radio" name="log_range" value="30" id="log_range3">
                     <label class="form-check-label" for="log_range3">30 seconds</label>
                 </div>
-            </div>
-
-            <div class="me-3 mb-3 d-flex align-items-end">
-                <a class="btn btn-primary" target="_blank" href="{% url 'log:server_log' %}?full=1{% if request.GET.file %}&file={{ request.GET.file }}{% endif %}">
-                    Full log
-                </a>
             </div>
         </div>
     </div>

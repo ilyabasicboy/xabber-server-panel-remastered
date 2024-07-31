@@ -430,7 +430,7 @@ def check_certificates():
                     except ValueError as e:
                         print(f"Error parsing certificate in file '{file}': {e}")
 
-    # Certificate.objects.exclude(name__in=certificates_info).delete()
+    Certificate.objects.exclude(name__in=certificates_info).delete()
 
 
 def validate_certificate(certificate_path):
