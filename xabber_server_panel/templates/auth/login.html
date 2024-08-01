@@ -4,7 +4,7 @@
 
 {% block body %}
     <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
-        <div class="container-fluid d-flex flex-column justify-content-start flex-grow-1 overflow-auto bg-primary bg-gradient position-relative login-page">
+        <main class="container-fluid d-flex flex-column justify-content-start flex-grow-1 overflow-auto bg-primary bg-gradient position-relative login-page scroll-custom-y">
             <a class="d-flex justify-content-center py-4 position-relative z-3" href="https://www.xabber.com/" target="_blank">
                 <img class="me-2" src="{% static 'img/logo.png' %}" width="128" height="128" alt="Xabber">
             </a>
@@ -77,6 +77,6 @@
                 <div class="login-page__wave login-page__wave--3"></div>
                 <div class="login-page__wave login-page__wave--4"></div>
             </div>
-        </div>
+        </main>
     </body>
 {% endblock %}

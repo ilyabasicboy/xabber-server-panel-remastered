@@ -4,10 +4,10 @@
 {% block content_title %}Xabber server have successfully installed{% endblock %}
 
 {% block body %}
-    <body class="d-flex flex-column min-vh-100 vh-100 bg-body bg-opacity-75">
-        <div class="container flex-md-grow-1">
+    <body class="d-flex flex-column min-vh-100 vh-100 bg-body bg-opacity-75 scroll-custom-y">
+        <main class="container flex-md-grow-1">
             <div class="row h-100">
-                <main class="px-md-4 py-4">
+                <div class="px-md-4 py-4">
                     <div class="d-flex align-items-center my-4 fs-4 text-success">
                         <img src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
                         Xabber server has been successfully installed
@@ -22,8 +22,8 @@
                             Go to the management console
                         </a>
                     </div>
-                </main>
+                </div>
             </div>
-        </div>
+        </main>
     </body>
 {% endblock %}

@@ -41,8 +41,8 @@
         {% check_user_permissions 'config' as settings_read_permissions %}
         {% check_user_permissions 'log' as log_read_permissions %}
 
-        <body class="d-flex flex-column overflow-hidden min-vh-100 vh-100 bg-body bg-opacity-75">
-            <header class="navbar d-flex flex-wrap flex-md-nowrap justify-content-start flex-grow-0 flex-shrink-1 sticky-top bg-dark shadow pe-3 ps-3 ps-md-0">
+        <body class="body d-flex flex-column overflow-hidden vh-md-100 bg-body bg-opacity-75">
+            <header class="header navbar d-flex flex-wrap flex-md-nowrap justify-content-start flex-grow-0 flex-shrink-1 fixed-top bg-dark shadow pe-3 ps-3 ps-md-0">
                 <a class="navbar-brand d-flex align-items-center col-md-3 col-xl-2 fs-4 text-white p-0 me-2 me-md-4" href="{% url 'home' %}">
                     <img src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
                     <span class="d-none d-md-block ms-2 fs-4">Xabber</span>
@@ -147,9 +147,9 @@
                 </ul>
             </header>
 
-            <div class="container-fluid flex-md-grow-1 overflow-auto">
-                <div class="row h-100">
-                    <div class="offcanvas-md offcanvas-end col-md-3 col-xl-2 p-0 p-md-3 text-bg-dark bg-dark shadow" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <main class="main h-100 container-fluid">
+                <div class="h-100 row">
+                    <div class="sidebar h-100 overflow-hidden overflow-y-auto scroll-custom-y offcanvas-md offcanvas-end col-md-3 col-xl-2 p-0 p-md-3 text-bg-dark bg-dark shadow" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
                         <div class="offcanvas-header" data-bs-theme="dark">
                             <a class="navbar-brand d-flex align-items-center fs-4 p-0" href="/" id="sidebarMenuLabel">
                                 <img class="me-2" src="{% static 'img/logo.png' %}" width="48" height="48" alt="Xabber">
@@ -158,7 +158,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
                         </div>
 
-                        <div class="offcanvas-body d-flex flex-column h-100 pt-md-3 overflow-y-auto" data-bs-theme="dark">
+                        <div class="mhp-100 offcanvas-body d-flex flex-column pt-md-3 overflow-hidden" data-bs-theme="dark">
                             <div class="flex-column mb-auto">
                                 {% include 'parts/left_menu.html' %}
                             </div>
@@ -175,8 +175,8 @@
                         </div>
                     </div>
 
-                    <main class="col-md-9 col-xl-10 overflow-hidden ms-sm-auto px-md-4 py-4">
-                        <div class="container-xxl p-0">
+                    <div class="content h-100 col-md-9 col-xl-10 overflow-hidden overflow-y-auto scroll-custom-y ms-sm-auto px-md-4 py-4">
+                        <div class="mhp-100 container-xxl p-0 d-flex flex-column">
                             {% block messages %}
                                 {% get_messages as messages %}
                                 {% if messages %}
@@ -284,9 +284,9 @@
                                 </div>
                             {% endblock %}
                         </div>
-                    </main>
+                    </div>
                 </div>
-            </div>
+            </main>
         </body>
     {% endblock %}
 
