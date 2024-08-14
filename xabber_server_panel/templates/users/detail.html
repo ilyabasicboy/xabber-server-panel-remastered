@@ -74,7 +74,7 @@
                             </select>
                         </div>
 
-                        <div class="collapse mt-3 {% if user.status == 'BLOCKED' %}show{% endif %}">
+                        <div class="collapse mt-3 {% if user.status == 'BLOCKED' or user.status == 'EXPIRED' %}show{% endif %}">
                             <div>
                                 <label class="form-label">Reason for blocking:</label>
                                 <textarea class="form-control" name="reason" cols="30" rows="6" placeholder="Reason for blocking" {% if not users_write_permissions %}disabled{% endif %}>{{ user.reason|default:'' }}</textarea>
