@@ -1,5 +1,4 @@
 from django.urls import path, include
-from django.contrib import admin
 
 from xabber_server_panel.views import HomePage, Search, Root, Suggestions, UpdatePanel
 from xabber_server_panel.base_modules.config.utils import get_modules

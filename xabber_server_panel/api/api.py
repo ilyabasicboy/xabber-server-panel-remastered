@@ -139,17 +139,6 @@ class EjabberdAPI(object):
         self._call_method('post', '/revoke_token', data=data)
         return self.response
 
-    def request_token(self, username, ip, browser):
-        data = {
-            "jid": username,
-            "ip": ip,
-            "browser": browser,
-            "scopes": settings.EJABBERD_API_SCOPES,
-            "ttl": settings.EJABBERD_API_TOKEN_TTL
-        }
-        self._call_method('post', '/issue_token', data=data)
-        return self.response
-
     def get_vhosts(self, data={}):
 
         """ Get Virtual host list """

@@ -39,7 +39,6 @@ class CustomAuthenticationForm(forms.Form):
     def clean(self):
         super(CustomAuthenticationForm, self).clean()
         self.user = authenticate(
-            request=self.request,
             username=self.cleaned_data['username'],
             password=self.cleaned_data['password']
         )
@@ -88,7 +87,6 @@ class ApiAuthenticationForm(forms.Form):
 
     def after_clean(self):
         self.user = authenticate(
-            request=self.request,
             username=self.cleaned_data['username'],
             password=self.cleaned_data['password'],
             check_password=False
